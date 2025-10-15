@@ -103,6 +103,8 @@ hospital_meds = {
 rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
 
 st.sidebar.header("🏥 Navigation")
+if "room" not in st.session_state or st.session_state.room not in ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]:
+    st.session_state.room = "ER"
 st.session_state.room = st.sidebar.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
 
 st.sidebar.write("---")
