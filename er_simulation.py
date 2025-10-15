@@ -166,7 +166,11 @@ def perform_diagnostics(patient):
                 result += " Results confirm clinical suspicion."
                 st.session_state.score += 10
             else:
-                result += " Results incon
+                result += " Results inconclusive."
+            st.session_state.test_results = result
+            st.session_state.treatment_history.append(result)
+            st.success(result)
+
 
 
 
