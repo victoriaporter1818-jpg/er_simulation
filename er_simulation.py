@@ -411,4 +411,30 @@ with right:
     st.info(st.session_state.room)
 
     st.write("---")
-    st.header("Action
+ # Right column: Info and history
+with right:
+    st.header("Current Room")
+    st.info(st.session_state.room)
+
+    st.write("---")
+    st.header("Action Log")
+    if st.session_state.history:
+        for line in st.session_state.history[:15]:
+            st.write(line)
+    else:
+        st.write("No actions yet.")
+
+    st.write("---")
+    st.header("Performance")
+    st.write(f"Score: {st.session_state.score}")
+
+    st.write("---")
+    st.header("Quick patient snapshot")
+    if st.session_state.patient:
+        p = st.session_state.patient
+        st.write(f"Name: {p['name']}")
+        st.write(f"Symptoms: {p['symptoms']}")
+        st.write("Diagnosis (hidden until doctor confirms)")
+    else:
+        st.write("No active patient.")
+
