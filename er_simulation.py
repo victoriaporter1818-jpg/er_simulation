@@ -14,11 +14,11 @@ role = st.selectbox("Select your role:", ["-- Choose --", "Nurse", "Doctor", "Su
 if role == "-- Choose --":
   st.info("👋 Welcome! Please select a role to begin your shift.")
 elif role == "Nurse":
-st.success("🩺 You’re on triage duty. Take vitals, record patient history, and administer meds.")
+  st.success("🩺 You’re on triage duty. Take vitals, record patient history, and administer meds.")
 elif role == "Doctor":
-st.success("⚕️ You’ll be diagnosing and performing minor procedures like biopsies or intubation.")
+  st.success("⚕️ You’ll be diagnosing and performing minor procedures like biopsies or intubation.")
 elif role == "Surgeon":
-st.success("🔪 You’re scheduled for major procedures, including transplants and trauma surgeries.")
+  st.success("🔪 You’re scheduled for major procedures, including transplants and trauma surgeries.")
 
 st.write("---")
 st.write("🚑 Patients will begin arriving soon...")
