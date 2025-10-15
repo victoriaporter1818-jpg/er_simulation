@@ -200,8 +200,25 @@ with left:
                     st.info(f"ℹ️ You already have {item}.")
             with st.expander(item):
                 st.caption(desc)
+                
+# MEDSTATION
+elif st.session_state.room == "Medstation":
+    st.subheader("💉 Emergency Medstation")
+    st.write("Dispense emergency and critical-care medications.")
 
-# PHARMACY
+    for med, desc in medstation_meds.items():
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            with st.expander(med):
+                st.caption(desc)
+        with col2:
+            if st.button(f"Dispense {med}", key=f"dispense_{med}"):
+                if med not in st.session_state.inventory:
+                    st.session_state.inventory.append(med)
+                    st.success(f"✅ {med} added to your inventory.")
+                else:
+                    st.info(f"ℹ️ You already have {med}.")
+
 elif st.session_state.room == "Pharmacy":
     st.subheader("🏪 Hospital Pharmacy")
     st.write("Access long-term and prescription medications for patients.")
