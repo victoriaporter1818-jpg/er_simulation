@@ -115,7 +115,10 @@ if st.session_state.inventory:
     if st.sidebar.button("🗑️ Clear Inventory"):
         st.session_state.inventory = []
         st.session_state.success_message = "Inventory cleared."
-        st.experimental_rerun()
+       if st.sidebar.button("🗑️ Clear Inventory"):
+    st.session_state.inventory = []
+    st.sidebar.success("🗑️ Inventory cleared!")
+
 else:
     st.sidebar.info("Your inventory is empty.")
 
