@@ -112,10 +112,10 @@ st.sidebar.subheader("🎒 Inventory")
 if st.session_state.inventory:
     for item in st.session_state.inventory:
         st.sidebar.write(f"- {item}")
-    if st.sidebar.button("🗑️ Clear Inventory"):
+if st.sidebar.button("🗑️ Clear Inventory"):
         st.session_state.inventory = []
         st.session_state.success_message = "Inventory cleared."
-       if st.sidebar.button("🗑️ Clear Inventory"):
+if st.sidebar.button("🗑️ Clear Inventory"):
     st.session_state.inventory = []
     st.sidebar.success("🗑️ Inventory cleared!")
 
