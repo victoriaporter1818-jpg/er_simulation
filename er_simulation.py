@@ -273,6 +273,26 @@ with left:
             st.write(f"**Symptoms:** {p['symptoms']}")
             st.write("---")
 
+                    # -------------------------
+        # Medical History Questionnaire
+        # -------------------------
+        st.subheader("📝 Medical History")
+        with st.form("medical_history_form"):
+            chronic_conditions = st.multiselect(
+                "Select chronic conditions the patient has:",
+                ["Diabetes", "Hypertension", "Asthma", "Heart Disease", "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"]
+            )
+            allergies = st.text_input("List any known allergies (comma separated):")
+            medications_taken = st.text_area("Current medications the patient is taking:")
+            family_history = st.text_area("Relevant family medical history:")
+
+            submitted = st.form_submit_button("Save Medical History")
+            if submitted:
+                st.session_state.treatment_history.append(
+                    f"Medical history recorded: Chronic conditions={chronic_conditions}, Allergies={allergies}, Medications={medications_taken}, Family history={family_history}"
+                )
+                st.success("✅ Medical history saved.")
+
             # Allow diagnostics for doctor/radiologist
             if role in ["Doctor", "Radiologist"]:
                 perform_diagnostics(p)
