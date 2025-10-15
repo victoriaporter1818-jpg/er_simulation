@@ -335,7 +335,7 @@ with left:
                     # -------------------------
         # Medical History Questionnaire
         # -------------------------
-        st.subheader("📝 Medical History")
+    st.subheader("📝 Medical History")
         with st.form("medical_history_form"):
             chronic_conditions = st.multiselect(
                 "Select chronic conditions the patient has:",
