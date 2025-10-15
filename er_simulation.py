@@ -145,7 +145,7 @@ with left:
 
 # SUPPLY ROOM
 if st.session_state.room == "Supply Room":
-for item, desc in hospital_supplies.items():
+  for item, desc in hospital_supplies.items():
 if st.button(f"Collect {item}"):
 if item not in st.session_state.inventory:
   st.session_state.inventory.append(item)
