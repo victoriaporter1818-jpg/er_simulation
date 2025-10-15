@@ -100,7 +100,7 @@ hospital_meds = {
 # --------------------------------------
 # ROOM NAVIGATION + INVENTORY
 # --------------------------------------
-rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy", "Nursing Station"]
+rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
 
 st.sidebar.header("🏥 Navigation")
 st.session_state.room = st.sidebar.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
