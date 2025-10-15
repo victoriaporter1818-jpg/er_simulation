@@ -2,6 +2,11 @@ import streamlit as st
 import random
 
 # --------------------------------------
+# STREAMLIT SETUP
+# --------------------------------------
+st.set_page_config(page_title="AI Emergency Room Simulation", layout="wide")
+
+# --------------------------------------
 # INITIAL SESSION STATE
 # --------------------------------------
 if "inventory" not in st.session_state:
@@ -16,47 +21,6 @@ if "treatment_history" not in st.session_state:
     st.session_state.treatment_history = []
 if "test_results" not in st.session_state:
     st.session_state.test_results = None
-
-# --------------------------------------
-# ROOM SELECTION
-# --------------------------------------
-rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
-
-st.sidebar.header("🏥 Navigation")
-if st.session_state.room not in rooms:
-    st.session_state.room = "ER"
-st.session_state.room = st.sidebar.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
-
-# --------------------------------------
-# ER-SPECIFIC INTRODUCTION & DIFFICULTY
-# --------------------------------------
-if st.session_state.room == "ER":
-    st.title("🏥 AI Emergency Room Simulation - Hospital Expansion")
-    st.subheader("Choose your role, diagnose patients, perform procedures, and manage care.")
-    st.write("---")
-
-    difficulty = st.radio("Select Difficulty Level:", ["Beginner", "Intermediate", "Expert"])
-    difficulty_multiplier = {"Beginner": 1, "Intermediate": 1.5, "Expert": 2}[difficulty]
-    st.write("---")
-
-# --------------------------------------
-# ROLE SELECTION
-# --------------------------------------
-roles = ["-- Choose --", "Nurse", "Doctor", "Surgeon", "Radiologist", "Pharmacist"]
-role = st.selectbox("Select your role:", roles)
-
-role_descriptions = {
-    "Nurse": "🩺 You’re on triage duty. Take vitals, record patient history, and provide initial care.",
-    "Doctor": "⚕️ Diagnose patients, order tests, and prescribe medications.",
-    "Surgeon": "🔪 Perform critical surgical procedures in the OR.",
-    "Radiologist": "🩻 Perform and interpret diagnostic imaging such as CT, MRI, and X-rays.",
-    "Pharmacist": "💊 Verify prescriptions and dispense correct medications to patients."
-}
-
-if role == "-- Choose --":
-    st.info("👋 Welcome! Please select a role to begin your shift.")
-else:
-    st.success(role_descriptions[role])
 
 # --------------------------------------
 # PATIENT DATABASE
@@ -114,8 +78,14 @@ pharmacy_meds = {
 }
 
 # --------------------------------------
-# SIDEBAR INVENTORY
+# ROOM NAVIGATION + INVENTORY
 # --------------------------------------
+rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
+st.sidebar.header("🏥 Navigation")
+if st.session_state.room not in rooms:
+    st.session_state.room = "ER"
+st.session_state.room = st.sidebar.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
+
 st.sidebar.write("---")
 st.sidebar.subheader("📦 Current Inventory")
 if st.session_state.inventory:
@@ -123,13 +93,12 @@ if st.session_state.inventory:
         st.sidebar.write(f"- {i}")
 else:
     st.sidebar.info("Inventory is empty.")
-
 if st.sidebar.button("🗑️ Clear Inventory"):
     st.session_state.inventory = []
     st.sidebar.warning("Inventory cleared.")
 
 # --------------------------------------
-# DIAGNOSTIC FUNCTION
+# DIAGNOSTIC SYSTEM
 # --------------------------------------
 def perform_diagnostics(patient):
     st.subheader("🧪 Order Diagnostic Tests")
@@ -170,6 +139,42 @@ def perform_diagnostics(patient):
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
+
+# --------------------------------------
+# MAIN INTERFACE
+# --------------------------------------
+left, right = st.columns([2, 1])
+
+with left:
+    # -----------------------------
+    # ER INTRO + PATIENT SECTION (ONLY in ER)
+    # -----------------------------
+    if st.session_state.room == "ER":
+        st.title("🏥 AI Emergency Room Simulation - Hospital Expansion")
+        st.subheader("Choose your role, diagnose patients, perform procedures, and manage care.")
+        st.write("---")
+        difficulty = st.radio("Select Difficulty Level:", ["Beginner", "Intermediate", "Expert"])
+        difficulty_multiplier = {"Beginner": 1, "Intermediate": 1.5, "Expert": 2}[difficulty]
+        st.write("---")
+
+    # -----------------------------
+    # ROOM LOGIC
+    # -----------------------------
+    if st.session_state.room == "Supply Room":
+        st.subheader("🧰 Hospital Supply Room")
+        for item, desc in hospital_supplies.items():
+            if st.button(f"Collect {item}"):
+                if item not in st.session_state.inventory:
+                    st.session_state.inventory.append(item)
+                    st.success(f"✅ {item} added to inventory.")
+                else:
+                    st.info(f"ℹ️ You already have {item}.")
+            with st.expander(item):
+                st.caption(desc)
+
+    elif st.session_state.room == "Medstation":
+        st.subheader("
+
 
 
 
