@@ -536,12 +536,15 @@ else:
     st.info("Your inventory is empty. Visit the Supply Room or Medstation to gather items.")
 
 # --------------------------------------
-# PATIENT TREATMENT LOGIC + SCORING
+# PATIENT TREATMENT LOGIC + SCORING (HIDDEN ANSWERS)
 # --------------------------------------
 
-# Initialize score if missing
 if "score" not in st.session_state:
     st.session_state.score = 0
+if "treatment_feedback" not in st.session_state:
+    st.session_state.treatment_feedback = None
+if "treatment_history" not in st.session_state:
+    st.session_state.treatment_history = []
 
 # Define correct treatments for each diagnosis
 treatment_protocols = {
@@ -588,9 +591,19 @@ if st.session_state.get("patient"):
     st.write("---")
     st.header("💊 Treat the Patient")
 
-    # Treatment selection dropdown
+    # Reset feedback on new patient
+    if st.button("🧍 New patient - clear feedback"):
+        st.session_state.treatment_feedback = None
+        st.session_state.treatment_history = []
+
+    # Treatment selection
     if st.session_state.inventory:
-        selected_item = st.selectbox("Select an item from your inventory to use:", st.session_state.inventory)
+        selected_item = st.selectbox(
+            "Select an item from your inventory to use:",
+            st.session_state.inventory,
+            key="treatment_select"
+        )
+
         if st.button("🩹 Use Selected Item"):
             diagnosis = p.get("diagnosis", "Unknown")
             protocol = treatment_protocols.get(diagnosis, {})
@@ -599,27 +612,42 @@ if st.session_state.get("patient"):
             harmful = protocol.get("harmful", [])
 
             if selected_item in correct:
-                st.success(f"✅ You used {selected_item}. Correct treatment for {diagnosis}!")
                 st.session_state.score += 10
-                feedback = "The patient’s condition improves."
+                feedback = f"✅ You used {selected_item}. That was an appropriate choice for this case!"
+                color = "success"
             elif selected_item in neutral:
-                st.info(f"😐 {selected_item} had little to no effect on {diagnosis}.")
                 st.session_state.score += 0
-                feedback = "No significant change in condition."
+                feedback = f"😐 You used {selected_item}. It didn’t cause harm, but it didn’t help either."
+                color = "info"
             elif selected_item in harmful:
-                st.error(f"❌ {selected_item} was an inappropriate choice for {diagnosis}.")
                 st.session_state.score -= 10
-                feedback = "Patient stability worsened."
+                feedback = f"❌ You used {selected_item}. That made the patient worse!"
+                color = "error"
             else:
-                st.warning(f"⚠️ {selected_item} has no known effect for {diagnosis}.")
                 st.session_state.score -= 2
-                feedback = "Unnecessary treatment administered."
+                feedback = f"⚠️ {selected_item} has no known effect for this condition."
+                color = "warning"
 
-            # Log the result
-            st.write(feedback)
-            st.write(f"**Current Score:** {st.session_state.score}")
+            # Save feedback + history
+            st.session_state.treatment_feedback = (feedback, color)
+            st.session_state.treatment_history.append(
+                f"{selected_item} used → {feedback.split('.')[0]}"
+            )
 
-            # Optionally remove item (uncomment below line if you want one-time use)
+            # Optional: remove used item
             # st.session_state.inventory.remove(selected_item)
+
     else:
         st.info("Your inventory is empty. Visit the Supply Room or Medstation first.")
+
+    # Show results only *after* a choice has been made
+    if st.session_state.treatment_feedback:
+        feedback, color = st.session_state.treatment_feedback
+        getattr(st, color)(feedback)
+        st.write(f"**Current Score:** {st.session_state.score}")
+
+        with st.expander("📋 Treatment History"):
+            for line in st.session_state.treatment_history[-10:]:
+                st.write(line)
+else:
+    st.info("No active patient. Receive one first to begin treatment.")
