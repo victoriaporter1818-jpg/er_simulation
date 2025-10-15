@@ -184,11 +184,10 @@ left, right = st.columns([2, 1])
 with left:
     st.header("🏥 Main Actions")
 
-       # --------------------------------------
+    # -----------------------------
     # ROOM LOGIC AND ACTIONS
-    # --------------------------------------
+    # -----------------------------
 
-    # SUPPLY ROOM
     if st.session_state.room == "Supply Room":
         st.subheader("🧰 Hospital Supply Room")
         for item, desc in hospital_supplies.items():
@@ -200,49 +199,42 @@ with left:
                     st.info(f"ℹ️ You already have {item}.")
             with st.expander(item):
                 st.caption(desc)
-                
-# MEDSTATION
-elif st.session_state.room == "Medstation":
-    st.subheader("💉 Emergency Medstation")
-    st.write("Dispense emergency and critical-care medications.")
 
-    for med, desc in medstation_meds.items():
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            with st.expander(med):
-                st.caption(desc)
-        with col2:
-            if st.button(f"Dispense {med}", key=f"dispense_{med}"):
-                if med not in st.session_state.inventory:
-                    st.session_state.inventory.append(med)
-                    st.success(f"✅ {med} added to your inventory.")
-                else:
-                    st.info(f"ℹ️ You already have {med}.")
-                    
-# PHARMACY
+    elif st.session_state.room == "Medstation":
+        st.subheader("💉 Emergency Medstation")
+        st.write("Dispense emergency and critical-care medications.")
+        for med, desc in medstation_meds.items():
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                with st.expander(med):
+                    st.caption(desc)
+            with col2:
+                if st.button(f"Dispense {med}", key=f"dispense_{med}"):
+                    if med not in st.session_state.inventory:
+                        st.session_state.inventory.append(med)
+                        st.success(f"✅ {med} added to your inventory.")
+                    else:
+                        st.info(f"ℹ️ You already have {med}.")
 
-elif st.session_state.room == "Pharmacy":
-    st.subheader("🏪 Hospital Pharmacy")
-    st.write("Access long-term and prescription medications for patients.")
+    elif st.session_state.room == "Pharmacy":
+        st.subheader("🏪 Hospital Pharmacy")
+        st.write("Access long-term and prescription medications for patients.")
+        for med, desc in pharmacy_meds.items():
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                with st.expander(med):
+                    st.caption(desc)
+            with col2:
+                if st.button(f"Dispense {med}", key=f"pharmacy_{med}"):
+                    if role == "Pharmacist":
+                        st.session_state.score += 5
+                        st.success(f"💊 Correctly dispensed {med}. +5 points!")
+                    if med not in st.session_state.inventory:
+                        st.session_state.inventory.append(med)
+                        st.info(f"{med} added to your inventory.")
+                    else:
+                        st.warning(f"You already have {med}.")
 
-    for med, desc in pharmacy_meds.items():
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            with st.expander(med):
-                st.caption(desc)
-        with col2:
-            if st.button(f"Dispense {med}", key=f"pharmacy_{med}"):
-                if role == "Pharmacist":
-                    st.session_state.score += 5
-                    st.success(f"💊 Correctly dispensed {med}. +5 points!")
-                if med not in st.session_state.inventory:
-                    st.session_state.inventory.append(med)
-                    st.info(f"{med} added to your inventory.")
-                else:
-                    st.warning(f"You already have {med}.")
-
-
-    # RADIOLOGY LAB
     elif st.session_state.room == "Radiology Lab":
         st.subheader("🩻 Radiology Lab")
         if role != "Radiologist":
@@ -252,7 +244,6 @@ elif st.session_state.room == "Pharmacy":
         else:
             st.info("No patient available for imaging tests. Return to ER to receive one.")
 
-    # OPERATING ROOM
     elif st.session_state.room == "Operating Room":
         st.subheader("🔪 Operating Room")
         if role != "Surgeon":
@@ -270,7 +261,6 @@ elif st.session_state.room == "Pharmacy":
             st.success("Surgery completed successfully!")
             st.session_state.score += 15
 
-    # ER ROOM
     elif st.session_state.room == "ER":
         if st.button("🚨 Receive Next Patient"):
             st.session_state.patient = random.choice(patients)
@@ -286,6 +276,7 @@ elif st.session_state.room == "Pharmacy":
             # Allow diagnostics for doctor/radiologist
             if role in ["Doctor", "Radiologist"]:
                 perform_diagnostics(p)
+
 
 
 with right:
