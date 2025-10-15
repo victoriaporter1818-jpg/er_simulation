@@ -201,19 +201,27 @@ with left:
             with st.expander(item):
                 st.caption(desc)
 
-    # MEDSTATION / PHARMACY
-    elif st.session_state.room in ["Medstation", "Pharmacy"]:
-        st.subheader("💊 Medication Handling")
-        for med, desc in hospital_meds.items():
-            if st.button(f"Dispense {med}"):
+# PHARMACY
+elif st.session_state.room == "Pharmacy":
+    st.subheader("🏪 Hospital Pharmacy")
+    st.write("Access long-term and prescription medications for patients.")
+
+    for med, desc in pharmacy_meds.items():
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            with st.expander(med):
+                st.caption(desc)
+        with col2:
+            if st.button(f"Dispense {med}", key=f"pharmacy_{med}"):
                 if role == "Pharmacist":
                     st.session_state.score += 5
-                    st.success(f"💊 You dispensed {med} correctly.")
+                    st.success(f"💊 Correctly dispensed {med}. +5 points!")
                 if med not in st.session_state.inventory:
                     st.session_state.inventory.append(med)
                     st.info(f"{med} added to your inventory.")
-            with st.expander(med):
-                st.caption(desc)
+                else:
+                    st.warning(f"You already have {med}.")
+
 
     # RADIOLOGY LAB
     elif st.session_state.room == "Radiology Lab":
