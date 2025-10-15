@@ -170,7 +170,67 @@ left, right = st.columns([2, 1])
 with left:
     st.header("🏥 Main Actions")
 
-    if st.session_state.room == "ER":
+       # --------------------------------------
+    # ROOM LOGIC AND ACTIONS
+    # --------------------------------------
+
+    # SUPPLY ROOM
+    if st.session_state.room == "Supply Room":
+        st.subheader("🧰 Hospital Supply Room")
+        for item, desc in hospital_supplies.items():
+            if st.button(f"Collect {item}"):
+                if item not in st.session_state.inventory:
+                    st.session_state.inventory.append(item)
+                    st.success(f"✅ {item} added to inventory.")
+                else:
+                    st.info(f"ℹ️ You already have {item}.")
+            with st.expander(item):
+                st.caption(desc)
+
+    # MEDSTATION / PHARMACY
+    elif st.session_state.room in ["Medstation", "Pharmacy"]:
+        st.subheader("💊 Medication Handling")
+        for med, desc in hospital_meds.items():
+            if st.button(f"Dispense {med}"):
+                if role == "Pharmacist":
+                    st.session_state.score += 5
+                    st.success(f"💊 You dispensed {med} correctly.")
+                if med not in st.session_state.inventory:
+                    st.session_state.inventory.append(med)
+                    st.info(f"{med} added to your inventory.")
+            with st.expander(med):
+                st.caption(desc)
+
+    # RADIOLOGY LAB
+    elif st.session_state.room == "Radiology Lab":
+        st.subheader("🩻 Radiology Lab")
+        if role != "Radiologist":
+            st.warning("Only Radiologists can perform imaging tests.")
+        elif st.session_state.patient:
+            perform_diagnostics(st.session_state.patient)
+        else:
+            st.info("No patient available for imaging tests. Return to ER to receive one.")
+
+    # OPERATING ROOM
+    elif st.session_state.room == "Operating Room":
+        st.subheader("🔪 Operating Room")
+        if role != "Surgeon":
+            st.warning("Only Surgeons can perform operations.")
+        elif st.button("Start Surgery"):
+            steps = [
+                "Sterilize area",
+                "Administer anesthesia",
+                "Make incision",
+                "Repair or remove organ",
+                "Close incision"
+            ]
+            for step in steps:
+                st.write(f"✅ {step}")
+            st.success("Surgery completed successfully!")
+            st.session_state.score += 15
+
+    # ER ROOM
+    elif st.session_state.room == "ER":
         if st.button("🚨 Receive Next Patient"):
             st.session_state.patient = random.choice(patients)
             st.session_state.treatment_history = []
@@ -181,8 +241,11 @@ with left:
             st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
             st.write(f"**Symptoms:** {p['symptoms']}")
             st.write("---")
+
+            # Allow diagnostics for doctor/radiologist
             if role in ["Doctor", "Radiologist"]:
                 perform_diagnostics(p)
+
 
 with right:
     st.header("🩺 Patient Vitals & Logs")
