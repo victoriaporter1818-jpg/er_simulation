@@ -12,7 +12,7 @@ st.subheader("Choose your role and interact with dynamic patient cases.")
 role = st.selectbox("Select your role:", ["-- Choose --", "Nurse", "Doctor", "Surgeon"])
 
 if role == "-- Choose --":
-st.info("👋 Welcome! Please select a role to begin your shift.")
+  st.info("👋 Welcome! Please select a role to begin your shift.")
 elif role == "Nurse":
 st.success("🩺 You’re on triage duty. Take vitals, record patient history, and administer meds.")
 elif role == "Doctor":
