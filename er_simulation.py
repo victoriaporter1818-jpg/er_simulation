@@ -99,14 +99,14 @@ medstation_meds = {
 }
 
 pharmacy_meds = {
-    "Oral Antibiotics": "Treat common bacterial infections (e.g., amoxicillin, doxycycline).",
-    "Antifungals": "Treat fungal infections (e.g., fluconazole, clotrimazole).",
+    "Oral Antibiotics": "Treat common bacterial infections.",
+    "Antifungals": "Treat fungal infections.",
     "Inhalers": "Used for asthma and COPD symptom relief.",
-    "Antidepressants": "Used to treat mood disorders (SSRIs, SNRIs, etc.).",
-    "Cholesterol Meds (Statins)": "Lower LDL cholesterol and prevent heart disease.",
-    "Blood Thinners (Warfarin, Heparin)": "Prevent blood clots and strokes.",
+    "Antidepressants": "Used to treat mood disorders.",
+    "Cholesterol Meds (Statins)": "Lower LDL cholesterol.",
+    "Blood Thinners": "Prevent blood clots and strokes.",
     "Antihypertensives": "Used to control high blood pressure.",
-    "Steroids": "Used to reduce inflammation (e.g., prednisone)."
+    "Steroids": "Used to reduce inflammation."
 }
 
 # --------------------------------------
@@ -159,7 +159,6 @@ def perform_diagnostics(patient):
                 else:
                     result += "No significant findings."
 
-                # Save results to session_state for this patient
                 st.session_state.test_results = result
                 st.session_state.treatment_history.append(result)
                 st.success(result)
@@ -182,9 +181,7 @@ def perform_diagnostics(patient):
                 else:
                     result += "Results inconclusive."
 
-                st.session_state.test_results = result
-                st.session_state.treatment_history.append(result)
-                st.success(result)
+                st.session_state.test
 
 
 # --------------------------------------
