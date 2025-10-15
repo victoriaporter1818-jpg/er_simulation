@@ -126,7 +126,87 @@ def perform_diagnostics(patient):
     test_type = st.radio("Select Test Type:", ["Imaging", "Lab Test"])
     if test_type == "Imaging":
         imaging_types = ["X-Ray", "CT Scan", "MRI", "Ultrasound"]
-        body_parts = ["Chest", "Abdomen", "Head/Brain", "L]()_
+        body_parts = ["Chest", "Abdomen", "Head/Brain", "Limb", "Neck", "Pelvis"]
+        chosen_imaging = st.selectbox("Select Imaging Type:", imaging_types)
+        chosen_body_part = st.selectbox("Select Body Part:", body_parts)
+        if st.button("📸 Perform Imaging"):
+            result = f"{chosen_imaging} of {chosen_body_part} performed. "
+            dx = patient["diagnosis"]
+            if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
+               (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
+               (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen"):
+                result += "Findings consistent with suspected diagnosis."
+                st.session_state.score += 10
+            else:
+                result += "No significant findings."
+            st.session_state.test_results = result
+            st.session_state.treatment_history.append(result)
+            st.success(result)
+
+    elif test_type == "Lab Test":
+        lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
+        chosen_test = st.selectbox("Select Diagnostic Test:", lab_tests)
+        if st.button("🧬 Perform Test"):
+            result = f"{chosen_test} completed. "
+            dx = patient["diagnosis"]
+            if (dx == "Heart attack" and chosen_test == "EKG") or \
+               (dx == "Seizure" and chosen_test == "EEG") or \
+               (dx == "Pneumonia" and chosen_test == "CBC"):
+                result += "Results confirm clinical suspicion."
+                st.session_state.score += 10
+            else:
+                result += "Results inconclusive."
+            st.session_state.test_results = result
+            st.session_state.treatment_history.append(result)
+            st.success(result)
+
+# --------------------------------------
+# MAIN INTERFACE
+# --------------------------------------
+left, right = st.columns([2, 1])
+
+with left:
+    st.header("🏥 Main Actions")
+
+    if st.session_state.room == "ER":
+        if st.button("🚨 Receive Next Patient"):
+            st.session_state.patient = random.choice(patients)
+            st.session_state.treatment_history = []
+            st.session_state.test_results = None
+
+        if st.session_state.patient:
+            p = st.session_state.patient
+            st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
+            st.write(f"**Symptoms:** {p['symptoms']}")
+            st.write("---")
+            if role in ["Doctor", "Radiologist"]:
+                perform_diagnostics(p)
+
+with right:
+    st.header("🩺 Patient Vitals & Logs")
+
+    if st.session_state.patient:
+        p = st.session_state.patient
+        st.subheader(f"{p['name']} - Vitals")
+        for k, v in p['vitals'].items():
+            st.write(f"**{k}:** {v}")
+    else:
+        st.info("No active patient.")
+
+    if st.session_state.test_results:
+        st.write("---")
+        st.subheader("🧠 Test Results")
+        st.info(st.session_state.test_results)
+
+    st.write("---")
+    st.subheader("📋 Action Log")
+    for line in reversed(st.session_state.treatment_history[-10:]):
+        st.write(line)
+
+    st.write("---")
+    st.subheader("🏆 Score")
+    st.metric("Total Score", st.session_state.score)
+
 
 
 
