@@ -273,6 +273,65 @@ with left:
             st.write(f"**Symptoms:** {p['symptoms']}")
             st.write("---")
 
+    # Pre-fill based on patient diagnosis
+    default_history = {
+        "Heart attack": {
+            "chronic_conditions": ["Heart Disease", "Hypertension"],
+            "allergies": "None",
+            "medications": "Aspirin, Statins",
+            "family_history": "Father had heart disease"
+        },
+        "Pneumonia": {
+            "chronic_conditions": ["Asthma"],
+            "allergies": "Penicillin",
+            "medications": "Albuterol",
+            "family_history": "No significant history"
+        },
+        "Stroke": {
+            "chronic_conditions": ["Hypertension", "Diabetes"],
+            "allergies": "None",
+            "medications": "Blood thinners",
+            "family_history": "Mother had stroke"
+        },
+        "Appendicitis": {
+            "chronic_conditions": [],
+            "allergies": "None",
+            "medications": "None",
+            "family_history": "No significant history"
+        },
+        "Seizure": {
+            "chronic_conditions": ["Seizure Disorder"],
+            "allergies": "None",
+            "medications": "Diazepam",
+            "family_history": "Brother has epilepsy"
+        },
+        "Anaphylaxis": {
+            "chronic_conditions": ["Asthma"],
+            "allergies": "Peanuts",
+            "medications": "Inhaler",
+            "family_history": "No significant history"
+        },
+        "Diabetic Crisis": {
+            "chronic_conditions": ["Diabetes"],
+            "allergies": "None",
+            "medications": "Insulin",
+            "family_history": "Mother has diabetes"
+        }
+    }
+
+    history = default_history.get(p["diagnosis"], {
+        "chronic_conditions": [],
+        "allergies": "",
+        "medications": "",
+        "family_history": ""
+    })
+
+    st.write(f"**Chronic Conditions:** {', '.join(history['chronic_conditions']) if history['chronic_conditions'] else 'None'}")
+    st.write(f"**Allergies:** {history['allergies'] if history['allergies'] else 'None'}")
+    st.write(f"**Current Medications:** {history['medications'] if history['medications'] else 'None'}")
+    st.write(f"**Family History:** {history['family_history'] if history['family_history'] else 'None'}")
+
+        
                     # -------------------------
         # Medical History Questionnaire
         # -------------------------
