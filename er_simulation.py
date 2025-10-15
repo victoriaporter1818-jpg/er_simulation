@@ -39,9 +39,9 @@ role_descriptions = {
 }
 
 if role == "-- Choose --":
-st.info("👋 Welcome! Please select a role to begin your shift.")
+  st.info("👋 Welcome! Please select a role to begin your shift.")
 else:
-st.success(role_descriptions[role])
+  st.success(role_descriptions[role])
 
 st.write("---")
 
@@ -49,17 +49,17 @@ st.write("---")
 # INITIAL SESSION STATE
 # --------------------------------------
 if "inventory" not in st.session_state:
-st.session_state.inventory = []
+  st.session_state.inventory = []
 if "room" not in st.session_state:
-st.session_state.room = "ER"
+  st.session_state.room = "ER"
 if "score" not in st.session_state:
-st.session_state.score = 0
+  st.session_state.score = 0
 if "patient" not in st.session_state:
-st.session_state.patient = None
+  st.session_state.patient = None
 if "treatment_history" not in st.session_state:
-st.session_state.treatment_history = []
+  st.session_state.treatment_history = []
 if "test_results" not in st.session_state:
-st.session_state.test_results = None
+  st.session_state.test_results = None
 
 # --------------------------------------
 # PATIENT DATABASE
@@ -148,34 +148,34 @@ if st.session_state.room == "Supply Room":
 for item, desc in hospital_supplies.items():
 if st.button(f"Collect {item}"):
 if item not in st.session_state.inventory:
-st.session_state.inventory.append(item)
-st.success(f"✅ {item} added to inventory.")
+  st.session_state.inventory.append(item)
+  st.success(f"✅ {item} added to inventory.")
 else:
-st.info(f"ℹ️ You already have {item}.")
+  st.info(f"ℹ️ You already have {item}.")
 with st.expander(item):
-st.caption(desc)
+  st.caption(desc)
 
 # MEDSTATION / PHARMACY
 elif st.session_state.room in ["Medstation", "Pharmacy"]:
-st.subheader("💊 Medication Handling")
+  st.subheader("💊 Medication Handling")
 for med, desc in hospital_meds.items():
 if st.button(f"Dispense {med}"):
 if role == "Pharmacist":
-st.session_state.score += 5
-st.success(f"💊 You dispensed {med} correctly to the patient.")
+  st.session_state.score += 5
+  st.success(f"💊 You dispensed {med} correctly to the patient.")
 if med not in st.session_state.inventory:
-st.session_state.inventory.append(med)
-st.info(f"{med} added to your inventory.")
+  st.session_state.inventory.append(med)
+  st.info(f"{med} added to your inventory.")
 with st.expander(med):
-st.caption(desc)
+  st.caption(desc)
 
 # RADIOLOGY LAB
 elif st.session_state.room == "Radiology Lab":
 if role != "Radiologist":
-st.warning("Only Radiologists can perform imaging tests.")
+  st.warning("Only Radiologists can perform imaging tests.")
 else:
-st.subheader("🩻 Imaging Options")
-imaging_tests = {
+  st.subheader("🩻 Imaging Options")
+  imaging_tests = {
 "CT Scan": "Shows internal bleeding or stroke clots.",
 "MRI": "Reveals detailed brain or tissue abnormalities.",
 "X-Ray": "Displays fractures or pneumonia.",
@@ -183,28 +183,28 @@ imaging_tests = {
 }
 test_choice = st.selectbox("Select Imaging Test", list(imaging_tests.keys()))
 if st.button("📸 Perform Imaging"):
-result = imaging_tests[test_choice]
-st.session_state.test_results = result
-st.success(f"✅ Imaging complete: {result}")
-st.session_state.score += 10
+  result = imaging_tests[test_choice]
+  st.session_state.test_results = result
+  st.success(f"✅ Imaging complete: {result}")
+  st.session_state.score += 10
 
 # ER ROOM
 elif st.session_state.room == "ER":
 if st.button("🚨 Receive Next Patient"):
-st.session_state.patient = random.choice(patients)
-st.session_state.treatment_history = []
-st.session_state.test_results = None
+  st.session_state.patient = random.choice(patients)
+  st.session_state.treatment_history = []
+  st.session_state.test_results = None
 
 if st.session_state.patient:
-p = st.session_state.patient
-st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
-st.write(f"**Symptoms:** {p['symptoms']}")
-st.write("---")
+  p = st.session_state.patient
+  st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
+  st.write(f"**Symptoms:** {p['symptoms']}")
+  st.write("---")
 
 # Diagnostic test (Doctor access)
 if role in ["Doctor", "Radiologist"]:
 if st.button("🧪 Request Diagnostic Imaging"):
-imaging = {
+  imaging = {
 "Heart attack": "CT Scan shows cardiac blockage.",
 "Pneumonia": "X-Ray reveals lung infiltrates.",
 "Stroke": "CT Scan shows ischemic area.",
@@ -214,76 +214,76 @@ st.info(imaging.get(p["diagnosis"], "No abnormal findings."))
 
 # Treatment selection
 if st.session_state.inventory:
-selected_item = st.selectbox("Select an item from inventory:", st.session_state.inventory)
+  selected_item = st.selectbox("Select an item from inventory:", st.session_state.inventory)
 if st.button("🩹 Use Selected Item"):
-dx = p["diagnosis"]
-protocol = treatment_protocols.get(dx, {})
-correct, neutral, harmful = protocol.get("correct", []), protocol.get("neutral", []), protocol.get("harmful", [])
+  dx = p["diagnosis"]
+  protocol = treatment_protocols.get(dx, {})
+  correct, neutral, harmful = protocol.get("correct", []), protocol.get("neutral", []), protocol.get("harmful", [])
 
 if selected_item in correct:
-st.session_state.score += int(10 * difficulty_multiplier)
-fb = f"✅ You used {selected_item}. Correct treatment!"
+  st.session_state.score += int(10 * difficulty_multiplier)
+  fb = f"✅ You used {selected_item}. Correct treatment!"
 elif selected_item in neutral:
-fb = f"😐 {selected_item} had little effect."
+  fb = f"😐 {selected_item} had little effect."
 elif selected_item in harmful:
-st.session_state.score -= int(10 * difficulty_multiplier)
-fb = f"❌ {selected_item} was harmful!"
+  st.session_state.score -= int(10 * difficulty_multiplier)
+  fb = f"❌ {selected_item} was harmful!"
 else:
-st.session_state.score -= 2
-fb = f"⚠️ {selected_item} had no effect."
+  st.session_state.score -= 2
+  fb = f"⚠️ {selected_item} had no effect."
 
-st.session_state.treatment_history.append(fb)
-st.info(fb)
+  st.session_state.treatment_history.append(fb)
+  st.info(fb)
 
 if st.button("🏁 Finish Treatment"):
 if st.session_state.score >= 20:
-st.success(f"🎉 Great job! {p['name']} stabilized and is recovering.")
+  st.success(f"🎉 Great job! {p['name']} stabilized and is recovering.")
 elif st.session_state.score >= 10:
-st.info(f"😐 {p['name']} is stable but needs monitoring.")
+  st.info(f"😐 {p['name']} is stable but needs monitoring.")
 else:
-st.error(f"💀 {p['name']} deteriorated. Review treatment choices.")
+  st.error(f"💀 {p['name']} deteriorated. Review treatment choices.")
 
 # OPERATING ROOM
 elif st.session_state.room == "Operating Room":
 if role != "Surgeon":
-st.warning("Only Surgeons can perform operations.")
+  st.warning("Only Surgeons can perform operations.")
 else:
 if st.button("Start Surgery"):
-steps = ["Sterilize area", "Administer anesthesia", "Make incision", "Repair or remove organ", "Close incision"]
+  steps = ["Sterilize area", "Administer anesthesia", "Make incision", "Repair or remove organ", "Close incision"]
 for step in steps:
-st.write(f"✅ {step}")
-st.success("Surgery completed successfully!")
-st.session_state.score += 15
+  st.write(f"✅ {step}")
+  st.success("Surgery completed successfully!")
+  st.session_state.score += 15
 
 # NURSING STATION
 elif st.session_state.room == "Nursing Station":
-st.header("🗒️ Nursing Station")
-st.write("Review charts, update notes, and manage ongoing patient care.")
-st.session_state.score += 2
+  st.header("🗒️ Nursing Station")
+  st.write("Review charts, update notes, and manage ongoing patient care.")
+  st.session_state.score += 2
 
 # -----------------------
 # RIGHT SIDE: VITALS & LOG
 # -----------------------
 with right:
-st.header("🩺 Patient Vitals & Logs")
+  st.header("🩺 Patient Vitals & Logs")
 
 if st.session_state.patient:
-p = st.session_state.patient
-st.subheader(f"{p['name']} - Vitals")
+  p = st.session_state.patient
+  st.subheader(f"{p['name']} - Vitals")
 for k, v in p['vitals'].items():
-st.write(f"**{k}:** {v}")
+  st.write(f"**{k}:** {v}")
 else:
-st.info("No active patient.")
+  st.info("No active patient.")
 
 if st.session_state.test_results:
-st.write("---")
-st.subheader("🧠 Test Results")
-st.info(st.session_state.test_results)
+  st.write("---")
+  st.subheader("🧠 Test Results")
+  st.info(st.session_state.test_results)
 
-st.write("---")
-st.subheader("📋 Action Log")
+  st.write("---")
+  st.subheader("📋 Action Log")
 for line in reversed(st.session_state.treatment_history[-10:]):
-st.write(line)
+  st.write(line)
 
 st.write("---")
 st.subheader("🏆 Score")
