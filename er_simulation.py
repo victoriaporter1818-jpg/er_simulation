@@ -84,17 +84,31 @@ hospital_supplies = {
     "Blood Test Kit": "Used to collect and test blood samples.",
     "Swab Kit": "Used for infection or viral samples.",
     "Defibrillator Pads": "Used to deliver electric shocks during cardiac arrest.",
+    "Heated Blanket": "Used to maintain body temperature in hypothermic or post-op patients."
 }
 
-hospital_meds = {
+# Emergency / procedural meds (Medstation)
+medstation_meds = {
     "Aspirin": "Used for heart attacks and stroke prevention.",
     "Nitroglycerin": "Used for chest pain and heart attacks.",
-    "Antibiotics": "Treat bacterial infections.",
     "tPA (Clot Buster)": "Used for ischemic strokes.",
-    "Diazepam": "Used for seizure control.",
     "Epinephrine": "Used for anaphylaxis or cardiac arrest.",
     "Insulin": "Used for diabetic emergencies.",
     "Morphine": "Strong opioid pain medication.",
+    "Diazepam": "Used for seizure control.",
+    "IV Antibiotics": "Used for emergency infection treatment (broad-spectrum).",
+}
+
+# Prescription / long-term meds (Pharmacy)
+pharmacy_meds = {
+    "Oral Antibiotics": "Treat common bacterial infections (e.g., amoxicillin, doxycycline).",
+    "Antifungals": "Treat fungal infections (e.g., fluconazole, clotrimazole).",
+    "Inhalers": "Used for asthma and COPD symptom relief.",
+    "Antidepressants": "Used to treat mood disorders (SSRIs, SNRIs, etc.).",
+    "Cholesterol Meds (Statins)": "Lower LDL cholesterol and prevent heart disease.",
+    "Blood Thinners (Warfarin, Heparin)": "Prevent blood clots and strokes.",
+    "Antihypertensives": "Used to control high blood pressure.",
+    "Steroids": "Used to reduce inflammation (e.g., prednisone)."
 }
 
 # --------------------------------------
