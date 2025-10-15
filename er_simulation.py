@@ -1,452 +1,74 @@
-# Full enhanced Streamlit app: room navigation, inventory, patient progression, treatment workflow
-
 import streamlit as st
 import random
 import time
 
+# --------------------------------------
+# STREAMLIT SETUP
+# --------------------------------------
 st.set_page_config(page_title="AI Emergency Room Simulation", layout="wide")
 
 st.title("🏥 AI Emergency Room Simulation")
-st.subheader("Choose your role and interact with dynamic patient cases.")
+st.subheader("Choose your role, treat patients, and manage emergency situations.")
+st.write("---")
 
-# ---------- Role selection ----------
+# --------------------------------------
+# ROLE SELECTION
+# --------------------------------------
 role = st.selectbox("Select your role:", ["-- Choose --", "Nurse", "Doctor", "Surgeon"])
 
 if role == "-- Choose --":
     st.info("👋 Welcome! Please select a role to begin your shift.")
 elif role == "Nurse":
-    st.success("🩺 You’re on triage duty. Take vitals, record patient history, and administer meds.")
+    st.success("🩺 You’re on triage duty. Take vitals, record patient history, and provide initial care.")
 elif role == "Doctor":
-    st.success("⚕️ You’ll be diagnosing and performing minor procedures like biopsies or intubation.")
+    st.success("⚕️ You’ll diagnose and determine treatment plans for your patients.")
 elif role == "Surgeon":
-    st.success("🔪 You’re scheduled for major procedures, including transplants and trauma surgeries.")
-
+    st.success("🔪 You handle critical surgical procedures in the OR.")
 st.write("---")
 
-# ---------- Patients ----------
-PATIENT_POOL = [
-    {
-        "id": 1,
-        "name": "John Doe",
-        "age": 45,
-        "symptoms": "severe chest pain and shortness of breath",
-        "vitals": {"BP_systolic": 90, "BP_diastolic": 60, "HR": 120, "O2": 85, "Temp": 36.8},
-        "diagnosis": "Heart attack",
-        "treatment": ["Aspirin", "Oxygen", "Cath lab (angioplasty)"],
-        "priority": 1
-    },
-    {
-        "id": 2,
-        "name": "Sarah Li",
-        "age": 29,
-        "symptoms": "high fever, cough, and low oxygen",
-        "vitals": {"BP_systolic": 110, "BP_diastolic": 70, "HR": 95, "O2": 88, "Temp": 39.2},
-        "diagnosis": "Pneumonia",
-        "treatment": ["IV antibiotics", "Oxygen", "Chest x-ray"],
-        "priority": 2
-    },
-    {
-        "id": 3,
-        "name": "Carlos Vega",
-        "age": 60,
-        "symptoms": "sudden weakness on one side and slurred speech",
-        "vitals": {"BP_systolic": 150, "BP_diastolic": 90, "HR": 82, "O2": 97, "Temp": 36.9},
-        "diagnosis": "Stroke",
-        "treatment": ["CT scan", "tPA (if eligible)", "Stroke team"],
-        "priority": 1
-    },
-    {
-        "id": 4,
-        "name": "Emma Brown",
-        "age": 8,
-        "symptoms": "abdominal pain and vomiting for 12 hours",
-        "vitals": {"BP_systolic": 100, "BP_diastolic": 65, "HR": 110, "O2": 98, "Temp": 37.0},
-        "diagnosis": "Appendicitis",
-        "treatment": ["NPO", "IV fluids", "Emergency appendectomy"],
-        "priority": 2
-    }
-]
-
-# ---------- Session state initialization ----------
-if "inventory" not in st.session_state:
-    st.session_state.inventory = {"IV": 0, "Bandage": 0, "Ice Pack": 0, "Aspirin": 0, "Antibiotics": 0, "Oxygen Mask": 0}
-
-if "patient" not in st.session_state:
-    st.session_state.patient = None
-
-if "time_elapsed" not in st.session_state:
-    st.session_state.time_elapsed = 0  # minutes since patient arrival in simulation
-
-if "score" not in st.session_state:
-    st.session_state.score = 0
-
-if "history" not in st.session_state:
-    st.session_state.history = []  # action log lines
-
-if "room" not in st.session_state:
-    st.session_state.room = "ER Room"
-
-if "patient_state" not in st.session_state:
-    # will hold patient dynamics: stability (0-100), pain, need flags
-    st.session_state.patient_state = {}
-
-# ---------- Helper functions ----------
-def log_action(text):
-    timestamp = f"{st.session_state.time_elapsed}m"
-    st.session_state.history.insert(0, f"[{timestamp}] {text}")
-    # limit history length
-    if len(st.session_state.history) > 100:
-        st.session_state.history = st.session_state.history[:100]
-
-def spawn_patient():
-    p = random.choice(PATIENT_POOL).copy()
-    # deep-ish copy for vitals
-    p["vitals"] = p["vitals"].copy()
-    st.session_state.patient = p
-    # initialize dynamic state
-    st.session_state.patient_state = {
-        "stability": 60 + random.randint(-10, 10),  # 0-100 where lower -> critical
-        "pain": random.randint(1, 10),
-        "bleeding": 0,   # 0 none, 1 minor, 2 major
-        "infection_risk": 0,
-        "treated": False,
-        "arrival_time": st.session_state.time_elapsed
-    }
-    log_action(f"Patient arrived: {p['name']} ({p['symptoms']})")
-
-def update_patient_over_time(minutes=1):
-    """Advance patient internal clock and degrade/improve based on state."""
-    for _ in range(minutes):
-        st.session_state.time_elapsed += 1
-        s = st.session_state.patient_state
-        if not s:
-            continue
-        # baseline deterioration for unstable patients
-        instability = max(0, 50 - s["stability"])  # the lower the stability, the higher instability
-        deterioration = 0
-        # random events: slow deterioration, faster if untreated or severe vitals
-        deterioration += 0.5 + (instability * 0.02)
-        # if bleeding or high pain increases deterioration
-        deterioration += s["bleeding"] * 0.5
-        deterioration += (s["pain"] / 20.0)
-        # apply deterioration
-        s["stability"] -= deterioration
-        # infection risk increases slowly if untreated infection-prone cases
-        if st.session_state.patient and "Pneumonia" in st.session_state.patient["diagnosis"]:
-            s["infection_risk"] += 0.3
-        # cap values
-        s["stability"] = max(0, min(100, s["stability"]))
-        s["infection_risk"] = min(100, s["infection_risk"])
-
-def check_patient_outcome():
-    s = st.session_state.patient_state
-    if not s:
-        return None
-    if s["stability"] <= 0:
-        return "deceased"
-    if s["stability"] >= 100 and s["treated"]:
-        return "discharged_stable"
-    return None
-
-def apply_item(item):
-    """Use an inventory item on patient; return message"""
-    if st.session_state.inventory.get(item, 0) <= 0:
-        return f"You do not have any {item} in inventory."
-    # consume
-    st.session_state.inventory[item] -= 1
-    s = st.session_state.patient_state
-    msg = ""
-    if item == "IV":
-        s["stability"] += 8
-        s["pain"] -= 1
-        msg = "Started IV fluids: modest stabilization."
-    elif item == "Bandage":
-        if s["bleeding"] > 0:
-            s["bleeding"] -= 1
-            s["stability"] += 6
-            msg = "Applied bandage to control bleeding."
-        else:
-            msg = "Applied bandage; no active bleeding but wound covered."
-    elif item == "Ice Pack":
-        s["pain"] = max(0, s["pain"] - 2)
-        msg = "Ice pack applied: pain reduced."
-    elif item == "Aspirin":
-        # effective for heart attack scenario (simplified)
-        if st.session_state.patient and "Heart attack" in st.session_state.patient["diagnosis"]:
-            s["stability"] += 12
-            msg = "Administered aspirin — patient shows improvement."
-        else:
-            s["stability"] += 3
-            msg = "Administered aspirin."
-    elif item == "Antibiotics":
-        if st.session_state.patient and "Pneumonia" in st.session_state.patient["diagnosis"]:
-            s["stability"] += 15
-            s["infection_risk"] = max(0, s["infection_risk"] - 20)
-            msg = "Antibiotics given — infection controlled."
-        else:
-            s["stability"] += 2
-            msg = "Antibiotics given (empiric)."
-    elif item == "Oxygen Mask":
-        s["stability"] += 10
-        st.session_state.patient["vitals"]["O2"] = min(100, st.session_state.patient["vitals"]["O2"] + 6)
-        msg = "Oxygen provided — O2 improved."
-    # bounds
-    s["stability"] = min(100, s["stability"])
-    s["pain"] = max(0, s["pain"])
-    log_action(f"Used {item} on patient: {msg}")
-    return msg
-
-def perform_procedure(action):
-    """Procedures like CT scan, surgery, cath lab, etc."""
-    p = st.session_state.patient
-    s = st.session_state.patient_state
-    if not p or not s:
-        return "No patient to treat."
-    # cost: performing procedures consumes time and has chance for complications
-    time_cost = random.randint(5, 20)
-    update_patient_over_time(minutes=time_cost)
-    comp_chance = 0.08  # baseline complication
-    success_modifier = 0
-    msg = ""
-    if action == "CT scan":
-        msg = "Performed CT scan: imaging completed. Useful for stroke/appendicitis."
-        success_modifier = 0
-    elif action == "Cath lab (angioplasty)":
-        if role != "Surgeon" and role != "Doctor":
-            return "Only Doctors or Surgeons can call the cath lab / perform interventional procedures."
-        comp_chance += 0.12
-        success_modifier = 20
-        msg = "Patient taken to cath lab for angioplasty."
-    elif action == "Appendectomy":
-        if role != "Surgeon":
-            return "Only Surgeons may operate (appendectomy)."
-        comp_chance += 0.15
-        success_modifier = 25
-        msg = "Appendectomy performed."
-    elif action == "tPA":
-        # stroke thrombolysis risk/benefit
-        comp_chance += 0.10
-        success_modifier = 18
-        msg = "tPA administered for stroke (if eligible)."
-    elif action == "Chest x-ray":
-        msg = "Chest x-ray obtained: helps confirm pneumonia."
-    else:
-        msg = f"Performed {action}."
-    # result roll
-    roll = random.random()
-    if roll < comp_chance:
-        # complication
-        s["stability"] -= random.randint(10, 25)
-        log_action(f"Procedure '{action}' had a complication. Stability decreased.")
-        outcome_text = f"Procedure had a complication. Patient stability decreased."
-    else:
-        s["stability"] += success_modifier
-        s["treated"] = True
-        outcome_text = f"Procedure succeeded; patient improved."
-        log_action(f"Procedure '{action}' succeeded. Stability improved by {success_modifier}.")
-    # clamp
-    s["stability"] = max(0, min(100, s["stability"]))
-    return msg + " " + outcome_text + f" (took {time_cost} minutes)."
-
-# ---------- UI layout ----------
-left, mid, right = st.columns([1, 2, 1])
-
-# Left column: Controls
-with left:
-    st.header("Controls")
-    if st.button("🚨 Receive Next Patient"):
-        spawn_patient()
-
-    st.write("**Move between rooms:**")
-    room = st.selectbox("Go to:", ["ER Room", "Supply Room", "Medstation", "Operating Room", "Nursing Station"], index=["ER Room", "Supply Room", "Medstation", "Operating Room", "Nursing Station"].index(st.session_state.room) if st.session_state.room in ["ER Room", "Supply Room", "Medstation", "Operating Room", "Nursing Station"] else 0)
-    if room != st.session_state.room:
-        st.session_state.room = room
-        log_action(f"Moved to {room}.")
-
-    st.write("---")
-    st.write("**Inventory**")
-    for item, qty in st.session_state.inventory.items():
-        st.write(f"{item}: {qty}")
-
-    st.write("---")
-    st.write("**Quick actions**")
-    if st.button("Advance time by 5 min"):
-        update_patient_over_time(minutes=5)
-        log_action("Advanced time by 5 minutes.")
-    if st.button("Advance time by 15 min"):
-        update_patient_over_time(minutes=15)
-        log_action("Advanced time by 15 minutes.")
-
-# Middle column: Patient and main workflow
-with mid:
-    st.header("Patient & Workflow")
-
-    if st.session_state.patient is None:
-        st.info("No active patient. Click 'Receive Next Patient' to get a new case.")
-    else:
-        p = st.session_state.patient
-        s = st.session_state.patient_state
-        st.subheader(f"🧍 Patient: {p['name']} (Age {p['age']})")
-        st.markdown(f"**Symptoms:** {p['symptoms']}")
-        st.markdown(f"**Priority:** {p.get('priority', 'N/A')}")
-        st.markdown(f"**Stability:** {s['stability']:.1f}/100")
-        st.markdown(f"**Pain:** {s['pain']}/10")
-        st.markdown(f"**Arrival:** {s['arrival_time']}m ago")
-
-        st.write("**Vitals:**")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.write(f"BP: {p['vitals']['BP_systolic']}/{p['vitals']['BP_diastolic']}")
-            st.write(f"HR: {p['vitals']['HR']} bpm")
-        with col2:
-            st.write(f"O2: {p['vitals']['O2']}%")
-            st.write(f"Temp: {p['vitals']['Temp']} °C")
-        with col3:
-            st.write(f"Diagnosis (hidden until doctor confirms)")
-
-        st.write("---")
-        st.subheader("Role-specific actions")
-        if st.session_state.room == "ER Room":
-            if role == "Nurse":
-                if st.button("Take Vitals / Reassess"):
-                    # small random variation
-                    p["vitals"]["HR"] += random.randint(-3, 3)
-                    p["vitals"]["O2"] = max(60, p["vitals"]["O2"] + random.randint(-1, 2))
-                    update_patient_over_time(minutes=2)
-                    log_action("Nurse took vitals and reassessed patient.")
-                # administer item selection
-                item_choice = st.selectbox("Use item from inventory:", ["-- choose --"] + [k for k in st.session_state.inventory.keys()])
-                if item_choice != "-- choose --":
-                    if st.button("Apply item"):
-                        msg = apply_item(item_choice)
-                        st.info(msg)
-            elif role == "Doctor":
-                # Diagnostics: view labs / confirm diagnosis
-                if st.button("View Vitals (read-only)"):
-                    st.write(p["vitals"])
-                # diagnostic choice
-                diag_choices = ["Heart attack", "Pneumonia", "Stroke", "Appendicitis", "Other"]
-                diag_pick = st.selectbox("Suspected diagnosis:", diag_choices)
-                if st.button("Confirm diagnosis and recommend treatment"):
-                    update_patient_over_time(minutes=3)
-                    if diag_pick == p["diagnosis"]:
-                        st.success("✅ Correct diagnosis.")
-                        log_action("Doctor correctly diagnosed the patient.")
-                        # propose treatment choices
-                        for t in p["treatment"]:
-                            st.write(f"- {t}")
-                        st.session_state.patient_state["treated"] = True
-                        st.session_state.score += 10
-                    else:
-                        st.error(f"❌ Incorrect. True diagnosis: {p['diagnosis']}.")
-                        log_action("Doctor made incorrect diagnosis.")
-                        st.session_state.score -= 5
-                # order procedure
-                proc = st.selectbox("Order procedure:", ["-- choose --", "CT scan", "Chest x-ray", "tPA", "Cath lab (angioplasty)"])
-                if proc != "-- choose --" and st.button("Perform/Order procedure"):
-                    result = perform_procedure(proc if proc != "Cath lab (angioplasty)" else "Cath lab (angioplasty)")
-                    st.info(result)
-            elif role == "Surgeon":
-                st.write("Surgeons can move to the OR for operations.")
-                if st.button("Move patient to OR"):
-                    st.session_state.room = "Operating Room"
-                    log_action("Patient moved to Operating Room.")
-        elif st.session_state.room == "Supply Room":
-            st.subheader("Supply Room — Collect items")
-            # show available items with stock (infinite or limited)
-            supply_options = ["IV", "Bandage", "Ice Pack", "Oxygen Mask"]
-            for it in supply_options:
-                col_a, col_b = st.columns([3,1])
-                with col_a:
-                    st.write(it)
-                with col_b:
-                    if st.button(f"Take 1 x {it}", key=f"take_{it}"):
-                        st.session_state.inventory[it] = st.session_state.inventory.get(it, 0) + 1
-                        log_action(f"Picked up 1 x {it} in Supply Room.")
-                        st.success(f"{it} added to inventory.")
-        elif st.session_state.room == "Medstation":
-            st.subheader("Medstation — Get medications")
-            meds = ["Aspirin", "Antibiotics"]
-            for med in meds:
-                col_a, col_b = st.columns([3,1])
-                with col_a:
-                    st.write(med)
-                with col_b:
-                    if st.button(f"Dispense 1 x {med}", key=f"med_{med}"):
-                        st.session_state.inventory[med] = st.session_state.inventory.get(med, 0) + 1
-                        log_action(f"Dispensed 1 x {med} from Medstation.")
-                        st.success(f"{med} added to inventory.")
-        elif st.session_state.room == "Operating Room":
-            st.subheader("Operating Room")
-            if role == "Surgeon":
-                if st.button("Perform Appendectomy / Major Surgery"):
-                    # pick suitable procedure from patient
-                    op_name = "Appendectomy" if "Appendicitis" in p["diagnosis"] else "Major surgery"
-                    result = perform_procedure(op_name)
-                    st.info(result)
-            else:
-                st.info("Only surgeons may perform operations here.")
-        elif st.session_state.room == "Nursing Station":
-            st.subheader("Nursing Station")
-            if st.button("Write patient notes / update chart"):
-                log_action("Nurse charted notes in patient chart.")
-                st.success("Chart updated.")
-        # After actions, check patient outcome
-        outcome = check_patient_outcome()
-        if outcome == "deceased":
-            st.error("❌ The patient has deteriorated and expired.")
-            log_action("Patient died.")
-            st.session_state.patient = None
-            st.session_state.patient_state = {}
-        elif outcome == "discharged_stable":
-            st.success("✅ Patient stabilized and discharged.")
-            log_action("Patient stabilized and discharged.")
-            st.session_state.score += 20
-            st.session_state.patient = None
-            st.session_state.patient_state = {}
-
-# Right column: Info and history
-with right:
-    st.header("Current Room")
-    st.info(st.session_state.room)
-
-    st.write("---")
- # Right column: Info and history
-with right:
-    st.header("Current Room")
-    st.info(st.session_state.room)
-
-    st.write("---")
-    st.header("Action Log")
-    if st.session_state.history:
-        for line in st.session_state.history[:15]:
-            st.write(line)
-    else:
-        st.write("No actions yet.")
-
-    st.write("---")
-    st.header("Performance")
-    st.write(f"Score: {st.session_state.score}")
-
-    st.write("---")
-    st.header("Quick patient snapshot")
-    if st.session_state.patient:
-        p = st.session_state.patient
-        st.write(f"Name: {p['name']}")
-        st.write(f"Symptoms: {p['symptoms']}")
-        st.write("Diagnosis (hidden until doctor confirms)")
-    else:
-        st.write("No active patient.")
-
 # --------------------------------------
-# INVENTORY SYSTEM + ROOM CONTENTS
+# INITIAL SESSION STATE
 # --------------------------------------
-
-# Initialize state if needed
 if "inventory" not in st.session_state:
     st.session_state.inventory = []
+if "room" not in st.session_state:
+    st.session_state.room = "ER"
+if "score" not in st.session_state:
+    st.session_state.score = 0
+if "patient" not in st.session_state:
+    st.session_state.patient = None
+if "treatment_feedback" not in st.session_state:
+    st.session_state.treatment_feedback = None
+if "treatment_history" not in st.session_state:
+    st.session_state.treatment_history = []
 
-# Define available supplies and medications
+# --------------------------------------
+# ROOM NAVIGATION
+# --------------------------------------
+st.sidebar.header("🏥 Navigation")
+new_room = st.sidebar.radio(
+    "Move to another room:",
+    ["ER", "Supply Room", "Medstation", "Operating Room", "Nursing Station"],
+    index=["ER", "Supply Room", "Medstation", "Operating Room", "Nursing Station"].index(st.session_state.room)
+)
+st.session_state.room = new_room
+
+# --------------------------------------
+# PATIENT GENERATOR
+# --------------------------------------
+patients = [
+    {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath", "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}, "diagnosis": "Heart attack"},
+    {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen", "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}, "diagnosis": "Pneumonia"},
+    {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech", "vitals": {"BP": "150/90", "HR": 82, "O2": "97%"}, "diagnosis": "Stroke"},
+    {"name": "Emma Brown", "age": 8, "symptoms": "abdominal pain and vomiting for 12 hours", "vitals": {"BP": "100/65", "HR": 110, "O2": "98%"}, "diagnosis": "Appendicitis"},
+    {"name": "Maya Thompson", "age": 34, "symptoms": "convulsions and unresponsiveness", "vitals": {"BP": "130/85", "HR": 112, "O2": "94%"}, "diagnosis": "Seizure"},
+    {"name": "Jacob Rivera", "age": 50, "symptoms": "swelling and trouble breathing after eating peanuts", "vitals": {"BP": "80/50", "HR": 140, "O2": "82%"}, "diagnosis": "Anaphylaxis"},
+    {"name": "Helen Carter", "age": 67, "symptoms": "confusion, sweating, and low blood sugar", "vitals": {"BP": "120/80", "HR": 105, "O2": "96%"}, "diagnosis": "Diabetic Crisis"},
+]
+
+# --------------------------------------
+# ROOM CONTENTS: SUPPLIES & MEDS
+# --------------------------------------
 hospital_supplies = {
     "IV Fluids (Saline)": "Used to maintain hydration and administer medications.",
     "Intubation Kit": "Used for airway management in critical patients.",
@@ -464,38 +86,35 @@ hospital_supplies = {
 }
 
 hospital_meds = {
-    "Ibuprofen": "Pain relief and anti-inflammatory for mild pain or fever.",
+    "Ibuprofen": "Pain relief and anti-inflammatory.",
     "Acetaminophen": "Fever reducer and mild pain reliever.",
-    "Morphine": "Strong opioid pain medication for severe pain or post-surgery.",
-    "Epinephrine": "Used for anaphylaxis, cardiac arrest, or severe asthma attacks.",
-    "Diazepam": "Used for seizure control or anxiety management.",
-    "Lorazepam": "Another option for seizures and sedation.",
-    "Insulin": "Used to lower blood sugar levels in diabetic emergencies.",
-    "Nitroglycerin": "Used for chest pain (angina) and heart attack cases.",
-    "Aspirin": "Used for heart attacks, stroke prevention, and mild pain.",
-    "Antibiotics": "Used to treat bacterial infections such as pneumonia.",
-    "tPA (Clot Buster)": "Used for ischemic stroke cases if given early.",
-    "Albuterol": "Used to relieve bronchospasm in asthma or COPD.",
-    "Ondansetron": "Used to treat nausea and vomiting.",
-    "Ketamine": "Used for sedation and pain management during procedures.",
-    "Erythropoietin": "Used for anemia management in chronic conditions."
+    "Morphine": "Strong opioid pain medication.",
+    "Epinephrine": "Used for anaphylaxis, cardiac arrest, or asthma attacks.",
+    "Diazepam": "Used for seizure control or anxiety.",
+    "Lorazepam": "Used for seizures or sedation.",
+    "Insulin": "Lowers blood sugar in diabetic emergencies.",
+    "Nitroglycerin": "Used for chest pain and heart attacks.",
+    "Aspirin": "For heart attacks and stroke prevention.",
+    "Antibiotics": "Treat bacterial infections.",
+    "tPA (Clot Buster)": "Used for ischemic strokes.",
+    "Albuterol": "Relieves bronchospasm in asthma.",
+    "Ondansetron": "Treats nausea and vomiting.",
+    "Ketamine": "Used for sedation and pain management.",
+    "Erythropoietin": "Used for anemia management."
 }
 
-# Display room interactions
-if "room" not in st.session_state:
-    st.session_state.room = "ER"
-
-st.write("---")
+# --------------------------------------
+# ROOM INTERACTIONS
+# --------------------------------------
 st.subheader(f"🏥 You are currently in the: {st.session_state.room}")
 
 if st.session_state.room == "Supply Room":
     st.header("🧃 Hospital Supply Room")
-    st.write("Select any supplies you need to collect:")
     for item, desc in hospital_supplies.items():
         if st.button(f"Collect {item}"):
             if item not in st.session_state.inventory:
                 st.session_state.inventory.append(item)
-                st.success(f"✅ {item} added to your inventory.")
+                st.success(f"✅ {item} added to inventory.")
             else:
                 st.info(f"ℹ️ You already have {item}.")
         with st.expander(item):
@@ -503,12 +122,11 @@ if st.session_state.room == "Supply Room":
 
 elif st.session_state.room == "Medstation":
     st.header("💊 Hospital Medstation")
-    st.write("Dispense medications as needed:")
     for med, desc in hospital_meds.items():
         if st.button(f"Dispense {med}"):
             if med not in st.session_state.inventory:
                 st.session_state.inventory.append(med)
-                st.success(f"💉 {med} added to your inventory.")
+                st.success(f"💉 {med} added to inventory.")
             else:
                 st.info(f"ℹ️ You already have {med}.")
         with st.expander(med):
@@ -516,131 +134,80 @@ elif st.session_state.room == "Medstation":
 
 elif st.session_state.room == "ER":
     st.header("🚑 Emergency Room")
-    st.write("Manage patients here. Use your inventory items and treatments.")
+    if st.button("🚨 Receive Next Patient"):
+        st.session_state.patient = random.choice(patients)
+        st.session_state.treatment_feedback = None
+        st.session_state.treatment_history = []
+
+    if st.session_state.patient:
+        p = st.session_state.patient
+        st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
+        st.write(f"**Symptoms:** {p['symptoms']}")
+        st.json(p["vitals"])
 
 elif st.session_state.room == "Operating Room":
     st.header("🔪 Operating Room")
-    st.write("Perform surgeries and advanced procedures here.")
+    st.info("Perform advanced surgical procedures here (future feature).")
 
 elif st.session_state.room == "Nursing Station":
     st.header("🗒️ Nursing Station")
-    st.write("Review charts, write notes, and plan patient care.")
+    st.write("Review patient charts, update notes, and plan ongoing care.")
 
-# Inventory display
+# --------------------------------------
+# INVENTORY DISPLAY
+# --------------------------------------
 st.write("---")
 st.subheader("🎒 Current Inventory")
 if st.session_state.inventory:
     for item in st.session_state.inventory:
         st.write(f"- {item}")
 else:
-    st.info("Your inventory is empty. Visit the Supply Room or Medstation to gather items.")
+    st.info("Your inventory is empty. Visit the Supply Room or Medstation.")
 
 # --------------------------------------
-# PATIENT TREATMENT LOGIC + SCORING (HIDDEN ANSWERS)
+# TREATMENT LOGIC + SCORING
 # --------------------------------------
-
-if "score" not in st.session_state:
-    st.session_state.score = 0
-if "treatment_feedback" not in st.session_state:
-    st.session_state.treatment_feedback = None
-if "treatment_history" not in st.session_state:
-    st.session_state.treatment_history = []
-
-# Define correct treatments for each diagnosis
 treatment_protocols = {
-    "Heart attack": {
-        "correct": ["Aspirin", "Nitroglycerin", "Oxygen Mask", "IV Fluids (Saline)"],
-        "neutral": ["Bandages", "Ice Pack", "Heated Blanket"],
-        "harmful": ["Insulin", "tPA (Clot Buster)"]
-    },
-    "Pneumonia": {
-        "correct": ["Antibiotics", "Oxygen Mask", "IV Fluids (Saline)"],
-        "neutral": ["Acetaminophen", "Ibuprofen", "Heated Blanket"],
-        "harmful": ["Epinephrine", "Nitroglycerin"]
-    },
-    "Stroke": {
-        "correct": ["tPA (Clot Buster)", "Oxygen Mask", "IV Fluids (Saline)"],
-        "neutral": ["Heated Blanket", "Bandages"],
-        "harmful": ["Morphine", "Nitroglycerin"]
-    },
-    "Appendicitis": {
-        "correct": ["IV Fluids (Saline)", "Antibiotics", "Intubation Kit"],
-        "neutral": ["Bandages", "Heated Blanket"],
-        "harmful": ["Aspirin", "Ibuprofen"]
-    },
-    "Seizure": {
-        "correct": ["Diazepam", "Lorazepam", "Oxygen Mask"],
-        "neutral": ["Heated Blanket", "IV Fluids (Saline)"],
-        "harmful": ["Morphine", "Nitroglycerin"]
-    },
-    "Anaphylaxis": {
-        "correct": ["Epinephrine", "Oxygen Mask", "IV Fluids (Saline)"],
-        "neutral": ["Heated Blanket", "Ice Pack"],
-        "harmful": ["Morphine", "Nitroglycerin"]
-    },
-    "Diabetic Crisis": {
-        "correct": ["Insulin", "IV Fluids (Saline)"],
-        "neutral": ["Heated Blanket", "Bandages"],
-        "harmful": ["Aspirin", "Morphine"]
-    },
+    "Heart attack": {"correct": ["Aspirin", "Nitroglycerin", "Oxygen Mask", "IV Fluids (Saline)"], "neutral": ["Bandages", "Heated Blanket"], "harmful": ["Insulin", "tPA (Clot Buster)"]},
+    "Pneumonia": {"correct": ["Antibiotics", "Oxygen Mask", "IV Fluids (Saline)"], "neutral": ["Acetaminophen", "Ibuprofen"], "harmful": ["Epinephrine", "Nitroglycerin"]},
+    "Stroke": {"correct": ["tPA (Clot Buster)", "Oxygen Mask", "IV Fluids (Saline)"], "neutral": ["Heated Blanket"], "harmful": ["Morphine", "Nitroglycerin"]},
+    "Appendicitis": {"correct": ["IV Fluids (Saline)", "Antibiotics", "Intubation Kit"], "neutral": ["Heated Blanket"], "harmful": ["Aspirin", "Ibuprofen"]},
+    "Seizure": {"correct": ["Diazepam", "Lorazepam", "Oxygen Mask"], "neutral": ["Heated Blanket"], "harmful": ["Morphine", "Nitroglycerin"]},
+    "Anaphylaxis": {"correct": ["Epinephrine", "Oxygen Mask", "IV Fluids (Saline)"], "neutral": ["Heated Blanket"], "harmful": ["Morphine", "Nitroglycerin"]},
+    "Diabetic Crisis": {"correct": ["Insulin", "IV Fluids (Saline)"], "neutral": ["Heated Blanket"], "harmful": ["Aspirin", "Morphine"]},
 }
 
-# Let user treat the patient if one exists
-if st.session_state.get("patient"):
-    p = st.session_state.patient
+if st.session_state.patient:
     st.write("---")
     st.header("💊 Treat the Patient")
 
-    # Reset feedback on new patient
-    if st.button("🧍 New patient - clear feedback"):
-        st.session_state.treatment_feedback = None
-        st.session_state.treatment_history = []
-
-    # Treatment selection
     if st.session_state.inventory:
-        selected_item = st.selectbox(
-            "Select an item from your inventory to use:",
-            st.session_state.inventory,
-            key="treatment_select"
-        )
-
+        selected_item = st.selectbox("Select an item from your inventory to use:", st.session_state.inventory)
         if st.button("🩹 Use Selected Item"):
-            diagnosis = p.get("diagnosis", "Unknown")
+            p = st.session_state.patient
+            diagnosis = p["diagnosis"]
             protocol = treatment_protocols.get(diagnosis, {})
-            correct = protocol.get("correct", [])
-            neutral = protocol.get("neutral", [])
-            harmful = protocol.get("harmful", [])
+            correct, neutral, harmful = protocol.get("correct", []), protocol.get("neutral", []), protocol.get("harmful", [])
 
             if selected_item in correct:
                 st.session_state.score += 10
-                feedback = f"✅ You used {selected_item}. That was an appropriate choice for this case!"
+                feedback = f"✅ You used {selected_item}. Correct treatment for {diagnosis}!"
                 color = "success"
             elif selected_item in neutral:
-                st.session_state.score += 0
-                feedback = f"😐 You used {selected_item}. It didn’t cause harm, but it didn’t help either."
+                feedback = f"😐 {selected_item} had little effect."
                 color = "info"
             elif selected_item in harmful:
                 st.session_state.score -= 10
-                feedback = f"❌ You used {selected_item}. That made the patient worse!"
+                feedback = f"❌ {selected_item} was harmful for {diagnosis}!"
                 color = "error"
             else:
                 st.session_state.score -= 2
-                feedback = f"⚠️ {selected_item} has no known effect for this condition."
+                feedback = f"⚠️ {selected_item} had no known benefit."
                 color = "warning"
 
-            # Save feedback + history
             st.session_state.treatment_feedback = (feedback, color)
-            st.session_state.treatment_history.append(
-                f"{selected_item} used → {feedback.split('.')[0]}"
-            )
+            st.session_state.treatment_history.append(f"{selected_item} → {feedback.split('.')[0]}")
 
-            # Optional: remove used item
-            # st.session_state.inventory.remove(selected_item)
-
-    else:
-        st.info("Your inventory is empty. Visit the Supply Room or Medstation first.")
-
-    # Show results only *after* a choice has been made
     if st.session_state.treatment_feedback:
         feedback, color = st.session_state.treatment_feedback
         getattr(st, color)(feedback)
@@ -649,5 +216,3 @@ if st.session_state.get("patient"):
         with st.expander("📋 Treatment History"):
             for line in st.session_state.treatment_history[-10:]:
                 st.write(line)
-else:
-    st.info("No active patient. Receive one first to begin treatment.")
