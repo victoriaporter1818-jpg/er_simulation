@@ -158,7 +158,7 @@ with st.expander(item):
 # MEDSTATION / PHARMACY
 elif st.session_state.room in ["Medstation", "Pharmacy"]:
   st.subheader("💊 Medication Handling")
-for med, desc in hospital_meds.items():
+  for med, desc in hospital_meds.items():
 if st.button(f"Dispense {med}"):
 if role == "Pharmacist":
   st.session_state.score += 5
@@ -250,7 +250,7 @@ if role != "Surgeon":
 else:
 if st.button("Start Surgery"):
   steps = ["Sterilize area", "Administer anesthesia", "Make incision", "Repair or remove organ", "Close incision"]
-for step in steps:
+  for step in steps:
   st.write(f"✅ {step}")
   st.success("Surgery completed successfully!")
   st.session_state.score += 15
@@ -270,7 +270,7 @@ with right:
 if st.session_state.patient:
   p = st.session_state.patient
   st.subheader(f"{p['name']} - Vitals")
-for k, v in p['vitals'].items():
+  for k, v in p['vitals'].items():
   st.write(f"**{k}:** {v}")
 else:
   st.info("No active patient.")
@@ -282,7 +282,7 @@ if st.session_state.test_results:
 
   st.write("---")
   st.subheader("📋 Action Log")
-for line in reversed(st.session_state.treatment_history[-10:]):
+  for line in reversed(st.session_state.treatment_history[-10:]):
   st.write(line)
 
 st.write("---")
