@@ -438,3 +438,188 @@ with right:
     else:
         st.write("No active patient.")
 
+# --------------------------------------
+# INVENTORY SYSTEM + ROOM CONTENTS
+# --------------------------------------
+
+# Initialize state if needed
+if "inventory" not in st.session_state:
+    st.session_state.inventory = []
+
+# Define available supplies and medications
+hospital_supplies = {
+    "IV Fluids (Saline)": "Used to maintain hydration and administer medications.",
+    "Intubation Kit": "Used for airway management in critical patients.",
+    "Blood Test Kit": "Used to collect and test blood samples.",
+    "Swab Kit": "Used for infection testing or viral samples.",
+    "Bandages": "Used to dress wounds or stop bleeding.",
+    "Ice Pack": "Used to reduce inflammation or pain.",
+    "Oxygen Mask": "Used to deliver oxygen to patients.",
+    "Bed Pan": "Used for bedridden patients needing toileting assistance.",
+    "Vomit Bag": "Used for patients experiencing nausea or vomiting.",
+    "Heated Blanket": "Used to prevent hypothermia or comfort shivering patients.",
+    "Syringe Pack": "Used for injections or drawing samples.",
+    "Defibrillator Pads": "Used to deliver electric shocks during cardiac arrest.",
+    "Gloves & PPE": "Personal protective equipment for infection control."
+}
+
+hospital_meds = {
+    "Ibuprofen": "Pain relief and anti-inflammatory for mild pain or fever.",
+    "Acetaminophen": "Fever reducer and mild pain reliever.",
+    "Morphine": "Strong opioid pain medication for severe pain or post-surgery.",
+    "Epinephrine": "Used for anaphylaxis, cardiac arrest, or severe asthma attacks.",
+    "Diazepam": "Used for seizure control or anxiety management.",
+    "Lorazepam": "Another option for seizures and sedation.",
+    "Insulin": "Used to lower blood sugar levels in diabetic emergencies.",
+    "Nitroglycerin": "Used for chest pain (angina) and heart attack cases.",
+    "Aspirin": "Used for heart attacks, stroke prevention, and mild pain.",
+    "Antibiotics": "Used to treat bacterial infections such as pneumonia.",
+    "tPA (Clot Buster)": "Used for ischemic stroke cases if given early.",
+    "Albuterol": "Used to relieve bronchospasm in asthma or COPD.",
+    "Ondansetron": "Used to treat nausea and vomiting.",
+    "Ketamine": "Used for sedation and pain management during procedures.",
+    "Erythropoietin": "Used for anemia management in chronic conditions."
+}
+
+# Display room interactions
+if "room" not in st.session_state:
+    st.session_state.room = "ER"
+
+st.write("---")
+st.subheader(f"🏥 You are currently in the: {st.session_state.room}")
+
+if st.session_state.room == "Supply Room":
+    st.header("🧃 Hospital Supply Room")
+    st.write("Select any supplies you need to collect:")
+    for item, desc in hospital_supplies.items():
+        if st.button(f"Collect {item}"):
+            if item not in st.session_state.inventory:
+                st.session_state.inventory.append(item)
+                st.success(f"✅ {item} added to your inventory.")
+            else:
+                st.info(f"ℹ️ You already have {item}.")
+        with st.expander(item):
+            st.caption(desc)
+
+elif st.session_state.room == "Medstation":
+    st.header("💊 Hospital Medstation")
+    st.write("Dispense medications as needed:")
+    for med, desc in hospital_meds.items():
+        if st.button(f"Dispense {med}"):
+            if med not in st.session_state.inventory:
+                st.session_state.inventory.append(med)
+                st.success(f"💉 {med} added to your inventory.")
+            else:
+                st.info(f"ℹ️ You already have {med}.")
+        with st.expander(med):
+            st.caption(desc)
+
+elif st.session_state.room == "ER":
+    st.header("🚑 Emergency Room")
+    st.write("Manage patients here. Use your inventory items and treatments.")
+
+elif st.session_state.room == "Operating Room":
+    st.header("🔪 Operating Room")
+    st.write("Perform surgeries and advanced procedures here.")
+
+elif st.session_state.room == "Nursing Station":
+    st.header("🗒️ Nursing Station")
+    st.write("Review charts, write notes, and plan patient care.")
+
+# Inventory display
+st.write("---")
+st.subheader("🎒 Current Inventory")
+if st.session_state.inventory:
+    for item in st.session_state.inventory:
+        st.write(f"- {item}")
+else:
+    st.info("Your inventory is empty. Visit the Supply Room or Medstation to gather items.")
+
+# --------------------------------------
+# PATIENT TREATMENT LOGIC + SCORING
+# --------------------------------------
+
+# Initialize score if missing
+if "score" not in st.session_state:
+    st.session_state.score = 0
+
+# Define correct treatments for each diagnosis
+treatment_protocols = {
+    "Heart attack": {
+        "correct": ["Aspirin", "Nitroglycerin", "Oxygen Mask", "IV Fluids (Saline)"],
+        "neutral": ["Bandages", "Ice Pack", "Heated Blanket"],
+        "harmful": ["Insulin", "tPA (Clot Buster)"]
+    },
+    "Pneumonia": {
+        "correct": ["Antibiotics", "Oxygen Mask", "IV Fluids (Saline)"],
+        "neutral": ["Acetaminophen", "Ibuprofen", "Heated Blanket"],
+        "harmful": ["Epinephrine", "Nitroglycerin"]
+    },
+    "Stroke": {
+        "correct": ["tPA (Clot Buster)", "Oxygen Mask", "IV Fluids (Saline)"],
+        "neutral": ["Heated Blanket", "Bandages"],
+        "harmful": ["Morphine", "Nitroglycerin"]
+    },
+    "Appendicitis": {
+        "correct": ["IV Fluids (Saline)", "Antibiotics", "Intubation Kit"],
+        "neutral": ["Bandages", "Heated Blanket"],
+        "harmful": ["Aspirin", "Ibuprofen"]
+    },
+    "Seizure": {
+        "correct": ["Diazepam", "Lorazepam", "Oxygen Mask"],
+        "neutral": ["Heated Blanket", "IV Fluids (Saline)"],
+        "harmful": ["Morphine", "Nitroglycerin"]
+    },
+    "Anaphylaxis": {
+        "correct": ["Epinephrine", "Oxygen Mask", "IV Fluids (Saline)"],
+        "neutral": ["Heated Blanket", "Ice Pack"],
+        "harmful": ["Morphine", "Nitroglycerin"]
+    },
+    "Diabetic Crisis": {
+        "correct": ["Insulin", "IV Fluids (Saline)"],
+        "neutral": ["Heated Blanket", "Bandages"],
+        "harmful": ["Aspirin", "Morphine"]
+    },
+}
+
+# Let user treat the patient if one exists
+if st.session_state.get("patient"):
+    p = st.session_state.patient
+    st.write("---")
+    st.header("💊 Treat the Patient")
+
+    # Treatment selection dropdown
+    if st.session_state.inventory:
+        selected_item = st.selectbox("Select an item from your inventory to use:", st.session_state.inventory)
+        if st.button("🩹 Use Selected Item"):
+            diagnosis = p.get("diagnosis", "Unknown")
+            protocol = treatment_protocols.get(diagnosis, {})
+            correct = protocol.get("correct", [])
+            neutral = protocol.get("neutral", [])
+            harmful = protocol.get("harmful", [])
+
+            if selected_item in correct:
+                st.success(f"✅ You used {selected_item}. Correct treatment for {diagnosis}!")
+                st.session_state.score += 10
+                feedback = "The patient’s condition improves."
+            elif selected_item in neutral:
+                st.info(f"😐 {selected_item} had little to no effect on {diagnosis}.")
+                st.session_state.score += 0
+                feedback = "No significant change in condition."
+            elif selected_item in harmful:
+                st.error(f"❌ {selected_item} was an inappropriate choice for {diagnosis}.")
+                st.session_state.score -= 10
+                feedback = "Patient stability worsened."
+            else:
+                st.warning(f"⚠️ {selected_item} has no known effect for {diagnosis}.")
+                st.session_state.score -= 2
+                feedback = "Unnecessary treatment administered."
+
+            # Log the result
+            st.write(feedback)
+            st.write(f"**Current Score:** {st.session_state.score}")
+
+            # Optionally remove item (uncomment below line if you want one-time use)
+            # st.session_state.inventory.remove(selected_item)
+    else:
+        st.info("Your inventory is empty. Visit the Supply Room or Medstation first.")
