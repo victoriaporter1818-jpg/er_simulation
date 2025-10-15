@@ -218,6 +218,8 @@ elif st.session_state.room == "Medstation":
                     st.success(f"✅ {med} added to your inventory.")
                 else:
                     st.info(f"ℹ️ You already have {med}.")
+                    
+# PHARMACY
 
 elif st.session_state.room == "Pharmacy":
     st.subheader("🏪 Hospital Pharmacy")
