@@ -106,6 +106,7 @@ st.session_state.room = st.sidebar.radio(
     "Move to another room:",
     ["ER", "Supply Room", "Medstation", "Operating Room", "Nursing Station"],
     index=["ER", "Supply Room", "Medstation", "Operating Room", "Nursing Station"].index(st.session_state.room)
+)
 
 # --------------------------------------
 # TREATMENT PROTOCOLS
