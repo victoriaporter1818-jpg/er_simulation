@@ -214,4 +214,201 @@ def perform_procedure(action):
     elif action == "Cath lab (angioplasty)":
         if role != "Surgeon" and role != "Doctor":
             return "Only Doctors or Surgeons can call the cath lab / perform interventional procedures."
-        comp_chance +=_
+        comp_chance += 0.12
+        success_modifier = 20
+        msg = "Patient taken to cath lab for angioplasty."
+    elif action == "Appendectomy":
+        if role != "Surgeon":
+            return "Only Surgeons may operate (appendectomy)."
+        comp_chance += 0.15
+        success_modifier = 25
+        msg = "Appendectomy performed."
+    elif action == "tPA":
+        # stroke thrombolysis risk/benefit
+        comp_chance += 0.10
+        success_modifier = 18
+        msg = "tPA administered for stroke (if eligible)."
+    elif action == "Chest x-ray":
+        msg = "Chest x-ray obtained: helps confirm pneumonia."
+    else:
+        msg = f"Performed {action}."
+    # result roll
+    roll = random.random()
+    if roll < comp_chance:
+        # complication
+        s["stability"] -= random.randint(10, 25)
+        log_action(f"Procedure '{action}' had a complication. Stability decreased.")
+        outcome_text = f"Procedure had a complication. Patient stability decreased."
+    else:
+        s["stability"] += success_modifier
+        s["treated"] = True
+        outcome_text = f"Procedure succeeded; patient improved."
+        log_action(f"Procedure '{action}' succeeded. Stability improved by {success_modifier}.")
+    # clamp
+    s["stability"] = max(0, min(100, s["stability"]))
+    return msg + " " + outcome_text + f" (took {time_cost} minutes)."
+
+# ---------- UI layout ----------
+left, mid, right = st.columns([1, 2, 1])
+
+# Left column: Controls
+with left:
+    st.header("Controls")
+    if st.button("🚨 Receive Next Patient"):
+        spawn_patient()
+
+    st.write("**Move between rooms:**")
+    room = st.selectbox("Go to:", ["ER Room", "Supply Room", "Medstation", "Operating Room", "Nursing Station"], index=["ER Room", "Supply Room", "Medstation", "Operating Room", "Nursing Station"].index(st.session_state.room) if st.session_state.room in ["ER Room", "Supply Room", "Medstation", "Operating Room", "Nursing Station"] else 0)
+    if room != st.session_state.room:
+        st.session_state.room = room
+        log_action(f"Moved to {room}.")
+
+    st.write("---")
+    st.write("**Inventory**")
+    for item, qty in st.session_state.inventory.items():
+        st.write(f"{item}: {qty}")
+
+    st.write("---")
+    st.write("**Quick actions**")
+    if st.button("Advance time by 5 min"):
+        update_patient_over_time(minutes=5)
+        log_action("Advanced time by 5 minutes.")
+    if st.button("Advance time by 15 min"):
+        update_patient_over_time(minutes=15)
+        log_action("Advanced time by 15 minutes.")
+
+# Middle column: Patient and main workflow
+with mid:
+    st.header("Patient & Workflow")
+
+    if st.session_state.patient is None:
+        st.info("No active patient. Click 'Receive Next Patient' to get a new case.")
+    else:
+        p = st.session_state.patient
+        s = st.session_state.patient_state
+        st.subheader(f"🧍 Patient: {p['name']} (Age {p['age']})")
+        st.markdown(f"**Symptoms:** {p['symptoms']}")
+        st.markdown(f"**Priority:** {p.get('priority', 'N/A')}")
+        st.markdown(f"**Stability:** {s['stability']:.1f}/100")
+        st.markdown(f"**Pain:** {s['pain']}/10")
+        st.markdown(f"**Arrival:** {s['arrival_time']}m ago")
+
+        st.write("**Vitals:**")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.write(f"BP: {p['vitals']['BP_systolic']}/{p['vitals']['BP_diastolic']}")
+            st.write(f"HR: {p['vitals']['HR']} bpm")
+        with col2:
+            st.write(f"O2: {p['vitals']['O2']}%")
+            st.write(f"Temp: {p['vitals']['Temp']} °C")
+        with col3:
+            st.write(f"Diagnosis (hidden until doctor confirms)")
+
+        st.write("---")
+        st.subheader("Role-specific actions")
+        if st.session_state.room == "ER Room":
+            if role == "Nurse":
+                if st.button("Take Vitals / Reassess"):
+                    # small random variation
+                    p["vitals"]["HR"] += random.randint(-3, 3)
+                    p["vitals"]["O2"] = max(60, p["vitals"]["O2"] + random.randint(-1, 2))
+                    update_patient_over_time(minutes=2)
+                    log_action("Nurse took vitals and reassessed patient.")
+                # administer item selection
+                item_choice = st.selectbox("Use item from inventory:", ["-- choose --"] + [k for k in st.session_state.inventory.keys()])
+                if item_choice != "-- choose --":
+                    if st.button("Apply item"):
+                        msg = apply_item(item_choice)
+                        st.info(msg)
+            elif role == "Doctor":
+                # Diagnostics: view labs / confirm diagnosis
+                if st.button("View Vitals (read-only)"):
+                    st.write(p["vitals"])
+                # diagnostic choice
+                diag_choices = ["Heart attack", "Pneumonia", "Stroke", "Appendicitis", "Other"]
+                diag_pick = st.selectbox("Suspected diagnosis:", diag_choices)
+                if st.button("Confirm diagnosis and recommend treatment"):
+                    update_patient_over_time(minutes=3)
+                    if diag_pick == p["diagnosis"]:
+                        st.success("✅ Correct diagnosis.")
+                        log_action("Doctor correctly diagnosed the patient.")
+                        # propose treatment choices
+                        for t in p["treatment"]:
+                            st.write(f"- {t}")
+                        st.session_state.patient_state["treated"] = True
+                        st.session_state.score += 10
+                    else:
+                        st.error(f"❌ Incorrect. True diagnosis: {p['diagnosis']}.")
+                        log_action("Doctor made incorrect diagnosis.")
+                        st.session_state.score -= 5
+                # order procedure
+                proc = st.selectbox("Order procedure:", ["-- choose --", "CT scan", "Chest x-ray", "tPA", "Cath lab (angioplasty)"])
+                if proc != "-- choose --" and st.button("Perform/Order procedure"):
+                    result = perform_procedure(proc if proc != "Cath lab (angioplasty)" else "Cath lab (angioplasty)")
+                    st.info(result)
+            elif role == "Surgeon":
+                st.write("Surgeons can move to the OR for operations.")
+                if st.button("Move patient to OR"):
+                    st.session_state.room = "Operating Room"
+                    log_action("Patient moved to Operating Room.")
+        elif st.session_state.room == "Supply Room":
+            st.subheader("Supply Room — Collect items")
+            # show available items with stock (infinite or limited)
+            supply_options = ["IV", "Bandage", "Ice Pack", "Oxygen Mask"]
+            for it in supply_options:
+                col_a, col_b = st.columns([3,1])
+                with col_a:
+                    st.write(it)
+                with col_b:
+                    if st.button(f"Take 1 x {it}", key=f"take_{it}"):
+                        st.session_state.inventory[it] = st.session_state.inventory.get(it, 0) + 1
+                        log_action(f"Picked up 1 x {it} in Supply Room.")
+                        st.success(f"{it} added to inventory.")
+        elif st.session_state.room == "Medstation":
+            st.subheader("Medstation — Get medications")
+            meds = ["Aspirin", "Antibiotics"]
+            for med in meds:
+                col_a, col_b = st.columns([3,1])
+                with col_a:
+                    st.write(med)
+                with col_b:
+                    if st.button(f"Dispense 1 x {med}", key=f"med_{med}"):
+                        st.session_state.inventory[med] = st.session_state.inventory.get(med, 0) + 1
+                        log_action(f"Dispensed 1 x {med} from Medstation.")
+                        st.success(f"{med} added to inventory.")
+        elif st.session_state.room == "Operating Room":
+            st.subheader("Operating Room")
+            if role == "Surgeon":
+                if st.button("Perform Appendectomy / Major Surgery"):
+                    # pick suitable procedure from patient
+                    op_name = "Appendectomy" if "Appendicitis" in p["diagnosis"] else "Major surgery"
+                    result = perform_procedure(op_name)
+                    st.info(result)
+            else:
+                st.info("Only surgeons may perform operations here.")
+        elif st.session_state.room == "Nursing Station":
+            st.subheader("Nursing Station")
+            if st.button("Write patient notes / update chart"):
+                log_action("Nurse charted notes in patient chart.")
+                st.success("Chart updated.")
+        # After actions, check patient outcome
+        outcome = check_patient_outcome()
+        if outcome == "deceased":
+            st.error("❌ The patient has deteriorated and expired.")
+            log_action("Patient died.")
+            st.session_state.patient = None
+            st.session_state.patient_state = {}
+        elif outcome == "discharged_stable":
+            st.success("✅ Patient stabilized and discharged.")
+            log_action("Patient stabilized and discharged.")
+            st.session_state.score += 20
+            st.session_state.patient = None
+            st.session_state.patient_state = {}
+
+# Right column: Info and history
+with right:
+    st.header("Current Room")
+    st.info(st.session_state.room)
+
+    st.write("---")
+    st.header("Action
