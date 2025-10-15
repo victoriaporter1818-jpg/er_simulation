@@ -141,7 +141,7 @@ left, right = st.columns([2, 1])
 # LEFT SIDE: MAIN ACTIONS
 # -----------------------
 with left:
-st.header("🏥 Main Actions")
+  st.header("🏥 Main Actions")
 
 # SUPPLY ROOM
 if st.session_state.room == "Supply Room":
