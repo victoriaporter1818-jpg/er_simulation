@@ -1,6 +1,5 @@
 import streamlit as st
 import random
-import time
 
 # --------------------------------------
 # STREAMLIT SETUP
@@ -43,27 +42,23 @@ if "treatment_history" not in st.session_state:
     st.session_state.treatment_history = []
 
 # --------------------------------------
-# ROOM NAVIGATION
-# --------------------------------------
-st.sidebar.header("🏥 Navigation")
-new_room = st.sidebar.radio(
-    "Move to another room:",
-    ["ER", "Supply Room", "Medstation", "Operating Room", "Nursing Station"],
-    index=["ER", "Supply Room", "Medstation", "Operating Room", "Nursing Station"].index(st.session_state.room)
-)
-st.session_state.room = new_room
-
-# --------------------------------------
 # PATIENT GENERATOR
 # --------------------------------------
 patients = [
-    {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath", "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}, "diagnosis": "Heart attack"},
-    {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen", "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}, "diagnosis": "Pneumonia"},
-    {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech", "vitals": {"BP": "150/90", "HR": 82, "O2": "97%"}, "diagnosis": "Stroke"},
-    {"name": "Emma Brown", "age": 8, "symptoms": "abdominal pain and vomiting for 12 hours", "vitals": {"BP": "100/65", "HR": 110, "O2": "98%"}, "diagnosis": "Appendicitis"},
-    {"name": "Maya Thompson", "age": 34, "symptoms": "convulsions and unresponsiveness", "vitals": {"BP": "130/85", "HR": 112, "O2": "94%"}, "diagnosis": "Seizure"},
-    {"name": "Jacob Rivera", "age": 50, "symptoms": "swelling and trouble breathing after eating peanuts", "vitals": {"BP": "80/50", "HR": 140, "O2": "82%"}, "diagnosis": "Anaphylaxis"},
-    {"name": "Helen Carter", "age": 67, "symptoms": "confusion, sweating, and low blood sugar", "vitals": {"BP": "120/80", "HR": 105, "O2": "96%"}, "diagnosis": "Diabetic Crisis"},
+    {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath",
+     "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}, "diagnosis": "Heart attack"},
+    {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen",
+     "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}, "diagnosis": "Pneumonia"},
+    {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech",
+     "vitals": {"BP": "150/90", "HR": 82, "O2": "97%"}, "diagnosis": "Stroke"},
+    {"name": "Emma Brown", "age": 8, "symptoms": "abdominal pain and vomiting for 12 hours",
+     "vitals": {"BP": "100/65", "HR": 110, "O2": "98%"}, "diagnosis": "Appendicitis"},
+    {"name": "Maya Thompson", "age": 34, "symptoms": "convulsions and unresponsiveness",
+     "vitals": {"BP": "130/85", "HR": 112, "O2": "94%"}, "diagnosis": "Seizure"},
+    {"name": "Jacob Rivera", "age": 50, "symptoms": "swelling and trouble breathing after eating peanuts",
+     "vitals": {"BP": "80/50", "HR": 140, "O2": "82%"}, "diagnosis": "Anaphylaxis"},
+    {"name": "Helen Carter", "age": 67, "symptoms": "confusion, sweating, and low blood sugar",
+     "vitals": {"BP": "120/80", "HR": 105, "O2": "96%"}, "diagnosis": "Diabetic Crisis"},
 ]
 
 # --------------------------------------
@@ -104,68 +99,28 @@ hospital_meds = {
 }
 
 # --------------------------------------
-# ROOM INTERACTIONS
+# SIDEBAR: NAVIGATION + INVENTORY
 # --------------------------------------
-st.subheader(f"🏥 You are currently in the: {st.session_state.room}")
+st.sidebar.header("🏥 Navigation")
+st.session_state.room = st.sidebar.radio(
+    "Move to another room:",
+    ["ER", "Supply Room", "Medstation", "Operating Room", "Nursing Station"],
+    index=["ER", "Supply Room", "Medstation", "Operating Room", "Nursing Station"].index(st.session_state.room)
+)
 
-if st.session_state.room == "Supply Room":
-    st.header("🧃 Hospital Supply Room")
-    for item, desc in hospital_supplies.items():
-        if st.button(f"Collect {item}"):
-            if item not in st.session_state.inventory:
-                st.session_state.inventory.append(item)
-                st.success(f"✅ {item} added to inventory.")
-            else:
-                st.info(f"ℹ️ You already have {item}.")
-        with st.expander(item):
-            st.caption(desc)
-
-elif st.session_state.room == "Medstation":
-    st.header("💊 Hospital Medstation")
-    for med, desc in hospital_meds.items():
-        if st.button(f"Dispense {med}"):
-            if med not in st.session_state.inventory:
-                st.session_state.inventory.append(med)
-                st.success(f"💉 {med} added to inventory.")
-            else:
-                st.info(f"ℹ️ You already have {med}.")
-        with st.expander(med):
-            st.caption(desc)
-
-elif st.session_state.room == "ER":
-    st.header("🚑 Emergency Room")
-    if st.button("🚨 Receive Next Patient"):
-        st.session_state.patient = random.choice(patients)
-        st.session_state.treatment_feedback = None
-        st.session_state.treatment_history = []
-
-    if st.session_state.patient:
-        p = st.session_state.patient
-        st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
-        st.write(f"**Symptoms:** {p['symptoms']}")
-        st.json(p["vitals"])
-
-elif st.session_state.room == "Operating Room":
-    st.header("🔪 Operating Room")
-    st.info("Perform advanced surgical procedures here (future feature).")
-
-elif st.session_state.room == "Nursing Station":
-    st.header("🗒️ Nursing Station")
-    st.write("Review patient charts, update notes, and plan ongoing care.")
-
-# --------------------------------------
-# INVENTORY DISPLAY
-# --------------------------------------
-st.write("---")
-st.subheader("🎒 Current Inventory")
+st.sidebar.subheader("🎒 Inventory")
 if st.session_state.inventory:
     for item in st.session_state.inventory:
-        st.write(f"- {item}")
+        st.sidebar.write(f"- {item}")
+    if st.sidebar.button("🗑️ Clear Inventory"):
+        st.session_state.inventory = []
+        st.session_state.success_message = "Inventory cleared."
+        st.experimental_rerun()
 else:
-    st.info("Your inventory is empty. Visit the Supply Room or Medstation.")
+    st.sidebar.info("Your inventory is empty.")
 
 # --------------------------------------
-# TREATMENT LOGIC + SCORING
+# TREATMENT PROTOCOLS
 # --------------------------------------
 treatment_protocols = {
     "Heart attack": {"correct": ["Aspirin", "Nitroglycerin", "Oxygen Mask", "IV Fluids (Saline)"], "neutral": ["Bandages", "Heated Blanket"], "harmful": ["Insulin", "tPA (Clot Buster)"]},
@@ -177,42 +132,108 @@ treatment_protocols = {
     "Diabetic Crisis": {"correct": ["Insulin", "IV Fluids (Saline)"], "neutral": ["Heated Blanket"], "harmful": ["Aspirin", "Morphine"]},
 }
 
-if st.session_state.patient:
-    st.write("---")
-    st.header("💊 Treat the Patient")
+# --------------------------------------
+# MAIN LAYOUT: LEFT (actions) / RIGHT (vitals & logs)
+# --------------------------------------
+left, right = st.columns([2, 1])
 
-    if st.session_state.inventory:
-        selected_item = st.selectbox("Select an item from your inventory to use:", st.session_state.inventory)
-        if st.button("🩹 Use Selected Item"):
+# -------------------
+# LEFT: ROOM INTERACTIONS
+# -------------------
+with left:
+    st.header("🏥 Main Actions")
+    
+    if st.session_state.room == "Supply Room":
+        for item, desc in hospital_supplies.items():
+            if st.button(f"Collect {item}"):
+                if item not in st.session_state.inventory:
+                    st.session_state.inventory.append(item)
+                    st.success(f"✅ {item} added to inventory.")
+                else:
+                    st.info(f"ℹ️ You already have {item}.")
+            with st.expander(item):
+                st.caption(desc)
+
+    elif st.session_state.room == "Medstation":
+        for med, desc in hospital_meds.items():
+            if st.button(f"Dispense {med}"):
+                if med not in st.session_state.inventory:
+                    st.session_state.inventory.append(med)
+                    st.success(f"💉 {med} added to inventory.")
+                else:
+                    st.info(f"ℹ️ You already have {med}.")
+            with st.expander(med):
+                st.caption(desc)
+
+    elif st.session_state.room == "ER":
+        if st.button("🚨 Receive Next Patient"):
+            st.session_state.patient = random.choice(patients)
+            st.session_state.treatment_feedback = None
+            st.session_state.treatment_history = []
+
+        if st.session_state.patient:
             p = st.session_state.patient
-            diagnosis = p["diagnosis"]
-            protocol = treatment_protocols.get(diagnosis, {})
-            correct, neutral, harmful = protocol.get("correct", []), protocol.get("neutral", []), protocol.get("harmful", [])
+            st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
+            st.write(f"**Symptoms:** {p['symptoms']}")
 
-            if selected_item in correct:
-                st.session_state.score += 10
-                feedback = f"✅ You used {selected_item}. Correct treatment for {diagnosis}!"
-                color = "success"
-            elif selected_item in neutral:
-                feedback = f"😐 {selected_item} had little effect."
-                color = "info"
-            elif selected_item in harmful:
-                st.session_state.score -= 10
-                feedback = f"❌ {selected_item} was harmful for {diagnosis}!"
-                color = "error"
-            else:
-                st.session_state.score -= 2
-                feedback = f"⚠️ {selected_item} had no known benefit."
-                color = "warning"
+            # Treatment selection
+            if st.session_state.inventory:
+                selected_item = st.selectbox("Select an item from your inventory to use:", st.session_state.inventory)
+                if st.button("🩹 Use Selected Item"):
+                    diagnosis = p["diagnosis"]
+                    protocol = treatment_protocols.get(diagnosis, {})
+                    correct, neutral, harmful = protocol.get("correct", []), protocol.get("neutral", []), protocol.get("harmful", [])
 
-            st.session_state.treatment_feedback = (feedback, color)
-            st.session_state.treatment_history.append(f"{selected_item} → {feedback.split('.')[0]}")
+                    if selected_item in correct:
+                        st.session_state.score += 10
+                        feedback = f"✅ You used {selected_item}. Correct treatment!"
+                        color = "success"
+                    elif selected_item in neutral:
+                        feedback = f"😐 {selected_item} had little effect."
+                        color = "info"
+                    elif selected_item in harmful:
+                        st.session_state.score -= 10
+                        feedback = f"❌ {selected_item} was harmful!"
+                        color = "error"
+                    else:
+                        st.session_state.score -= 2
+                        feedback = f"⚠️ {selected_item} had no effect."
+                        color = "warning"
 
-    if st.session_state.treatment_feedback:
-        feedback, color = st.session_state.treatment_feedback
-        getattr(st, color)(feedback)
-        st.write(f"**Current Score:** {st.session_state.score}")
+                    st.session_state.treatment_feedback = (feedback, color)
+                    st.session_state.treatment_history.append(f"{selected_item} → {feedback.split('.')[0]}")
 
-        with st.expander("📋 Treatment History"):
-            for line in st.session_state.treatment_history[-10:]:
-                st.write(line)
+    elif st.session_state.room == "Operating Room":
+        st.header("🔪 Operating Room")
+        st.info("Perform advanced surgical procedures here (future feature).")
+
+    elif st.session_state.room == "Nursing Station":
+        st.header("🗒️ Nursing Station")
+        st.write("Review patient charts, update notes, and plan ongoing care.")
+
+# -------------------
+# RIGHT: PATIENT VITALS + ACTION LOG
+# -------------------
+with right:
+    st.header("🩺 Patient Vitals & Action Log")
+
+    if st.session_state.patient:
+        p = st.session_state.patient
+        st.subheader(f"{p['name']} - Vitals")
+        for k, v in p['vitals'].items():
+            st.write(f"**{k}:** {v}")
+    else:
+        st.info("No active patient.")
+
+    st.write("---")
+    st.subheader("📋 Action Log")
+    if st.session_state.treatment_history:
+        for line in reversed(st.session_state.treatment_history[-15:]):
+            st.write(line)
+    else:
+        st.info("No actions taken yet.")
+
+    st.write("---")
+    st.subheader("🏆 Score")
+    st.write(st.session_state.score)
+
