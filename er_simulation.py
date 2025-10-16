@@ -43,6 +43,61 @@ patients = [
 ]
 
 # --------------------------------------
+# DIAGNOSTIC RESULTS DATABASE (expanded)
+# --------------------------------------
+diagnostic_results = {
+    "Heart attack": {
+        "EKG": "EKG shows ST-segment elevation in leads II, III, and aVF.",
+        "Troponin Lab": "Troponin elevated, confirming myocardial injury.",
+        "X-Ray Chest": "Heart size normal, lungs clear.",
+        "CT Scan Chest": "No pulmonary embolism detected.",
+        "MRI Heart": "Left ventricular function reduced.",
+        "Ultrasound Heart": "Wall motion abnormalities detected."
+    },
+    "Pneumonia": {
+        "CBC": "WBC 15,000/µL, indicating infection.",
+        "X-Ray Chest": "Consolidation in right lower lobe.",
+        "CT Scan Chest": "Patchy infiltrates in affected lobe.",
+        "Ultrasound Chest": "Pleural effusion absent.",
+        "Urinalysis": "Normal.",
+        "Biopsy": "Not applicable."
+    },
+    "Stroke": {
+        "CT Scan Head/Brain": "Ischemic infarct in left MCA territory.",
+        "MRI Head/Brain": "Acute ischemic stroke confirmed.",
+        "EKG": "Normal sinus rhythm.",
+        "CBC": "Normal.",
+        "EEG": "Mild slowing of background activity."
+    },
+    "Appendicitis": {
+        "Ultrasound Abdomen": "Inflamed appendix >6mm with surrounding fluid.",
+        "CT Scan Abdomen": "Appendix swollen with inflammation.",
+        "CBC": "WBC elevated at 14,500/µL.",
+        "Urinalysis": "Normal.",
+        "Endoscopy": "Not indicated."
+    },
+    "Seizure": {
+        "EEG": "EEG shows spikes and sharp waves consistent with seizure.",
+        "CBC": "Normal.",
+        "MRI Head/Brain": "No structural abnormality.",
+        "CT Scan Head/Brain": "Normal.",
+        "Electrolytes Lab": "Normal."
+    },
+    "Anaphylaxis": {
+        "Lab Test": "Elevated histamine and tryptase confirming allergic reaction.",
+        "CBC": "Normal.",
+        "X-Ray Chest": "Normal.",
+        "EKG": "Tachycardia present."
+    },
+    "Diabetic Crisis": {
+        "Lab Test": "Glucose 450 mg/dL, ketones positive, pH 7.2.",
+        "CBC": "Mild leukocytosis.",
+        "Electrolytes Lab": "Low sodium, high potassium.",
+        "Urinalysis": "Glucosuria and ketonuria present."
+    }
+}
+
+# --------------------------------------
 # SUPPLIES & MEDS
 # --------------------------------------
 hospital_supplies = {
