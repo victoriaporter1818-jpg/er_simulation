@@ -145,7 +145,28 @@ with left:
 
         # Patient selection only visible in ER
         st.subheader("🧍 Patient Info")
-        patient_name = st.selectbox("Select patient:", [p["name"] for p in patients], key="patient_select")
+        # ER ROOM
+elif st.session_state.room == "ER":
+    st.subheader("🚨 Emergency Room")
+
+    # Generate a new patient when the button is pressed
+    if st.button("🆕 Generate New Patient"):
+        st.session_state.patient = random.choice(patients)
+        st.session_state.treatment_history = []
+        st.session_state.test_results = None
+        st.success(f"New patient arrived: {st.session_state.patient['name']}!")
+
+    # If a patient is currently active, display their details
+    if st.session_state.patient:
+        p = st.session_state.patient
+        st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
+        st.write(f"**Symptoms:** {p['symptoms']}")
+        st.write("---")
+
+        # Allow diagnostics for doctors and radiologists
+        if role in ["Doctor", "Radiologist", "Nurse"]:
+            perform_diagnostics(p)
+
         st.session_state.patient = next((p for p in patients if p["name"] == patient_name), None)
 
         if st.session_state.patient:
