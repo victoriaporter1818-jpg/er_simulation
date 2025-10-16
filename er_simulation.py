@@ -121,6 +121,42 @@ if st.session_state.room not in rooms:
 
 st.session_state.room = st.sidebar.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
 
+# --------------------------------------
+# ONLY SHOW INTRO & DIFFICULTY/ROLE SELECTION IN ER
+# --------------------------------------
+if st.session_state.room == "ER":
+    st.title("🏥 AI Emergency Room Simulation - Hospital Expansion")
+    st.write("---")
+
+    # --------------------------------------
+    # DIFFICULTY LEVEL
+    # --------------------------------------
+    difficulty = st.radio("Select Difficulty Level:", ["Beginner", "Intermediate", "Expert"])
+    difficulty_multiplier = {"Beginner": 1, "Intermediate": 1.5, "Expert": 2}[difficulty]
+    st.write(f"**Difficulty Level:** {difficulty}")
+    st.write("---")
+
+    # --------------------------------------
+    # ROLE SELECTION
+    # --------------------------------------
+    roles = ["-- Choose --", "Nurse", "Doctor", "Surgeon", "Radiologist", "Pharmacist"]
+    role = st.selectbox("Select your role:", roles)
+
+    role_descriptions = {
+        "Nurse": "🩺 You’re on duty. Take vitals, record patient history, and provide care.",
+        "Doctor": "⚕️ Diagnose patients, order tests, and prescribe medications.",
+        "Surgeon": "🔪 Perform critical surgical procedures in the OR.",
+        "Radiologist": "🩻 Perform and interpret diagnostic imaging such as CT, MRI, and X-rays.",
+        "Pharmacist": "💊 Verify prescriptions and dispense medications."
+    }
+
+    if role == "-- Choose --":
+        st.info("👋 Welcome! Please select a role to begin your shift.")
+    else:
+        st.success(role_descriptions[role])
+
+    st.write("---")
+
 st.sidebar.write("---")
 st.sidebar.subheader("📦 Current Inventory")
 if st.session_state.inventory:
