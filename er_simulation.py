@@ -194,14 +194,14 @@ with left:
 
     st.write("---")
 
-    if st.session_state.room == "ER":
+        if st.session_state.room == "ER":
     # Generate new patient button
     if st.button("🚑 Generate New Patient"):
         st.session_state.patient = random.choice(patients)
         st.session_state.treatment_history = []
         st.session_state.test_results = None
 
-    if st.session_state.room == "ER":
+        if st.session_state.room == "ER":
     # Display patient info
     if st.session_state.patient:
         p = st.session_state.patient
@@ -219,7 +219,7 @@ with left:
         if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
             perform_diagnostics(p)
 
-        if st.session_state.room == "ER":
+            if st.session_state.room == "ER":
         # Show medical history questionnaire
         st.subheader("📝 Medical History")
         with st.form("medical_history_form"):
