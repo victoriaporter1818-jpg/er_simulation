@@ -173,8 +173,8 @@ with left:
                 st.caption(desc)
 
     elif st.session_state.room == "Medstation":
-    st.subheader("💉 Emergency Medstation")
-    st.write("Dispense emergency and critical-care medications.")
+        st.subheader("💉 Emergency Medstation")
+        st.write("Dispense emergency and critical-care medications.")
 
     for med, desc in medstation_meds.items():
         col1, col2 = st.columns([3, 1])
