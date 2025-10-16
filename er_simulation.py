@@ -283,26 +283,29 @@ with left:
             st.write(f"**Current Medications:** {history['medications'] if history['medications'] else 'None'}")
             st.write(f"**Family History:** {history['family_history'] if history['family_history'] else 'None'}")
 
-            # -------------------------
-            # Medical History Form
-            # -------------------------
-            form_key = f"medical_history_form_{p['name'].replace(' ', '_')}"
-            with st.form(form_key):
-                chronic_conditions = st.multiselect(
-                    "Select chronic conditions the patient has:",
-                    ["Diabetes", "Hypertension", "Asthma", "Heart Disease", "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"],
-                    default=history['chronic_conditions']
-                )
-                allergies = st.text_input("Known allergies (comma separated):", value=history['allergies'])
-                medications_taken = st.text_area("Current medications:", value=history['medications'])
-                family_history = st.text_area("Relevant family medical history:", value=history['family_history'])
+# -------------------------
+# Medical History Form
+# -------------------------
+form_key = f"medical_history_form_{p['name'].replace(' ', '_')}"
+history = generate_patient_history(p)
 
-                submitted = st.form_submit_button("Save Medical History")
-                if submitted:
-                    st.session_state.treatment_history.append(
-                        f"Medical history recorded: Chronic conditions={chronic_conditions}, Allergies={allergies}, Medications={medications_taken}, Family history={family_history}"
-                    )
-                    st.success("✅ Medical history saved.")
+with st.form(form_key):
+    chronic_conditions = st.multiselect(
+        "Select chronic conditions the patient has:",
+        ["Diabetes", "Hypertension", "Asthma", "Heart Disease", "Kidney Disease", "Liver Disease", "Seizure Disorder", "High Cholesterol", "Obesity", "Sleep Apnea", "Other"],
+        default=history['chronic_conditions']
+    )
+    allergies = st.text_input("Known allergies (comma separated):", value=history['allergies'])
+    medications_taken = st.text_area("Current medications:", value=history['medications'])
+    family_history = st.text_area("Relevant family medical history:", value=history['family_history'])
+
+    submitted = st.form_submit_button("Save Medical History")
+    if submitted:
+        st.session_state.treatment_history.append(
+            f"Medical history recorded: Chronic conditions={chronic_conditions}, Allergies={allergies}, Medications={medications_taken}, Family history={family_history}"
+        )
+        st.success("✅ Medical history saved.")
+
 
             # Allow diagnostics for doctors and nurses
             if role in ["Doctor", "Nurse", "Radiologist"]:
