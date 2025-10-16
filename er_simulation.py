@@ -149,7 +149,7 @@ if st.session_state.room == "ER":
     st.subheader("🧍 Patient Info")
 
         # ER ROOM
-        elif st.session_state.room == "ER":
+    elif st.session_state.room == "ER":
             st.subheader("🚨 Emergency Room")
 
     # Generate a new patient when the button is pressed
