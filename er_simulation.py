@@ -21,6 +21,8 @@ if "treatment_history" not in st.session_state:
     st.session_state.treatment_history = []
 if "test_results" not in st.session_state:
     st.session_state.test_results = None
+if "role" not in st.session_state:
+    st.session_state.role = "-- Choose --"
 
 # --------------------------------------
 # PATIENT DATABASE
@@ -100,22 +102,14 @@ if st.sidebar.button("🗑️ Clear Inventory"):
 # DIAGNOSTIC SYSTEM
 # --------------------------------------
 diagnostic_images = {
-    "X-Ray": {
-        "Chest": "https://upload.wikimedia.org/wikipedia/commons/8/85/Normal_chest_xray.jpg",
-        "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Abdomen_X-ray.jpg",
-        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
-        "Limb": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Hand_xray.jpg"
-    },
-    "CT Scan": {
-        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
-        "Chest": "https://upload.wikimedia.org/wikipedia/commons/4/44/CT_Thorax.jpg"
-    },
-    "MRI": {
-        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Brain_MRI.jpg"
-    },
-    "Ultrasound": {
-        "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Ultrasound_liver.jpg"
-    }
+    "X-Ray": {"Chest": "https://upload.wikimedia.org/wikipedia/commons/8/85/Normal_chest_xray.jpg",
+              "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Abdomen_X-ray.jpg",
+              "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
+              "Limb": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Hand_xray.jpg"},
+    "CT Scan": {"Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
+                "Chest": "https://upload.wikimedia.org/wikipedia/commons/4/44/CT_Thorax.jpg"},
+    "MRI": {"Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Brain_MRI.jpg"},
+    "Ultrasound": {"Abdomen": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Ultrasound_liver.jpg"}
 }
 
 def perform_diagnostics(patient):
@@ -129,7 +123,6 @@ def perform_diagnostics(patient):
         if st.button("📸 Perform Imaging", key=f"imaging_{chosen_imaging}_{chosen_body_part}"):
             dx = patient["diagnosis"]
             result = f"{chosen_imaging} of {chosen_body_part} performed. "
-            # patient-specific interpretation
             if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
                (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
                (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen") or \
@@ -141,7 +134,6 @@ def perform_diagnostics(patient):
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
-            # show sample image if available
             if chosen_body_part in diagnostic_images.get(chosen_imaging, {}):
                 st.image(diagnostic_images[chosen_imaging][chosen_body_part], use_container_width=True)
     else:
@@ -164,98 +156,71 @@ def perform_diagnostics(patient):
 # --------------------------------------
 # MAIN INTERFACE
 # --------------------------------------
-left, right = st.columns([2, 1])
+left, right = st.columns([2,1])
 
 with left:
-    # --------------------------------------
-# ER ROOM
-# --------------------------------------
+    # ER ROOM
     if st.session_state.room == "ER":
         st.subheader("🚨 Emergency Room")
 
-    # Initialize role in session state if not set
-    if "role" not in st.session_state:
-        st.session_state.role = "-- Choose --"
+        # Role selection
+        roles = ["-- Choose --", "Nurse", "Doctor", "Surgeon", "Radiologist", "Pharmacist"]
+        st.session_state.role = st.selectbox("Select your role:", roles)
 
-    # Role selection
-    roles = ["-- Choose --", "Nurse", "Doctor", "Surgeon", "Radiologist", "Pharmacist"]
-    st.session_state.role = st.selectbox("Select your role:", roles)
+        # Role description
+        if st.session_state.role != "-- Choose --":
+            role_descriptions = {
+                "Nurse": "🩺 You’re on duty. Take vitals, record patient history, and provide care.",
+                "Doctor": "⚕️ Diagnose patients, order tests, and prescribe medications.",
+                "Surgeon": "🔪 Perform critical surgical procedures in the OR.",
+                "Radiologist": "🩻 Perform and interpret diagnostic imaging.",
+                "Pharmacist": "💊 Verify prescriptions and dispense medications."
+            }
+            st.success(role_descriptions[st.session_state.role])
 
-    # Show role description if selected
-    if st.session_state.role != "-- Choose --":
-        role_descriptions = {
-            "Nurse": "🩺 You’re on duty. Take vitals, record patient history, and provide care.",
-            "Doctor": "⚕️ Diagnose patients, order tests, and prescribe medications.",
-            "Surgeon": "🔪 Perform critical surgical procedures in the OR.",
-            "Radiologist": "🩻 Perform and interpret diagnostic imaging.",
-            "Pharmacist": "💊 Verify prescriptions and dispense medications."
-        }
-        st.success(role_descriptions[st.session_state.role])
-
-    st.write("---")
-
-    # Generate new patient button
-    if st.button("🚑 Generate New Patient"):
-        st.session_state.patient = random.choice(patients)
-        st.session_state.treatment_history = []
-        st.session_state.test_results = None
-
-    # Display patient info
-    if st.session_state.patient:
-        p = st.session_state.patient
-        st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
-        st.write(f"**Symptoms:** {p['symptoms']}")
         st.write("---")
 
-        # Show vitals
-        st.subheader("🩺 Patient Vitals")
-        for k, v in p["vitals"].items():
-            st.write(f"**{k}:** {v}")
-
-        # Allow diagnostics for Doctors, Radiologists, and Nurses
-        if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
-            perform_diagnostics(p)
-
-        # Show medical history questionnaire
-        st.subheader("📝 Medical History")
-        with st.form("medical_history_form"):
-            chronic_conditions = st.multiselect(
-                "Select chronic conditions the patient has:",
-                ["Diabetes", "Hypertension", "Asthma", "Heart Disease",
-                 "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"]
-            )
-            allergies = st.text_input("List any known allergies (comma separated):")
-            medications_taken = st.text_area("Current medications the patient is taking:")
-            family_history = st.text_area("Relevant family medical history:")
-
-            submitted = st.form_submit_button("Save Medical History")
-            if submitted:
-                st.session_state.treatment_history.append(
-                    f"Medical history recorded: Chronic conditions={chronic_conditions}, "
-                    f"Allergies={allergies}, Medications={medications_taken}, "
-                    f"Family history={family_history}"
-                )
-                st.success("✅ Medical history saved.")
-
-
         # Generate new patient
-        if st.button("🚨 Generate New Patient"):
+        if st.button("🚑 Generate New Patient"):
             st.session_state.patient = random.choice(patients)
             st.session_state.treatment_history = []
             st.session_state.test_results = None
 
+        # Show patient info if exists
         if st.session_state.patient:
             p = st.session_state.patient
-            st.subheader(f"🧍 Patient: {p['name']} (Age {p['age']})")
+            st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
             st.write(f"**Symptoms:** {p['symptoms']}")
             st.write("---")
-            # show patient vitals
-            st.subheader("Vitals")
+
+            st.subheader("🩺 Patient Vitals")
             for k, v in p["vitals"].items():
                 st.write(f"**{k}:** {v}")
-            # allow diagnostics
-            if role in ["Doctor", "Radiologist", "Nurse"]:
+
+            # Allow diagnostics for Doctors, Radiologists, Nurses
+            if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
                 perform_diagnostics(p)
+
+            # Medical History Form
+            st.subheader("📝 Medical History")
+            with st.form("medical_history_form"):
+                chronic_conditions = st.multiselect(
+                    "Select chronic conditions the patient has:",
+                    ["Diabetes", "Hypertension", "Asthma", "Heart Disease",
+                     "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"]
+                )
+                allergies = st.text_input("List any known allergies (comma separated):")
+                medications_taken = st.text_area("Current medications the patient is taking:")
+                family_history = st.text_area("Relevant family medical history:")
+
+                submitted = st.form_submit_button("Save Medical History")
+                if submitted:
+                    st.session_state.treatment_history.append(
+                        f"Medical history recorded: Chronic conditions={chronic_conditions}, "
+                        f"Allergies={allergies}, Medications={medications_taken}, "
+                        f"Family history={family_history}"
+                    )
+                    st.success("✅ Medical history saved.")
 
     # -----------------------------
     # Supply Room
@@ -363,6 +328,7 @@ with right:
     st.write("---")
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
+
 
 
 
