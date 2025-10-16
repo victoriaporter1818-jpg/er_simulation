@@ -148,6 +148,11 @@ left, right = st.columns([2, 1])
 with left:
     st.header("🏥 Main Actions")
 
+    # DIFFICULTY LEVEL
+if st.session_state.room == "ER":
+    difficulty = st.radio("Select Difficulty Level:", ["Beginner", "Intermediate", "Expert"])
+    st.write(f"**Difficulty Level:** {difficulty}")
+
     # ER ROOM
     if st.session_state.room == "ER":
         # Show introduction and difficulty only in ER
