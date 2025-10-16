@@ -136,8 +136,8 @@ def perform_diagnostics(patient):
             }
             img_url = sample_images.get(dx, "")
             if img_url:
-                st.image(img_url, caption=f"Sample {chosen_imaging} for {dx}", use_column_width=True)
-            
+                st.image(img_url, caption=f"Sample {chosen_imaging} for {dx}", use_container_width=True)
+                
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
