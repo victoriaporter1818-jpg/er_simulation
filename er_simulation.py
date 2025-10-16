@@ -78,12 +78,10 @@ pharmacy_meds = {
 }
 
 # --------------------------------------
-# ROOM NAVIGATION + INVENTORY
+# ROOM NAVIGATION
 # --------------------------------------
 rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
 st.sidebar.header("🏥 Navigation")
-if st.session_state.room not in rooms:
-    st.session_state.room = "ER"
 st.session_state.room = st.sidebar.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
 
 st.sidebar.write("---")
@@ -93,6 +91,7 @@ if st.session_state.inventory:
         st.sidebar.write(f"- {i}")
 else:
     st.sidebar.info("Inventory is empty.")
+
 if st.sidebar.button("🗑️ Clear Inventory"):
     st.session_state.inventory = []
     st.sidebar.warning("Inventory cleared.")
@@ -102,7 +101,6 @@ if st.sidebar.button("🗑️ Clear Inventory"):
 # --------------------------------------
 def perform_diagnostics(patient):
     st.subheader("🧪 Order Diagnostic Tests")
-
     test_type = st.radio("Select Test Type:", ["Imaging", "Lab Test"])
     if test_type == "Imaging":
         imaging_types = ["X-Ray", "CT Scan", "MRI", "Ultrasound"]
@@ -110,32 +108,31 @@ def perform_diagnostics(patient):
         chosen_imaging = st.selectbox("Select Imaging Type:", imaging_types)
         chosen_body_part = st.selectbox("Select Body Part:", body_parts)
         if st.button("📸 Perform Imaging"):
-            result = f"{chosen_imaging} of {chosen_body_part} performed."
+            result = f"{chosen_imaging} of {chosen_body_part} performed. "
             dx = patient["diagnosis"]
             if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
                (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
                (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen"):
-                result += " Findings consistent with suspected diagnosis."
+                result += "Findings consistent with suspected diagnosis."
                 st.session_state.score += 10
             else:
-                result += " No significant findings."
+                result += "No significant findings."
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
-
     elif test_type == "Lab Test":
         lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
         chosen_test = st.selectbox("Select Diagnostic Test:", lab_tests)
         if st.button("🧬 Perform Test"):
-            result = f"{chosen_test} completed."
+            result = f"{chosen_test} completed. "
             dx = patient["diagnosis"]
             if (dx == "Heart attack" and chosen_test == "EKG") or \
                (dx == "Seizure" and chosen_test == "EEG") or \
                (dx == "Pneumonia" and chosen_test == "CBC"):
-                result += " Results confirm clinical suspicion."
+                result += "Results confirm clinical suspicion."
                 st.session_state.score += 10
             else:
-                result += " Results inconclusive."
+                result += "Results inconclusive."
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
@@ -148,16 +145,32 @@ left, right = st.columns([2, 1])
 with left:
     st.header("🏥 Main Actions")
 
-    # DIFFICULTY LEVEL
-if st.session_state.room == "ER":
-    difficulty = st.radio("Select Difficulty Level:", ["Beginner", "Intermediate", "Expert"])
-    st.write(f"**Difficulty Level:** {difficulty}")
-
+    # -----------------------------
     # ER ROOM
+    # -----------------------------
     if st.session_state.room == "ER":
-        # Show introduction and difficulty only in ER
         st.subheader("👋 Welcome to the ER")
+        difficulty = st.radio("Select Difficulty Level:", ["Beginner", "Intermediate", "Expert"])
+        difficulty_multiplier = {"Beginner": 1, "Intermediate": 1.5, "Expert": 2}[difficulty]
         st.write(f"**Difficulty Level:** {difficulty}")
+        st.write("---")
+
+        roles = ["-- Choose --", "Nurse", "Doctor", "Surgeon", "Radiologist", "Pharmacist"]
+        role = st.selectbox("Select your role:", roles)
+
+        role_descriptions = {
+            "Nurse": "🩺 You’re on triage duty. Take vitals, record patient history, and provide initial care.",
+            "Doctor": "⚕️ Diagnose patients, order tests, and prescribe medications.",
+            "Surgeon": "🔪 Perform critical surgical procedures in the OR.",
+            "Radiologist": "🩻 Perform and interpret diagnostic imaging such as CT, MRI, and X-rays.",
+            "Pharmacist": "💊 Verify prescriptions and dispense correct medications to patients."
+        }
+
+        if role == "-- Choose --":
+            st.info("👋 Please select a role to begin your shift.")
+        else:
+            st.success(role_descriptions[role])
+
         st.write("---")
 
         if st.button("🚨 Receive Next Patient"):
@@ -171,90 +184,58 @@ if st.session_state.room == "ER":
             st.write(f"**Symptoms:** {p['symptoms']}")
             st.write("---")
 
-            # Pre-fill based on patient diagnosis
+            # Pre-fill medical history
             default_history = {
-                "Heart attack": {
-                    "chronic_conditions": ["Heart Disease", "Hypertension"],
-                    "allergies": "None",
-                    "medications": "Aspirin, Statins",
-                    "family_history": "Father had heart disease"
-                },
-                "Pneumonia": {
-                    "chronic_conditions": ["Asthma"],
-                    "allergies": "Penicillin",
-                    "medications": "Albuterol",
-                    "family_history": "No significant history"
-                },
-                "Stroke": {
-                    "chronic_conditions": ["Hypertension", "Diabetes"],
-                    "allergies": "None",
-                    "medications": "Blood thinners",
-                    "family_history": "Mother had stroke"
-                },
-                "Appendicitis": {
-                    "chronic_conditions": [],
-                    "allergies": "None",
-                    "medications": "None",
-                    "family_history": "No significant history"
-                },
-                "Seizure": {
-                    "chronic_conditions": ["Seizure Disorder"],
-                    "allergies": "None",
-                    "medications": "Diazepam",
-                    "family_history": "Brother has epilepsy"
-                },
-                "Anaphylaxis": {
-                    "chronic_conditions": ["Asthma"],
-                    "allergies": "Peanuts",
-                    "medications": "Inhaler",
-                    "family_history": "No significant history"
-                },
-                "Diabetic Crisis": {
-                    "chronic_conditions": ["Diabetes"],
-                    "allergies": "None",
-                    "medications": "Insulin",
-                    "family_history": "Mother has diabetes"
-                }
+                "Heart attack": {"chronic_conditions": ["Heart Disease", "Hypertension"], "allergies": "None",
+                                 "medications": "Aspirin, Statins", "family_history": "Father had heart disease"},
+                "Pneumonia": {"chronic_conditions": ["Asthma"], "allergies": "Penicillin",
+                              "medications": "Albuterol", "family_history": "No significant history"},
+                "Stroke": {"chronic_conditions": ["Hypertension", "Diabetes"], "allergies": "None",
+                           "medications": "Blood thinners", "family_history": "Mother had stroke"},
+                "Appendicitis": {"chronic_conditions": [], "allergies": "None", "medications": "None",
+                                 "family_history": "No significant history"},
+                "Seizure": {"chronic_conditions": ["Seizure Disorder"], "allergies": "None",
+                            "medications": "Diazepam", "family_history": "Brother has epilepsy"},
+                "Anaphylaxis": {"chronic_conditions": ["Asthma"], "allergies": "Peanuts",
+                                "medications": "Inhaler", "family_history": "No significant history"},
+                "Diabetic Crisis": {"chronic_conditions": ["Diabetes"], "allergies": "None",
+                                    "medications": "Insulin", "family_history": "Mother has diabetes"}
             }
 
-            history = default_history.get(p["diagnosis"], {
-                "chronic_conditions": [],
-                "allergies": "",
-                "medications": "",
-                "family_history": ""
-            })
+            history = default_history.get(p["diagnosis"], {"chronic_conditions": [], "allergies": "", "medications": "", "family_history": ""})
 
             st.write(f"**Chronic Conditions:** {', '.join(history['chronic_conditions']) if history['chronic_conditions'] else 'None'}")
             st.write(f"**Allergies:** {history['allergies'] if history['allergies'] else 'None'}")
             st.write(f"**Current Medications:** {history['medications'] if history['medications'] else 'None'}")
             st.write(f"**Family History:** {history['family_history'] if history['family_history'] else 'None'}")
 
-            # -------------------------
             # Medical History Questionnaire
-            # -------------------------
             st.subheader("📝 Medical History")
             with st.form("medical_history_form"):
                 chronic_conditions = st.multiselect(
                     "Select chronic conditions the patient has:",
                     ["Diabetes", "Hypertension", "Asthma", "Heart Disease", "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"]
                 )
-                allergies_input = st.text_input("List any known allergies (comma separated):")
+                allergies = st.text_input("List any known allergies (comma separated):")
                 medications_taken = st.text_area("Current medications the patient is taking:")
-                family_history_input = st.text_area("Relevant family medical history:")
+                family_history = st.text_area("Relevant family medical history:")
 
                 submitted = st.form_submit_button("Save Medical History")
                 if submitted:
                     st.session_state.treatment_history.append(
-                        f"Medical history recorded: Chronic conditions={chronic_conditions}, Allergies={allergies_input}, Medications={medications_taken}, Family history={family_history_input}"
+                        f"Medical history recorded: Chronic conditions={chronic_conditions}, Allergies={allergies}, Medications={medications_taken}, Family history={family_history}"
                     )
                     st.success("✅ Medical history saved.")
 
-            # Allow diagnostics for doctor/nurse/radiologist
+            # Diagnostics available for Nurses, Doctors, Radiologists
             if role in ["Doctor", "Nurse", "Radiologist"]:
                 perform_diagnostics(p)
 
-    # SUPPLY ROOM
-    elif st.session_state.room == "Supply Room":
+# -----------------------------
+# Other rooms
+# -----------------------------
+with left:
+    if st.session_state.room == "Supply Room":
         st.subheader("🧰 Hospital Supply Room")
         for item, desc in hospital_supplies.items():
             if st.button(f"Collect {item}"):
@@ -266,7 +247,6 @@ if st.session_state.room == "ER":
             with st.expander(item):
                 st.caption(desc)
 
-    # MEDSTATION
     elif st.session_state.room == "Medstation":
         st.subheader("💉 Emergency Medstation")
         st.write("Dispense emergency and critical-care medications.")
@@ -283,7 +263,6 @@ if st.session_state.room == "ER":
                     else:
                         st.info(f"ℹ️ You already have {med}.")
 
-    # PHARMACY
     elif st.session_state.room == "Pharmacy":
         st.subheader("🏪 Hospital Pharmacy")
         st.write("Access long-term and prescription medications for patients.")
@@ -294,6 +273,7 @@ if st.session_state.room == "ER":
                     st.caption(desc)
             with col2:
                 if st.button(f"Dispense {med}", key=f"pharmacy_{med}"):
+
                     if role == "Pharmacist":
                         st.session_state.score += 5
                         st.success(f"💊 Correctly dispensed {med}. +5 points!")
@@ -303,17 +283,15 @@ if st.session_state.room == "ER":
                     else:
                         st.warning(f"You already have {med}.")
 
-    # RADIOLOGY LAB
     elif st.session_state.room == "Radiology Lab":
         st.subheader("🩻 Radiology Lab")
-        if role not in ["Radiologist", "Doctor", "Nurse"]:
-            st.warning("Only medical staff can perform imaging tests.")
+        if role != "Radiologist":
+            st.warning("Only Radiologists can perform imaging tests.")
         elif st.session_state.patient:
             perform_diagnostics(st.session_state.patient)
         else:
             st.info("No patient available for imaging tests. Return to ER to receive one.")
 
-    # OPERATING ROOM
     elif st.session_state.room == "Operating Room":
         st.subheader("🔪 Operating Room")
         if role != "Surgeon":
@@ -331,9 +309,9 @@ if st.session_state.room == "ER":
             st.success("Surgery completed successfully!")
             st.session_state.score += 15
 
-# -----------------------
-# RIGHT SIDE: VITALS & LOG
-# -----------------------
+# --------------------------------------
+# RIGHT COLUMN
+# --------------------------------------
 with right:
     st.header("🩺 Patient Vitals & Logs")
 
@@ -358,6 +336,7 @@ with right:
     st.write("---")
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
+
 
 
 
