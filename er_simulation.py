@@ -225,10 +225,62 @@ with left:
             st.session_state.score += 15
     
     elif st.session_state.room == "ER":
-        if st.button("🚨 Receive Next Patient"):
-            st.session_state.patient = random.choice(patients)
-            st.session_state.treatment_history = []
-            st.session_state.test_results = None
+    if st.button("🚨 Receive Next Patient"):
+        st.session_state.patient = random.choice(patients)
+        st.session_state.treatment_history = []
+        st.session_state.test_results = None
+
+    if st.session_state.patient:
+        p = st.session_state.patient
+        st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
+        st.write(f"**Symptoms:** {p['symptoms']}")
+        st.write("---")
+
+        # -------------------------
+        # Pre-filled patient history
+        # -------------------------
+        default_history = {
+            "Heart attack": {"chronic_conditions": ["Heart Disease", "Hypertension"], "allergies": "None", "medications": "Aspirin, Statins", "family_history": "Father had heart disease"},
+            "Pneumonia": {"chronic_conditions": ["Asthma"], "allergies": "Penicillin", "medications": "Albuterol", "family_history": "No significant history"},
+            "Stroke": {"chronic_conditions": ["Hypertension", "Diabetes"], "allergies": "None", "medications": "Blood thinners", "family_history": "Mother had stroke"},
+            "Appendicitis": {"chronic_conditions": [], "allergies": "None", "medications": "None", "family_history": "No significant history"},
+            "Seizure": {"chronic_conditions": ["Seizure Disorder"], "allergies": "None", "medications": "Diazepam", "family_history": "Brother has epilepsy"},
+            "Anaphylaxis": {"chronic_conditions": ["Asthma"], "allergies": "Peanuts", "medications": "Inhaler", "family_history": "No significant history"},
+            "Diabetic Crisis": {"chronic_conditions": ["Diabetes"], "allergies": "None", "medications": "Insulin", "family_history": "Mother has diabetes"},
+        }
+
+        history = default_history.get(p["diagnosis"], {"chronic_conditions": [], "allergies": "", "medications": "", "family_history": ""})
+
+        st.write(f"**Chronic Conditions:** {', '.join(history['chronic_conditions']) if history['chronic_conditions'] else 'None'}")
+        st.write(f"**Allergies:** {history['allergies'] if history['allergies'] else 'None'}")
+        st.write(f"**Current Medications:** {history['medications'] if history['medications'] else 'None'}")
+        st.write(f"**Family History:** {history['family_history'] if history['family_history'] else 'None'}")
+
+        # -------------------------
+        # Medical History Questionnaire
+        # -------------------------
+        st.subheader("📝 Medical History (Editable)")
+        with st.form("medical_history_form"):
+            chronic_conditions = st.multiselect(
+                "Select chronic conditions the patient has:",
+                ["Diabetes", "Hypertension", "Asthma", "Heart Disease", "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"],
+                default=history['chronic_conditions']
+            )
+            allergies = st.text_input("Known allergies (comma separated):", value=history['allergies'])
+            medications_taken = st.text_area("Current medications:", value=history['medications'])
+            family_history = st.text_area("Relevant family medical history:", value=history['family_history'])
+
+            submitted = st.form_submit_button("Save Medical History")
+            if submitted:
+                st.session_state.treatment_history.append(
+                    f"Medical history recorded: Chronic conditions={chronic_conditions}, Allergies={allergies}, Medications={medications_taken}, Family history={family_history}"
+                )
+                st.success("✅ Medical history saved.")
+
+        # Diagnostics for Doctor/Nurse/Radiologist
+        if role in ["Doctor", "Nurse", "Radiologist"]:
+            perform_diagnostics(p)
+
         
         if st.session_state.patient:
             p = st.session_state.patient
