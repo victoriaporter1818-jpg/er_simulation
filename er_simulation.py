@@ -144,7 +144,10 @@ with left:
         st.write("---")
 
         # Patient selection only visible in ER
-        st.subheader("🧍 Patient Info")
+if st.session_state.room == "ER":
+    st.subheader("🚨 Emergency Room")
+    st.subheader("🧍 Patient Info")
+
         # ER ROOM
         elif st.session_state.room == "ER":
         st.subheader("🚨 Emergency Room")
