@@ -231,8 +231,8 @@ with left:
 
     elif st.session_state.room == "Radiology Lab":
         st.subheader("🩻 Radiology Lab")
-        if role not in ["Doctor", "Radiologist"]:
-            st.warning("Only Doctors or Radiologists can perform imaging tests.")
+        if role not in ["Doctor", "Radiologist", "Nurse"]:
+            st.warning("Only Doctors, Nurses or Radiologists can perform imaging tests.")
         elif st.session_state.patient:
             perform_diagnostics(st.session_state.patient)
         else:
@@ -240,7 +240,6 @@ with left:
 
     elif st.session_state.room == "Operating Room":
         st.subheader("🔪 Operating Room")
-        if role != "Surgeon":
             st.warning("Only Surgeons can perform operations.")
         elif st.button("Start Surgery"):
             steps = [
