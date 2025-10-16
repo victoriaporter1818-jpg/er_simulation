@@ -302,7 +302,7 @@ with left:
                     st.caption(desc)
             with col2:
                 if st.button(f"Dispense {med}", key=f"pharm_{med}"):
-                    if role == "Pharmacist":
+                    if st.session_state.role == "Pharmacist":
                         st.session_state.score += 5
                         st.success(f"💊 Correctly dispensed {med}. +5 points!")
                     if med not in st.session_state.inventory:
@@ -316,7 +316,7 @@ with left:
     # -----------------------------
     elif st.session_state.room == "Radiology Lab":
         st.subheader("🩻 Radiology Lab")
-        if role != "Radiologist":
+        if st.session_state.role != "Radiologist":
             st.warning("Only Radiologists can perform imaging tests.")
         elif st.session_state.patient:
             perform_diagnostics(st.session_state.patient)
@@ -328,7 +328,7 @@ with left:
     # -----------------------------
     elif st.session_state.room == "Operating Room":
         st.subheader("🔪 Operating Room")
-        if role != "Surgeon":
+        if st.session_state.role != "Surgeon":
             st.warning("Only Surgeons can perform operations.")
         elif st.button("Start Surgery"):
             steps = ["Sterilize area", "Administer anesthesia", "Make incision", "Repair/Remove organ", "Close incision"]
