@@ -98,7 +98,7 @@ def generate_lab_trends(patient):
 # -------------------------
 st.sidebar.title("Navigation")
 
-rooms = ["ER", "Triage", "Radiology", "Pharmacy", "Operating Room", "Medstation"]
+rooms = ["ER", "Radiology", "Pharmacy", "Operating Room", "Medstation"]
 # Ensure current room is valid
 if st.session_state.room not in rooms:
     st.session_state.room = "ER"
