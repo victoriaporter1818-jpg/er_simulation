@@ -240,7 +240,7 @@ with left:
 
     elif st.session_state.room == "Operating Room":
         st.subheader("🔪 Operating Room")
-            st.warning("Only Surgeons can perform operations.")
+        st.warning("Only Surgeons can perform operations.")
         elif st.button("Start Surgery"):
             steps = [
                 "Sterilize area",
