@@ -225,10 +225,10 @@ with left:
             st.session_state.score += 15
     
     elif st.session_state.room == "ER":
-    if st.button("🚨 Receive Next Patient"):
-        st.session_state.patient = random.choice(patients)
-        st.session_state.treatment_history = []
-        st.session_state.test_results = None
+        if st.button("🚨 Receive Next Patient"):
+            st.session_state.patient = random.choice(patients)
+            st.session_state.treatment_history = []
+            st.session_state.test_results = None
 
     if st.session_state.patient:
         p = st.session_state.patient
