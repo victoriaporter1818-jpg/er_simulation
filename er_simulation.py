@@ -70,13 +70,13 @@ with col2:
             st.write(f"**Symptoms**: {patient['symptoms']}")
             st.write(f"**Diagnosis**: {patient['diagnosis']}")
             st.write("---")
-            # Patient Treatment History
-            st.subheader("Treatment History")
-            if st.session_state.treatment_history:
-                for treatment in st.session_state.treatment_history:
-                    st.write(treatment)
-            else:
-                st.write("No treatments administered yet.")
+
+            # Display the advanced medical history form
+            st.subheader("📄 Medical History")
+            medical_history = patient['medical_history']
+            for key, value in medical_history.items():
+                st.write(f"**{key}**: {value}")
+            
         else:
             st.info("No active patient. Please assign a patient.")
         
@@ -154,9 +154,27 @@ with col3:
 def next_patient():
     # Replace the current patient with a new one
     patient_list = [
-        {"name": "John Doe", "age": 45, "symptoms": "severe chest pain", "diagnosis": "Heart Attack", "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}},
-        {"name": "Sarah Li", "age": 29, "symptoms": "high fever", "diagnosis": "Pneumonia", "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}},
-        {"name": "James Lee", "age": 61, "symptoms": "difficulty breathing", "diagnosis": "COPD", "vitals": {"BP": "130/85", "HR": 110, "O2": "80%"}},
+        {"name": "John Doe", "age": 45, "symptoms": "severe chest pain", "diagnosis": "Heart Attack", "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"},
+         "medical_history": {
+             "Past Surgeries": "Coronary Artery Bypass Surgery (2018)",
+             "Allergies": "None",
+             "Family History": "Father had a heart attack at age 50.",
+             "Chronic Conditions": "Hypertension, Type 2 Diabetes"
+         }},
+        {"name": "Sarah Li", "age": 29, "symptoms": "high fever", "diagnosis": "Pneumonia", "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"},
+         "medical_history": {
+             "Past Surgeries": "Appendectomy (2012)",
+             "Allergies": "Penicillin",
+             "Family History": "No significant family history of lung disease.",
+             "Chronic Conditions": "None"
+         }},
+        {"name": "James Lee", "age": 61, "symptoms": "difficulty breathing", "diagnosis": "COPD", "vitals": {"BP": "130/85", "HR": 110, "O2": "80%"},
+         "medical_history": {
+             "Past Surgeries": "None",
+             "Allergies": "None",
+             "Family History": "Mother had COPD.",
+             "Chronic Conditions": "Chronic Obstructive Pulmonary Disease (COPD)"
+         }},
         # Add more patients as needed
     ]
     
