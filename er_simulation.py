@@ -95,13 +95,37 @@ hospital_supplies = {
     }
 }
 
-# Main layout with 2 columns
-col1, col2 = st.columns([3, 1])
+# Main layout with 3 columns
+col1, col2, col3 = st.columns([1, 3, 1])
 
-# Left Column - Difficulty, Role, and Room Navigation
+# Left Column - Difficulty, Role, Room Navigation, and Inventory
 with col1:
     st.title("AI Emergency Room Simulation")
+    
+    # Difficulty and Role Select
+    st.subheader("Game Settings")
+    difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
+    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
+    
+    # Room Navigation
+    st.write("---")
+    st.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
+    
+    # Inventory display
+    st.write("---")
+    st.subheader("📦 Current Inventory")
+    if st.session_state.inventory:
+        for item in st.session_state.inventory:
+            st.write(f"- {item}")
+    else:
+        st.info("Inventory is empty.")
 
+    if st.button("🗑️ Clear Inventory"):
+        st.session_state.inventory = []
+        st.warning("Inventory cleared.")
+
+# Center Column - Main Content of the Current Room
+with col2:
     # ER specific content
     if st.session_state.room == "ER":
         st.subheader("ER - Emergency Room")
@@ -156,38 +180,4 @@ with col1:
             st.write(f"**{item}:** {description}")
             if st.button(f"Add {item} to Inventory"):
                 st.session_state.inventory.append(item)
-                st.success(f"{item} added to inventory.")
-        if st.button("Order X-Ray"):
-            st.session_state.score += 15
-            st.success("X-Ray ordered successfully.")
-
-    # Pharmacy specific content
-    elif st.session_state.room == "Pharmacy":
-        st.subheader("Pharmacy")
-        for item, description in hospital_supplies["Pharmacy"].items():
-            st.write(f"**{item}:** {description}")
-            if st.button(f"Add {item} to Inventory"):
-                st.session_state.inventory.append(item)
-                st.success(f"{item} added to inventory.")
-        if st.button("Fill Prescription for Antibiotics"):
-            st.session_state.inventory.append("Antibiotics")
-            st.success("Antibiotics prescription filled.")
-
-# Right Column - Vitals, Action Log, and Score
-with col2:
-    if st.session_state.patient:
-        patient = st.session_state.patient
-        st.subheader("Patient Vitals")
-        for k, v in patient["vitals"].items():
-            st.write(f"**{k}:** {v}")
-        
-        # Action Log: Show recent treatment actions
-        st.subheader("📝 Action Log")
-        for line in reversed(st.session_state.treatment_history[-10:]):
-            st.write(line)
-        
-        # Display score
-        st.subheader("🏆 Score")
-        st.metric("Total Score", st.session_state.score)
-    else:
-        st.info("No active patient.")
+                st.success(f
