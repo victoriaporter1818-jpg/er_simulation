@@ -1,4 +1,3 @@
-i fixed up some things in the code. please use this code to add updates on: import streamlit as st
 import random
 
 # --------------------------------------
