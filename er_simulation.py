@@ -99,18 +99,44 @@ if st.sidebar.button("🗑️ Clear Inventory"):
     st.sidebar.warning("Inventory cleared.")
 
 # --------------------------------------
-# DIAGNOSTIC SYSTEM
+# Diagnostic Tests & Imaging with Images
 # --------------------------------------
-diagnostic_images = {
-    "X-Ray": {"Chest": "https://upload.wikimedia.org/wikipedia/commons/8/85/Normal_chest_xray.jpg",
-              "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Abdomen_X-ray.jpg",
-              "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
-              "Limb": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Hand_xray.jpg"},
-    "CT Scan": {"Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
-                "Chest": "https://upload.wikimedia.org/wikipedia/commons/4/44/CT_Thorax.jpg"},
-    "MRI": {"Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Brain_MRI.jpg"},
-    "Ultrasound": {"Abdomen": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Ultrasound_liver.jpg"}
-}
+if role in ["Doctor", "Radiologist", "Nurse"]:
+    st.subheader("🔬 Diagnostic Tests & Imaging")
+
+    diagnostic_options = {
+        "Chest X-ray": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Chest_Xray_PA_3-8-2010.png",
+        "CT Scan - Head": "https://upload.wikimedia.org/wikipedia/commons/5/59/CT_of_brain_showing_infarction_of_right_MCA_territory.jpg",
+        "Abdominal Ultrasound": "https://upload.wikimedia.org/wikipedia/commons/0/00/Normal_liver_ultrasound.jpg",
+        "Blood Test - CBC": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Complete_blood_count_report.JPG",
+        "ECG": "https://upload.wikimedia.org/wikipedia/commons/9/99/12_lead_ECG_with_ST_elevation_myocardial_infarction_inferior_leads.png"
+    }
+
+    test_selected = st.selectbox("Select a test or imaging to order:", list(diagnostic_options.keys()))
+
+    if st.button("Order Test / Imaging"):
+        result_text = f"Results for {test_selected}: "
+
+        if "X-ray" in test_selected:
+            result_text += "Findings suggest pneumonia or possible fluid buildup."
+        elif "CT" in test_selected:
+            result_text += "Shows a right-sided ischemic stroke region."
+        elif "Ultrasound" in test_selected:
+            result_text += "Normal liver echotexture, no gallstones or fluid."
+        elif "Blood Test" in test_selected:
+            result_text += "Mild anemia with elevated white count."
+        elif "ECG" in test_selected:
+            result_text += "Sinus tachycardia with mild ST elevation in inferior leads."
+
+        # Display results and image
+        st.session_state.test_results = result_text
+        image_url = diagnostic_options[test_selected]
+
+        st.image(image_url, caption=f"{test_selected} - Sample Result", use_container_width=True)
+        st.success(result_text)
+
+        # Add to log
+        st.session_state.treatment_history.append(f"Ordered {test_selected}")
 
 def perform_diagnostics(patient):
     st.subheader("🧪 Order Diagnostic Tests")
