@@ -99,22 +99,38 @@ if st.sidebar.button("🗑️ Clear Inventory"):
 # --------------------------------------
 # DIAGNOSTIC SYSTEM
 # --------------------------------------
+# --------------------------------------
+# DIAGNOSTIC SYSTEM (Updated with Detailed Test Images)
+# --------------------------------------
 diagnostic_images = {
     "X-Ray": {
-        "Chest": "https://upload.wikimedia.org/wikipedia/commons/8/85/Normal_chest_xray.jpg",
+        "Chest": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Chest_Xray_PA_3-8-2010.png",
         "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Abdomen_X-ray.jpg",
         "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
         "Limb": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Hand_xray.jpg"
     },
     "CT Scan": {
-        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
-        "Chest": "https://upload.wikimedia.org/wikipedia/commons/4/44/CT_Thorax.jpg"
+        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/5/59/CT_of_brain_showing_infarction_of_right_MCA_territory.jpg",
+        "Chest": "https://upload.wikimedia.org/wikipedia/commons/4/44/CT_Thorax.jpg",
+        "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/9/9b/CT_Abdomen.png"
     },
     "MRI": {
-        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Brain_MRI.jpg"
+        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Brain_MRI.jpg",
+        "Spine": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Spine_MRI.jpg"
     },
     "Ultrasound": {
-        "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Ultrasound_liver.jpg"
+        "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/0/00/Normal_liver_ultrasound.jpg",
+        "Pelvis": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Pelvic_ultrasound.jpg"
+    },
+    "Blood Test": {
+        "CBC": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Complete_blood_count_report.JPG",
+        "Blood Chemistry": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Blood_biochemistry_report_example.jpg"
+    },
+    "ECG": {
+        "12-lead": "https://upload.wikimedia.org/wikipedia/commons/9/99/12_lead_ECG_with_ST_elevation_myocardial_infarction_inferior_leads.png"
+    },
+    "EEG": {
+        "Brain": "https://upload.wikimedia.org/wikipedia/commons/4/4f/EEG_recording.png"
     }
 }
 
