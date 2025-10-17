@@ -180,4 +180,4 @@ with col2:
             st.write(f"**{item}:** {description}")
             if st.button(f"Add {item} to Inventory"):
                 st.session_state.inventory.append(item)
-                st.success(f
+                st.success(f)
