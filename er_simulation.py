@@ -11,6 +11,10 @@ if "treatment_history" not in st.session_state:
     st.session_state.treatment_history = []
 if "score" not in st.session_state:
     st.session_state.score = 0
+if "inventory" not in st.session_state:
+    st.session_state.inventory = []
+if "room" not in st.session_state:
+    st.session_state.room = "ER"
 
 # Patient database
 patients = [
@@ -31,9 +35,28 @@ def assign_patient():
     st.session_state.treatment_history.append(f"Assigned patient: {patient['name']}")
     st.session_state.score += 10
 
+# Room navigation logic
+rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
+room = st.sidebar.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
+st.session_state.room = room
+
+# Inventory display
+st.sidebar.write("---")
+st.sidebar.subheader("📦 Current Inventory")
+if st.session_state.inventory:
+    for item in st.session_state.inventory:
+        st.sidebar.write(f"- {item}")
+else:
+    st.sidebar.info("Inventory is empty.")
+
+if st.sidebar.button("🗑️ Clear Inventory"):
+    st.session_state.inventory = []
+    st.sidebar.warning("Inventory cleared.")
+
 # Main layout with 2 columns
 col1, col2 = st.columns([3, 1])
 
+# Left Column - Difficulty, Role, and Room Navigation
 with col1:
     st.title("AI Emergency Room Simulation")
 
@@ -58,6 +81,7 @@ with col1:
     if st.button("🚑 Assign Patient", on_click=assign_patient):
         pass
 
+# Right Column - Vitals, Action Log, and Score
 with col2:
     if st.session_state.patient:
         patient = st.session_state.patient
@@ -75,47 +99,3 @@ with col2:
         st.metric("Total Score", st.session_state.score)
     else:
         st.info("No active patient.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
