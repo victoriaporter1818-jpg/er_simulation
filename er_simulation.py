@@ -25,23 +25,50 @@ if "test_results" not in st.session_state:
 # --------------------------------------
 # PATIENT DATABASE
 # --------------------------------------
-patients = [
-    {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath",
-     "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}, "diagnosis": "Heart attack"},
-    {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen",
-     "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}, "diagnosis": "Pneumonia"},
-    {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech",
-     "vitals": {"BP": "150/90", "HR": 82, "O2": "97%"}, "diagnosis": "Stroke"},
-    {"name": "Emma Brown", "age": 8, "symptoms": "abdominal pain and vomiting for 12 hours",
-     "vitals": {"BP": "100/65", "HR": 110, "O2": "98%"}, "diagnosis": "Appendicitis"},
-    {"name": "Maya Thompson", "age": 34, "symptoms": "convulsions and unresponsiveness",
-     "vitals": {"BP": "130/85", "HR": 112, "O2": "94%"}, "diagnosis": "Seizure"},
-    {"name": "Jacob Rivera", "age": 50, "symptoms": "swelling and trouble breathing after eating peanuts",
-     "vitals": {"BP": "80/50", "HR": 140, "O2": "82%"}, "diagnosis": "Anaphylaxis"},
-    {"name": "Helen Carter", "age": 67, "symptoms": "confusion, sweating, and low blood sugar",
-     "vitals": {"BP": "120/80", "HR": 105, "O2": "96%"}, "diagnosis": "Diabetic Crisis"},
+patients_data = [
+    {
+        "name": "John Doe",
+        "age": 45,
+        "gender": "Male",
+        "diagnosis": "Pneumonia",
+        "medical_history": [
+            "No known allergies",
+            "No prior surgeries",
+            "Smokes 10 cigarettes per day",
+            "Has asthma"
+        ]
+    },
+    {
+        "name": "Jane Smith",
+        "age": 30,
+        "gender": "Female",
+        "diagnosis": "Stroke",
+        "medical_history": [
+            "Hypertension",
+            "No known allergies",
+            "No prior surgeries",
+            "Family history of stroke"
+        ]
+    },
+    {
+        "name": "Mark Johnson",
+        "age": 50,
+        "gender": "Male",
+        "diagnosis": "Heart attack",
+        "medical_history": [
+            "High cholesterol",
+            "No known allergies",
+            "Underwent heart bypass surgery 2 years ago",
+            "Family history of heart disease"
+        ]
+    }
 ]
-
+# When generating a new patient, select from this data:
+if st.button("🚑 Generate New Patient"):
+    st.session_state.patient = random.choice(patients)
+    st.session_state.treatment_history = []
+    st.session_state.test_results = None
+    
 # --------------------------------------
 # SUPPLIES & MEDS
 # --------------------------------------
@@ -146,31 +173,21 @@ def perform_diagnostics(patient):
             dx = patient["diagnosis"]
             result = f"{chosen_imaging} of {chosen_body_part} performed. "
 
-            # Check if the diagnosis matches the selected imaging test
-            if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest"):
-                result += "Findings consistent with suspected diagnosis."
-                st.session_state.score += 10
-                image_url = diagnostic_images["X-Ray"]["Chest"]
-                st.image(image_url, caption="Chest X-Ray - Pneumonia", use_container_width=True)
-            elif (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain"):
-                result += "Findings consistent with suspected diagnosis."
-                st.session_state.score += 10
-                image_url = diagnostic_images["CT Scan"]["Head/Brain"]
-                st.image(image_url, caption="CT Scan - Stroke", use_container_width=True)
-            elif (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen"):
-                result += "Findings consistent with suspected diagnosis."
-                st.session_state.score += 10
-                image_url = diagnostic_images["Ultrasound"]["Abdomen"]
-                st.image(image_url, caption="Ultrasound - Appendicitis", use_container_width=True)
-            elif (dx == "Heart attack" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest"):
-                result += "Findings consistent with suspected diagnosis."
-                st.session_state.score += 10
-                image_url = diagnostic_images["X-Ray"]["Chest"]
-                st.image(image_url, caption="Chest X-Ray - Heart Attack", use_container_width=True)
+            # Check for corresponding image in diagnostic_images
+            if chosen_imaging in diagnostic_images:
+                if chosen_body_part in diagnostic_images[chosen_imaging]:
+                    image_url = diagnostic_images[chosen_imaging][chosen_body_part]
+                    st.image(image_url, caption=f"{chosen_imaging} - {chosen_body_part}", use_container_width=True)
+                    result += "Findings consistent with suspected diagnosis."
+                    st.session_state.score += 10
+                else:
+                    result += "No corresponding image available."
+                    st.warning(f"No matching image for {chosen_imaging} of {chosen_body_part}.")
             else:
-                result += "No significant findings."
-                st.warning("No matching diagnostic image for this test.")
+                result += "No diagnostic images available."
+                st.warning("No diagnostic images for this test type.")
 
+            # Record the test result
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
