@@ -40,7 +40,8 @@ with col1:
     
     # Room Navigation
     st.write("---")
-    st.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room), key="room_navigation")
+    room_selection = st.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room), key="room_navigation")
+    st.session_state.room = room_selection  # Update the room when a new room is selected
     
     # Inventory display
     st.write("---")
@@ -105,7 +106,24 @@ with col2:
             st.success("Epinephrine added to inventory.")
         # You can add more medications here with similar buttons.
 
-    # Additional rooms can follow the same pattern
+    elif st.session_state.room == "Operating Room":
+        st.header("Operating Room")
+        st.write("Here, you can perform surgeries and other complex procedures.")
+        # Example surgery buttons
+        if st.button("Start Surgery", on_click=lambda: start_surgery()):
+            st.success("Surgery started!")
+
+    elif st.session_state.room == "Radiology Lab":
+        st.header("Radiology Lab")
+        st.write("Here, you can perform imaging tests.")
+        if st.button("Take X-ray", on_click=lambda: take_xray()):
+            st.success("X-ray completed!")
+
+    elif st.session_state.room == "Pharmacy":
+        st.header("Pharmacy")
+        st.write("Here you can dispense medications.")
+        if st.button("Dispense Painkillers", on_click=lambda: dispense_painkillers()):
+            st.success("Painkillers dispensed.")
 
 # --------------------------------------
 # Right Column (Vitals, Logs, and Score)
@@ -145,3 +163,15 @@ def assign_patient():
 def add_to_inventory(item):
     # Helper function to add items to the inventory
     st.session_state.inventory.append(item)
+
+def start_surgery():
+    # Simulate surgery action
+    st.session_state.treatment_history.append("Surgery started in Operating Room.")
+
+def take_xray():
+    # Simulate X-ray procedure
+    st.session_state.treatment_history.append("X-ray taken in Radiology Lab.")
+
+def dispense_painkillers():
+    # Simulate dispensing painkillers
+    st.session_state.treatment_history.append("Painkillers dispensed in Pharmacy.")
