@@ -1,6 +1,52 @@
 import streamlit as st
 import random
 
+import streamlit as st
+
+# Create two columns for layout
+col1, col2 = st.columns([3, 1])  # Main content (col1) will take 3 parts, and right panel (col2) will take 1 part
+
+# Left panel (main content)
+with col1:
+    st.title("AI Emergency Room Simulation")
+
+    # Select role (Doctor, Nurse, etc.)
+    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
+
+    # Display patient data if a patient is selected
+    if st.session_state.patient:
+        patient = st.session_state.patient
+        st.subheader(f"Patient: {patient['name']} - {patient['age']} years old")
+        st.write(f"Symptoms: {patient['symptoms']}")
+        st.write(f"Diagnosis: {patient['diagnosis']}")
+        st.write(f"Vitals: {patient['vitals']}")
+
+        # Treatment History
+        st.subheader("Treatment History")
+        if st.session_state.treatment_history:
+            for treatment in st.session_state.treatment_history:
+                st.write(treatment)
+        else:
+            st.write("No treatments administered yet.")
+
+# Right panel (Vitals and Logs)
+with col2:
+    if st.session_state.patient:
+        patient = st.session_state.patient
+        st.subheader("Patient Vitals & Logs")
+        st.write(f"Blood Pressure: {patient['vitals']['BP']}")
+        st.write(f"Heart Rate: {patient['vitals']['HR']}")
+        st.write(f"Oxygen Saturation: {patient['vitals']['O2']}")
+
+        # Logs: Simulate recent activity logs for the patient (add more logic here if needed)
+        st.write("Recent Activity Logs:")
+        st.write("- Administered oxygen")
+        st.write("- Blood test ordered")
+        st.write("- ECG performed")
+
+    else:
+        st.write("No patient selected.")
+
 # --------------------------------------
 # STREAMLIT SETUP
 # --------------------------------------
