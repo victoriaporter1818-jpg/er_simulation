@@ -152,215 +152,115 @@ def perform_diagnostics(patient):
                 st.session_state.score += 10
                 image_url = diagnostic_images["X-Ray"]["Chest"]
                 st.image(image_url, caption="Chest X-Ray - Pneumonia", use_container_width=True)
-            elif (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain"):
-                result += "CT Scan reveals evidence of stroke."
-                st.session_state.score += 15
-                image_url = diagnostic_images["CT Scan"]["Head/Brain"]
-                st.image(image_url, caption="CT Scan - Stroke", use_container_width=True)
-            elif (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen"):
-                result += "Ultrasound shows signs of appendicitis."
-                st.session_state.score += 20
-                image_url = diagnostic_images["Ultrasound"]["Abdomen"]
-                st.image(image_url, caption="Ultrasound - Appendicitis", use_container_width=True)
+            elif (dx == "Heart attack" and chosen_imaging == "CT Scan" and chosen_body_part == "Chest"):
+                result += "Findings consistent with suspected diagnosis."
+                st.session_state.score += 10
+                image_url = diagnostic_images["CT Scan"]["Chest"]
+                st.image(image_url, caption="CT Scan - Heart Attack", use_container_width=True)
             else:
-                result += "No findings. Further tests may be needed."
-                st.session_state.score += 5
+                result += "No findings relevant to diagnosis."
+                st.session_state.score -= 5
 
+            st.session_state.test_results = result
             st.success(result)
 
+    # Check for lab tests
     elif test_type == "Lab Test":
         lab_tests = ["Blood Test", "ECG", "EEG"]
-        chosen_test = st.selectbox("Select Lab Test:", lab_tests)
+        chosen_lab_test = st.selectbox("Select Lab Test:", lab_tests)
 
-        if st.button("🧪 Perform Lab Test", key=f"lab_test_{chosen_test}"):
-            result = f"{chosen_test} for {patient['name']} performed. "
-            # Example: Check diagnosis to give appropriate test result
-            if chosen_test == "Blood Test":
-                result += "Blood tests show abnormal results (e.g., infection markers)."
+        if st.button("🧬 Perform Lab Test", key=f"lab_{chosen_lab_test}"):
+            dx = patient["diagnosis"]
+            result = f"{chosen_lab_test} ordered. "
+            
+            if chosen_lab_test == "Blood Test":
+                result += "Results pending."
+                st.session_state.score += 5
+            elif chosen_lab_test == "ECG":
+                result += "ECG results show arrhythmia."
                 st.session_state.score += 10
-                image_url = diagnostic_images["Blood Test"]["CBC"]
-                st.image(image_url, caption="Blood Test - Abnormal Results", use_container_width=True)
-            elif chosen_test == "ECG":
-                result += "ECG shows signs of a possible arrhythmia."
-                st.session_state.score += 15
                 image_url = diagnostic_images["ECG"]["12-lead"]
                 st.image(image_url, caption="ECG - Arrhythmia", use_container_width=True)
-            elif chosen_test == "EEG":
-                result += "EEG shows possible seizure activity."
-                st.session_state.score += 20
+            elif chosen_lab_test == "EEG":
+                result += "EEG results show abnormal brain activity."
+                st.session_state.score += 5
                 image_url = diagnostic_images["EEG"]["Brain"]
-                st.image(image_url, caption="EEG - Seizure Activity", use_container_width=True)
-
+                st.image(image_url, caption="EEG - Abnormal Activity", use_container_width=True)
+            
+            st.session_state.test_results = result
             st.success(result)
 
 # --------------------------------------
-# ER ROOM
+# LEFT PANEL (Patient Interaction)
 # --------------------------------------
-if st.session_state.room == "ER":
-    st.subheader("🚨 Emergency Room")
+with st.container():
+    col1, col2 = st.columns([2, 1])
 
-    # Initialize role in session state if not set
-    if "role" not in st.session_state:
-        st.session_state.role = "-- Choose --"
-
-    # Role selection
-    roles = ["-- Choose --", "Nurse", "Doctor", "Surgeon", "Radiologist", "Pharmacist"]
-    st.session_state.role = st.selectbox("Select your role:", roles)
-
-    # Show role description if selected
-    if st.session_state.role != "-- Choose --":
-        role_descriptions = {
-            "Nurse": "🩺 You’re on duty. Take vitals, record patient history, and provide care.",
-            "Doctor": "⚕️ Diagnose patients, order tests, and prescribe medications.",
-            "Surgeon": "🔪 Perform critical surgical procedures in the OR.",
-            "Radiologist": "🩻 Perform and interpret diagnostic imaging.",
-            "Pharmacist": "💊 Verify prescriptions and dispense medications."
-        }
-        st.success(role_descriptions[st.session_state.role])
-
-    st.write("---")
-
-    # Generate new patient button
-    if st.button("🚑 Generate New Patient"):
-        st.session_state.patient = random.choice(patients)
-        st.session_state.treatment_history = []
-        st.session_state.test_results = None
-
-    # Display patient info
-    if st.session_state.patient:
-        p = st.session_state.patient
-        st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
-        st.write(f"**Symptoms:** {p['symptoms']}")
-        st.write("---")
-
-        # Show vitals only if the patient exists and has vitals
-        if "vitals" in p:
-            st.subheader("🩺 Patient Vitals")
-            for k, v in p["vitals"].items():
-                st.write(f"**{k}:** {v}")
-        else:
-            st.warning("Vitals not available for this patient.")
-
-    # Allow diagnostics for Doctors, Radiologists, and Nurses
-    if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
+    with col1:
+        st.header("👩‍⚕️ Patient Details")
         if st.session_state.patient:
-            perform_diagnostics(p)
+            p = st.session_state.patient
+            st.write(f"**Name:** {p['name']}")
+            st.write(f"**Age:** {p['age']}")
+            st.write(f"**Symptoms:** {p['symptoms']}")
+            st.write(f"**Diagnosis:** {p['diagnosis']}")
+            st.write("---")
         else:
-            st.warning("No patient selected. Please generate a new patient.")
+            st.info("No active patient.")
 
-    # -----------------------------
-    # Supply Room
-    # -----------------------------
-    elif st.session_state.room == "Supply Room":
-        st.subheader("🧰 Hospital Supply Room")
-        for item, desc in hospital_supplies.items():
-            if st.button(f"Collect {item}", key=f"supply_{item}"):
-                if item not in st.session_state.inventory:
-                    st.session_state.inventory.append(item)
-                    st.success(f"✅ {item} added to inventory.")
-                else:
-                    st.info(f"ℹ️ Already have {item}.")
-            with st.expander(item):
-                st.caption(desc)
-
-    # -----------------------------
-    # Medstation
-    # -----------------------------
-    elif st.session_state.room == "Medstation":
-        st.subheader("💉 Emergency Medstation")
-        for med, desc in medstation_meds.items():
-            col1, col2 = st.columns([3,1])
-            with col1:
-                with st.expander(med):
-                    st.caption(desc)
-            with col2:
-                if st.button(f"Dispense {med}", key=f"med_{med}"):
-                    if med not in st.session_state.inventory:
-                        st.session_state.inventory.append(med)
-                        st.success(f"✅ {med} added to inventory.")
-                    else:
-                        st.info(f"ℹ️ Already have {med}.")
-
-    # -----------------------------
-    # Pharmacy
-    # -----------------------------
-    elif st.session_state.room == "Pharmacy":
-        st.subheader("🏪 Hospital Pharmacy")
-        for med, desc in pharmacy_meds.items():
-            col1, col2 = st.columns([3,1])
-            with col1:
-                with st.expander(med):
-                    st.caption(desc)
-            with col2:
-                if st.button(f"Dispense {med}", key=f"pharm_{med}"):
-                    if st.session_state.role == "Pharmacist":
-                        st.session_state.score += 5
-                        st.success(f"💊 Correctly dispensed {med}. +5 points!")
-                    if med not in st.session_state.inventory:
-                        st.session_state.inventory.append(med)
-                        st.info(f"{med} added to inventory.")
-                    else:
-                        st.warning(f"ℹ️ Already have {med}.")
-
-    # -----------------------------
-    # Radiology Lab
-    # -----------------------------
-    elif st.session_state.room == "Radiology Lab":
-        st.subheader("🩻 Radiology Lab")
-        if st.session_state.role != "Radiologist":
-            st.warning("Only Radiologists can perform imaging tests.")
-        elif st.session_state.patient:
-            perform_diagnostics(st.session_state.patient)
-        else:
-            st.info("No patient available. Generate a patient in the ER first.")
-
-    # -----------------------------
-    # Operating Room
-    # -----------------------------
-    elif st.session_state.room == "Operating Room":
-        st.subheader("🔪 Operating Room")
-        if st.session_state.role != "Surgeon":
-            st.warning("Only Surgeons can perform operations.")
-        elif st.button("Start Surgery"):
-            steps = ["Sterilize area", "Administer anesthesia", "Make incision", "Repair/Remove organ", "Close incision"]
-            for step in steps:
-                st.write(f"✅ {step}")
-            st.success("Surgery completed successfully!")
-            st.session_state.score += 15
-
-# --------------------------------------
-# RIGHT PANEL
-# --------------------------------------
-with right:
-    st.header("🩺 Patient Vitals & Logs")
-    
-    # Check if a patient exists before displaying vitals
-    if st.session_state.patient:
-        p = st.session_state.patient
-        st.subheader(f"{p['name']} - Vitals")
-        
-        if "vitals" in p:
-            for k, v in p["vitals"].items():
-                st.write(f"**{k}:** {v}")
-        else:
-            st.warning("Vitals data not available for this patient.")
-    else:
-        st.info("No active patient.")
-
-    # Display test results if available
-    if st.session_state.test_results:
+        # Action buttons
         st.write("---")
-        st.subheader("🧠 Test Results")
-        st.info(st.session_state.test_results)
+        if st.session_state.room == "ER":
+            st.button("🚑 Assign Patient", on_click=lambda: assign_patient())
 
-    st.write("---")
-    st.subheader("📋 Action Log")
-    for line in reversed(st.session_state.treatment_history[-10:]):
-        st.write(line)
+    with col2:
+        if st.session_state.room == "ER":
+            # Action buttons for ER room
+            pass
+
+# --------------------------------------
+# RIGHT PANEL (Vitals & Logs)
+# --------------------------------------
+with st.container():
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        st.header("🩺 Patient Vitals & Logs")
+        if st.session_state.patient:
+            p = st.session_state.patient
+            st.subheader(f"{p['name']} - Vitals")
+
+            # Ensure vitals data exists before trying to display it
+            if "vitals" in p:
+                for k, v in p["vitals"].items():
+                    st.write(f"**{k}:** {v}")
+            else:
+                st.warning("Vitals data not available for this patient.")
+        else:
+            st.info("No active patient.")
+
+    with col2:
+        st.subheader("📝 Action Log")
+        for line in reversed(st.session_state.treatment_history[-10:]):
+            st.write(line)
 
     st.write("---")
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
+
+# --------------------------------------
+# Patient Assign Logic
+# --------------------------------------
+def assign_patient():
+    patient = random.choice(patients)
+    st.session_state.patient = patient
+    st.session_state.treatment_history.append(f"Assigned patient: {patient['name']}")
+    st.session_state.score += 10
+
+    # Perform Diagnostics
+    perform_diagnostics(patient)
+
+
 
 
 
