@@ -305,9 +305,9 @@ patients_data = [
     }
 ]
 
-        # Allow diagnostics for Doctors, Radiologists, and Nurses
-            if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
-                perform_diagnostics(p)
+    # Allow diagnostics for Doctors, Radiologists, and Nurses
+    if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
+        perform_diagnostics(p)
 
     # -----------------------------
     # Supply Room
