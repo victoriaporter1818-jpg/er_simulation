@@ -190,4 +190,4 @@ with col2:
         st.subheader("🏆 Score")
         st.metric("Total Score", st.session_state.score)
     else:
-        st.info("No active patient
+        st.info("No active patient.")
