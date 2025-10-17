@@ -155,7 +155,10 @@ with col3:
 # Helper Functions
 # --------------------------------------
 def next_patient():
-    # Replace the current patient with a new one
+    # Clear previous patient data
+    st.session_state.patient = None
+    
+    # New list of patients
     patient_list = [
         {"name": "John Doe", "age": 45, "symptoms": "severe chest pain", "diagnosis": "Heart Attack", "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"},
          "medical_history": {
@@ -182,7 +185,9 @@ def next_patient():
     ]
     
     # Randomly select a new patient
-    selected_patient = patient_list[1]  # For simplicity, we'll select a patient (can be randomized)
+    selected_patient = patient_list[0]  # For simplicity, we'll select the first patient in the list (can be randomized)
+    
+    # Assign the new patient to the session state
     st.session_state.patient = selected_patient
     st.session_state.treatment_history.append(f"Assigned new patient: {selected_patient['name']}")
 
@@ -196,8 +201,4 @@ def start_surgery():
 
 def take_xray():
     # Simulate X-ray action
-    st.session_state.treatment_history.append("X-ray completed.")
-
-def dispense_painkillers():
-    # Simulate dispensing painkillers
-    st.session_state.treatment_history.append("Painkillers dispensed.")
+    st
