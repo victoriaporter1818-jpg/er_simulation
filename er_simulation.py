@@ -25,50 +25,23 @@ if "test_results" not in st.session_state:
 # --------------------------------------
 # PATIENT DATABASE
 # --------------------------------------
-patients_data = [
-    {
-        "name": "John Doe",
-        "age": 45,
-        "gender": "Male",
-        "diagnosis": "Pneumonia",
-        "medical_history": [
-            "No known allergies",
-            "No prior surgeries",
-            "Smokes 10 cigarettes per day",
-            "Has asthma"
-        ]
-    },
-    {
-        "name": "Jane Smith",
-        "age": 30,
-        "gender": "Female",
-        "diagnosis": "Stroke",
-        "medical_history": [
-            "Hypertension",
-            "No known allergies",
-            "No prior surgeries",
-            "Family history of stroke"
-        ]
-    },
-    {
-        "name": "Mark Johnson",
-        "age": 50,
-        "gender": "Male",
-        "diagnosis": "Heart attack",
-        "medical_history": [
-            "High cholesterol",
-            "No known allergies",
-            "Underwent heart bypass surgery 2 years ago",
-            "Family history of heart disease"
-        ]
-    }
+patients = [
+    {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath",
+     "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}, "diagnosis": "Heart attack"},
+    {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen",
+     "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}, "diagnosis": "Pneumonia"},
+    {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech",
+     "vitals": {"BP": "150/90", "HR": 82, "O2": "97%"}, "diagnosis": "Stroke"},
+    {"name": "Emma Brown", "age": 8, "symptoms": "abdominal pain and vomiting for 12 hours",
+     "vitals": {"BP": "100/65", "HR": 110, "O2": "98%"}, "diagnosis": "Appendicitis"},
+    {"name": "Maya Thompson", "age": 34, "symptoms": "convulsions and unresponsiveness",
+     "vitals": {"BP": "130/85", "HR": 112, "O2": "94%"}, "diagnosis": "Seizure"},
+    {"name": "Jacob Rivera", "age": 50, "symptoms": "swelling and trouble breathing after eating peanuts",
+     "vitals": {"BP": "80/50", "HR": 140, "O2": "82%"}, "diagnosis": "Anaphylaxis"},
+    {"name": "Helen Carter", "age": 67, "symptoms": "confusion, sweating, and low blood sugar",
+     "vitals": {"BP": "120/80", "HR": 105, "O2": "96%"}, "diagnosis": "Diabetic Crisis"},
 ]
-# When generating a new patient, select from this data:
-if st.button("🚑 Generate New Patient"):
-    st.session_state.patient = random.choice(patients)
-    st.session_state.treatment_history = []
-    st.session_state.test_results = None
-    
+
 # --------------------------------------
 # SUPPLIES & MEDS
 # --------------------------------------
@@ -173,72 +146,58 @@ def perform_diagnostics(patient):
             dx = patient["diagnosis"]
             result = f"{chosen_imaging} of {chosen_body_part} performed. "
 
-            # Check for corresponding image in diagnostic_images
-            if chosen_imaging in diagnostic_images:
-                if chosen_body_part in diagnostic_images[chosen_imaging]:
-                    image_url = diagnostic_images[chosen_imaging][chosen_body_part]
-                    st.image(image_url, caption=f"{chosen_imaging} - {chosen_body_part}", use_container_width=True)
-                    result += "Findings consistent with suspected diagnosis."
-                    st.session_state.score += 10
-                else:
-                    result += "No corresponding image available."
-                    st.warning(f"No matching image for {chosen_imaging} of {chosen_body_part}.")
+            # Check if the diagnosis matches the selected imaging test
+            if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest"):
+                result += "Findings consistent with suspected diagnosis."
+                st.session_state.score += 10
+                image_url = diagnostic_images["X-Ray"]["Chest"]
+                st.image(image_url, caption="Chest X-Ray - Pneumonia", use_container_width=True)
+            elif (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain"):
+                result += "CT Scan reveals evidence of stroke."
+                st.session_state.score += 15
+                image_url = diagnostic_images["CT Scan"]["Head/Brain"]
+                st.image(image_url, caption="CT Scan - Stroke", use_container_width=True)
+            elif (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen"):
+                result += "Ultrasound shows signs of appendicitis."
+                st.session_state.score += 20
+                image_url = diagnostic_images["Ultrasound"]["Abdomen"]
+                st.image(image_url, caption="Ultrasound - Appendicitis", use_container_width=True)
             else:
-                result += "No diagnostic images available."
-                st.warning("No diagnostic images for this test type.")
+                result += "No findings. Further tests may be needed."
+                st.session_state.score += 5
 
-            # Record the test result
-            st.session_state.test_results = result
-            st.session_state.treatment_history.append(result)
             st.success(result)
 
-    # -------------------------
-    # Lab Tests
-    # -------------------------
     elif test_type == "Lab Test":
-        lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
+        lab_tests = ["Blood Test", "ECG", "EEG"]
         chosen_test = st.selectbox("Select Lab Test:", lab_tests)
 
-        if st.button("🧬 Perform Test", key=f"lab_{chosen_test}"):
-            dx = patient["diagnosis"]
-            result = f"{chosen_test} completed. "
-            if (dx == "Heart attack" and chosen_test == "EKG") or \
-               (dx == "Seizure" and chosen_test == "EEG") or \
-               (dx == "Pneumonia" and chosen_test == "CBC"):
-                result += "Results confirm clinical suspicion."
+        if st.button("🧪 Perform Lab Test", key=f"lab_test_{chosen_test}"):
+            result = f"{chosen_test} for {patient['name']} performed. "
+            # Example: Check diagnosis to give appropriate test result
+            if chosen_test == "Blood Test":
+                result += "Blood tests show abnormal results (e.g., infection markers)."
                 st.session_state.score += 10
-            else:
-                result += "Results inconclusive."
+                image_url = diagnostic_images["Blood Test"]["CBC"]
+                st.image(image_url, caption="Blood Test - Abnormal Results", use_container_width=True)
+            elif chosen_test == "ECG":
+                result += "ECG shows signs of a possible arrhythmia."
+                st.session_state.score += 15
+                image_url = diagnostic_images["ECG"]["12-lead"]
+                st.image(image_url, caption="ECG - Arrhythmia", use_container_width=True)
+            elif chosen_test == "EEG":
+                result += "EEG shows possible seizure activity."
+                st.session_state.score += 20
+                image_url = diagnostic_images["EEG"]["Brain"]
+                st.image(image_url, caption="EEG - Seizure Activity", use_container_width=True)
 
-            st.session_state.test_results = result
-            st.session_state.treatment_history.append(result)
             st.success(result)
 
-            # 🧬 Show lab test images based on test type
-            if chosen_test == "CBC":
-                image_url = diagnostic_images["Blood Test"]["CBC"]
-                st.image(image_url, caption="Complete Blood Count (CBC) - Sample Result", use_container_width=True)
-            elif chosen_test == "EKG":
-                image_url = diagnostic_images["ECG"]["12-lead"]
-                st.image(image_url, caption="EKG - Sample Result", use_container_width=True)
-            elif chosen_test == "EEG":
-                image_url = diagnostic_images["EEG"]["Brain"]
-                st.image(image_url, caption="EEG - Sample Result", use_container_width=True)
-            else:
-                st.warning(f"No image available for {chosen_test}.")
-
-
 # --------------------------------------
-# MAIN INTERFACE
-# --------------------------------------
-left, right = st.columns([2, 1])
-
-with left:
-    # --------------------------------------
 # ER ROOM
 # --------------------------------------
-    if st.session_state.room == "ER":
-        st.subheader("🚨 Emergency Room")
+if st.session_state.room == "ER":
+    st.subheader("🚨 Emergency Room")
 
     # Initialize role in session state if not set
     if "role" not in st.session_state:
@@ -275,13 +234,13 @@ with left:
         st.write("---")
 
     # Show vitals
-        st.subheader("🩺 Patient Vitals")
-        for k, v in p["vitals"].items():
-            st.write(f"**{k}:** {v}")
+    st.subheader("🩺 Patient Vitals")
+    for k, v in p["vitals"].items():
+        st.write(f"**{k}:** {v}")
 
     # Allow diagnostics for Doctors, Radiologists, and Nurses
-        if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
-            perform_diagnostics(p)
+    if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
+        perform_diagnostics(p)
 
     # -----------------------------
     # Supply Room
