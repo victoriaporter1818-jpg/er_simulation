@@ -279,49 +279,6 @@ with left:
         for k, v in p["vitals"].items():
             st.write(f"**{k}:** {v}")
 
-    # Show medical history questionnaire
-# --------------------------------------
-# Predefined Patient Data
-# --------------------------------------
-patients_data = [
-    {
-        "name": "John Doe",
-        "age": 45,
-        "gender": "Male",
-        "diagnosis": "Pneumonia",
-        "medical_history": [
-            "No known allergies",
-            "No prior surgeries",
-            "Smokes 10 cigarettes per day",
-            "Has asthma"
-        ]
-    },
-    {
-        "name": "Jane Smith",
-        "age": 30,
-        "gender": "Female",
-        "diagnosis": "Stroke",
-        "medical_history": [
-            "Hypertension",
-            "No known allergies",
-            "No prior surgeries",
-            "Family history of stroke"
-        ]
-    },
-    {
-        "name": "Mark Johnson",
-        "age": 50,
-        "gender": "Male",
-        "diagnosis": "Heart attack",
-        "medical_history": [
-            "High cholesterol",
-            "No known allergies",
-            "Underwent heart bypass surgery 2 years ago",
-            "Family history of heart disease"
-        ]
-    }
-]
-
     # Allow diagnostics for Doctors, Radiologists, and Nurses
         if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
             perform_diagnostics(p)
