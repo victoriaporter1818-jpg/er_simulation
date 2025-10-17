@@ -164,7 +164,6 @@ if chosen_imaging in diagnostic_images and chosen_body_part in diagnostic_images
     )
 else:
     st.warning("No image available for this selection.")
-
     else:
         lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
         chosen_test = st.selectbox("Select Lab Test:", lab_tests)
