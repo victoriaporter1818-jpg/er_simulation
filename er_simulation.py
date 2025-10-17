@@ -145,7 +145,7 @@ def perform_diagnostics(patient):
             dx = patient["diagnosis"]
             result = f"{chosen_imaging} of {chosen_body_part} performed. "
 
-            # patient-specific interpretation
+            # Match imaging type with patient's diagnosis
             if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
                (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
                (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen") or \
@@ -159,16 +159,21 @@ def perform_diagnostics(patient):
             st.session_state.treatment_history.append(result)
             st.success(result)
 
-            # ✅ Show image if available
-            if chosen_imaging in diagnostic_images and chosen_body_part in diagnostic_images[chosen_imaging]:
-                image_url = diagnostic_images[chosen_imaging][chosen_body_part]
-                st.image(
-                    image_url,
-                    caption=f"{chosen_imaging} - {chosen_body_part} (Sample Result)",
-                    use_container_width=True
-                )
+            # ✅ Show image if available based on diagnosis and imaging type
+            if dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest":
+                image_url = diagnostic_images["X-Ray"]["Chest"]
+                st.image(image_url, caption="Chest X-Ray - Pneumonia", use_container_width=True)
+            elif dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain":
+                image_url = diagnostic_images["CT Scan"]["Head/Brain"]
+                st.image(image_url, caption="CT Scan - Stroke", use_container_width=True)
+            elif dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen":
+                image_url = diagnostic_images["Ultrasound"]["Abdomen"]
+                st.image(image_url, caption="Ultrasound - Appendicitis", use_container_width=True)
+            elif dx == "Heart attack" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest":
+                image_url = diagnostic_images["X-Ray"]["Chest"]
+                st.image(image_url, caption="Chest X-Ray - Heart Attack", use_container_width=True)
             else:
-                st.warning("No image available for this selection.")
+                st.warning("No matching diagnostic image for this test.")
 
     # -------------------------
     # Lab Tests
@@ -191,6 +196,20 @@ def perform_diagnostics(patient):
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
+
+            # 🧬 Show lab test images based on test type
+            if chosen_test == "CBC":
+                image_url = diagnostic_images["Blood Test"]["CBC"]
+                st.image(image_url, caption="Complete Blood Count (CBC) - Sample Result", use_container_width=True)
+            elif chosen_test == "EKG":
+                image_url = diagnostic_images["ECG"]["12-lead"]
+                st.image(image_url, caption="EKG - Sample Result", use_container_width=True)
+            elif chosen_test == "EEG":
+                image_url = diagnostic_images["EEG"]["Brain"]
+                st.image(image_url, caption="EEG - Sample Result", use_container_width=True)
+            else:
+                st.warning(f"No image available for {chosen_test}.")
+
 
 # --------------------------------------
 # MAIN INTERFACE
