@@ -237,25 +237,6 @@ with left:
         if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
             perform_diagnostics(p)
 
-        # Generate new patient
-        if st.button("🚨 Generate New Patient"):
-            st.session_state.patient = random.choice(patients)
-            st.session_state.treatment_history = []
-            st.session_state.test_results = None
-
-        if st.session_state.patient:
-            p = st.session_state.patient
-            st.subheader(f"🧍 Patient: {p['name']} (Age {p['age']})")
-            st.write(f"**Symptoms:** {p['symptoms']}")
-            st.write("---")
-            # show patient vitals
-            st.subheader("Vitals")
-            for k, v in p["vitals"].items():
-                st.write(f"**{k}:** {v}")
-            # allow diagnostics
-            if role in ["Doctor", "Radiologist", "Nurse"]:
-                perform_diagnostics(p)
-
     # -----------------------------
     # Supply Room
     # -----------------------------
