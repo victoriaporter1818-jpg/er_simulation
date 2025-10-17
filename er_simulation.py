@@ -233,14 +233,20 @@ if st.session_state.room == "ER":
         st.write(f"**Symptoms:** {p['symptoms']}")
         st.write("---")
 
-    # Show vitals
-    st.subheader("🩺 Patient Vitals")
-    for k, v in p["vitals"].items():
-        st.write(f"**{k}:** {v}")
+        # Show vitals only if the patient exists and has vitals
+        if "vitals" in p:
+            st.subheader("🩺 Patient Vitals")
+            for k, v in p["vitals"].items():
+                st.write(f"**{k}:** {v}")
+        else:
+            st.warning("Vitals not available for this patient.")
 
     # Allow diagnostics for Doctors, Radiologists, and Nurses
     if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
-        perform_diagnostics(p)
+        if st.session_state.patient:
+            perform_diagnostics(p)
+        else:
+            st.warning("No patient selected. Please generate a new patient.")
 
     # -----------------------------
     # Supply Room
