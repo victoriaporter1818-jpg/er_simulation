@@ -135,45 +135,79 @@ def perform_diagnostics(patient):
     st.subheader("🧪 Order Diagnostic Tests")
     test_type = st.radio("Select Test Type:", ["Imaging", "Lab Test"])
 
+    # Check for imaging tests
     if test_type == "Imaging":
         imaging_types = ["X-Ray", "CT Scan", "MRI", "Ultrasound"]
         body_parts = ["Chest", "Abdomen", "Head/Brain", "Limb"]
         chosen_imaging = st.selectbox("Select Imaging Type:", imaging_types)
         chosen_body_part = st.selectbox("Select Body Part:", body_parts)
 
+        # Debugging Information
+        st.write(f"Debug: Selected Imaging: {chosen_imaging} | Body Part: {chosen_body_part} | Patient Diagnosis: {patient['diagnosis']}")
+
         if st.button("📸 Perform Imaging", key=f"imaging_{chosen_imaging}_{chosen_body_part}"):
             dx = patient["diagnosis"]
             result = f"{chosen_imaging} of {chosen_body_part} performed. "
 
-            # Match imaging type with patient's diagnosis
-            if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
-               (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
-               (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen") or \
-               (dx == "Heart attack" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest"):
+            # Check if the diagnosis matches the selected imaging test
+            if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest"):
                 result += "Findings consistent with suspected diagnosis."
                 st.session_state.score += 10
+                image_url = diagnostic_images["X-Ray"]["Chest"]
+                st.image(image_url, caption="Chest X-Ray - Pneumonia", use_container_width=True)
+            elif (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain"):
+                result += "Findings consistent with suspected diagnosis."
+                st.session_state.score += 10
+                image_url = diagnostic_images["CT Scan"]["Head/Brain"]
+                st.image(image_url, caption="CT Scan - Stroke", use_container_width=True)
+            elif (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen"):
+                result += "Findings consistent with suspected diagnosis."
+                st.session_state.score += 10
+                image_url = diagnostic_images["Ultrasound"]["Abdomen"]
+                st.image(image_url, caption="Ultrasound - Appendicitis", use_container_width=True)
+            elif (dx == "Heart attack" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest"):
+                result += "Findings consistent with suspected diagnosis."
+                st.session_state.score += 10
+                image_url = diagnostic_images["X-Ray"]["Chest"]
+                st.image(image_url, caption="Chest X-Ray - Heart Attack", use_container_width=True)
             else:
                 result += "No significant findings."
+                st.warning("No matching diagnostic image for this test.")
 
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
 
-            # ✅ Show image if available based on diagnosis and imaging type
-            if dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest":
-                image_url = diagnostic_images["X-Ray"]["Chest"]
-                st.image(image_url, caption="Chest X-Ray - Pneumonia", use_container_width=True)
-            elif dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain":
-                image_url = diagnostic_images["CT Scan"]["Head/Brain"]
-                st.image(image_url, caption="CT Scan - Stroke", use_container_width=True)
-            elif dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen":
-                image_url = diagnostic_images["Ultrasound"]["Abdomen"]
-                st.image(image_url, caption="Ultrasound - Appendicitis", use_container_width=True)
-            elif dx == "Heart attack" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest":
-                image_url = diagnostic_images["X-Ray"]["Chest"]
-                st.image(image_url, caption="Chest X-Ray - Heart Attack", use_container_width=True)
+    # -------------------------
+    # Lab Tests
+    # -------------------------
+    elif test_type == "Lab Test":
+        lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
+        chosen_test = st.selectbox("Select Lab Test:", lab_tests)
+
+        if st.button("🧬 Perform Test", key=f"lab_{chosen_test}"):
+            dx = patient["diagnosis"]
+            result = f"{chosen_test} completed. "
+            if (dx == "Heart attack" and chosen_test == "EKG") or \
+               (dx == "Seizure" and chosen_test == "EEG") or \
+               (dx == "Pneumonia" and chosen_test == "CBC"):
+                result += "Results confirm clinical suspicion."
+                st.session_state.score += 10
             else:
-                st.warning("No matching diagnostic image for this test.")
+                result += "Results inconclusive."
+
+            st.session_state.test_results = result
+            st.session_state.treatment_history.append(result)
+            st.success(result)
+
+            # 🧬 Show lab test images based on test type
+            if chosen_test == "CBC":
+                image_url = diagnostic_images["Blood Test"]["CBC"]
+                st.image(image_url, caption="Complete Blood Count (CBC) - Sample Result", use_container_width=True)
+            elif chosen_test == "EKG":
+                image_url = diagnostic_images["ECG"]["12-lead"]
+                st.image(image_url, caption="EKG - Sample Result", use_container_width=True)
+            elif chosen_test == "EEG":
 
     # -------------------------
     # Lab Tests
