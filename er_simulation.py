@@ -263,9 +263,6 @@ with left:
             st.write(f"**{k}:** {v}")
 
     # Show medical history questionnaire
-        import streamlit as st
-import random
-
 # --------------------------------------
 # Predefined Patient Data
 # --------------------------------------
@@ -305,9 +302,7 @@ patients_data = [
             "Underwent heart bypass surgery 2 years ago",
             "Family history of heart disease"
         ]
-    },
-    {
-        "
+    }
 
         # Allow diagnostics for Doctors, Radiologists, and Nurses
         if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
