@@ -97,9 +97,6 @@ if st.sidebar.button("🗑️ Clear Inventory"):
     st.sidebar.warning("Inventory cleared.")
 
 # --------------------------------------
-# DIAGNOSTIC SYSTEM
-# --------------------------------------
-# --------------------------------------
 # DIAGNOSTIC SYSTEM (Updated with Detailed Test Images)
 # --------------------------------------
 diagnostic_images = {
@@ -157,9 +154,17 @@ def perform_diagnostics(patient):
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
-            # show sample image if available
-            if chosen_body_part in diagnostic_images.get(chosen_imaging, {}):
-                st.image(diagnostic_images[chosen_imaging][chosen_body_part], use_container_width=True)
+            # ✅ Display diagnostic image (robust version)
+if chosen_imaging in diagnostic_images and chosen_body_part in diagnostic_images[chosen_imaging]:
+    image_url = diagnostic_images[chosen_imaging][chosen_body_part]
+    st.image(
+        image_url,
+        caption=f"{chosen_imaging} - {chosen_body_part} (Sample Result)",
+        use_container_width=True
+    )
+else:
+    st.warning("No image available for this selection.")
+
     else:
         lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
         chosen_test = st.selectbox("Select Lab Test:", lab_tests)
