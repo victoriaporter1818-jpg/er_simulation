@@ -80,8 +80,9 @@ with col2:
         else:
             st.info("No active patient. Please assign a patient.")
         
-        if st.button("🚑 Assign Patient", on_click=lambda: assign_patient()):
-            st.session_state.score += 10  # Add points for assigning a patient
+        # Button for assigning the next patient
+        if st.button("👩‍⚕️ Next Patient", on_click=lambda: next_patient()):
+            st.session_state.score += 10  # Add points for assigning a new patient
 
     elif st.session_state.room == "Supply Room":
         st.header("Supply Room")
@@ -150,15 +151,19 @@ with col3:
 # --------------------------------------
 # Helper Functions
 # --------------------------------------
-def assign_patient():
-    # Randomly assign a patient from the list
+def next_patient():
+    # Replace the current patient with a new one
     patient_list = [
         {"name": "John Doe", "age": 45, "symptoms": "severe chest pain", "diagnosis": "Heart Attack", "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}},
         {"name": "Sarah Li", "age": 29, "symptoms": "high fever", "diagnosis": "Pneumonia", "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}},
+        {"name": "James Lee", "age": 61, "symptoms": "difficulty breathing", "diagnosis": "COPD", "vitals": {"BP": "130/85", "HR": 110, "O2": "80%"}},
+        # Add more patients as needed
     ]
-    selected_patient = patient_list[0]  # For simplicity, we'll always assign the first patient
+    
+    # Randomly select a new patient
+    selected_patient = patient_list[1]  # For simplicity, we'll select a patient (can be randomized)
     st.session_state.patient = selected_patient
-    st.session_state.treatment_history.append(f"Assigned patient: {selected_patient['name']}")
+    st.session_state.treatment_history.append(f"Assigned new patient: {selected_patient['name']}")
 
 def add_to_inventory(item):
     # Helper function to add items to the inventory
