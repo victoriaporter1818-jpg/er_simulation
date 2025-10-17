@@ -134,14 +134,17 @@ diagnostic_images = {
 def perform_diagnostics(patient):
     st.subheader("🧪 Order Diagnostic Tests")
     test_type = st.radio("Select Test Type:", ["Imaging", "Lab Test"])
+
     if test_type == "Imaging":
         imaging_types = ["X-Ray", "CT Scan", "MRI", "Ultrasound"]
         body_parts = ["Chest", "Abdomen", "Head/Brain", "Limb"]
         chosen_imaging = st.selectbox("Select Imaging Type:", imaging_types)
         chosen_body_part = st.selectbox("Select Body Part:", body_parts)
+
         if st.button("📸 Perform Imaging", key=f"imaging_{chosen_imaging}_{chosen_body_part}"):
             dx = patient["diagnosis"]
             result = f"{chosen_imaging} of {chosen_body_part} performed. "
+
             # patient-specific interpretation
             if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
                (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
@@ -151,55 +154,43 @@ def perform_diagnostics(patient):
                 st.session_state.score += 10
             else:
                 result += "No significant findings."
+
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
-            # ✅ Display diagnostic image (robust version)
-if st.button("📸 Perform Imaging", key=f"imaging_{chosen_imaging}_{chosen_body_part}"):
-    dx = patient["diagnosis"]
-    result = f"{chosen_imaging} of {chosen_body_part} performed. "
-    # patient-specific interpretation
-    if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
-       (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
-       (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen") or \
-       (dx == "Heart attack" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest"):
-        result += "Findings consistent with suspected diagnosis."
-        st.session_state.score += 10
-    else:
-        result += "No significant findings."
-    st.session_state.test_results = result
-    st.session_state.treatment_history.append(result)
-    st.success(result)
 
-    # ✅ Display diagnostic image (move this block inside)
-    if chosen_imaging in diagnostic_images and chosen_body_part in diagnostic_images[chosen_imaging]:
-        image_url = diagnostic_images[chosen_imaging][chosen_body_part]
-        st.image(
-            image_url,
-            caption=f"{chosen_imaging} - {chosen_body_part} (Sample Result)",
-            use_container_width=True
-        )
-    else:
-        st.warning("No image available for this selection.")
-    
-# 🧬 Lab Tests Section
-lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
-chosen_test = st.selectbox("Select Lab Test:", lab_tests)
+            # ✅ Show image if available
+            if chosen_imaging in diagnostic_images and chosen_body_part in diagnostic_images[chosen_imaging]:
+                image_url = diagnostic_images[chosen_imaging][chosen_body_part]
+                st.image(
+                    image_url,
+                    caption=f"{chosen_imaging} - {chosen_body_part} (Sample Result)",
+                    use_container_width=True
+                )
+            else:
+                st.warning("No image available for this selection.")
 
-if st.button("🧬 Perform Test", key=f"lab_{chosen_test}"):
-    dx = patient["diagnosis"]
-    result = f"{chosen_test} completed. "
-    if (dx == "Heart attack" and chosen_test == "EKG") or \
-       (dx == "Seizure" and chosen_test == "EEG") or \
-       (dx == "Pneumonia" and chosen_test == "CBC"):
-        result += "Results confirm clinical suspicion."
-        st.session_state.score += 10
-    else:
-        result += "Results inconclusive."
+    # -------------------------
+    # Lab Tests
+    # -------------------------
+    elif test_type == "Lab Test":
+        lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
+        chosen_test = st.selectbox("Select Lab Test:", lab_tests)
 
-    st.session_state.test_results = result
-    st.session_state.treatment_history.append(result)
-    st.success(result)
+        if st.button("🧬 Perform Test", key=f"lab_{chosen_test}"):
+            dx = patient["diagnosis"]
+            result = f"{chosen_test} completed. "
+            if (dx == "Heart attack" and chosen_test == "EKG") or \
+               (dx == "Seizure" and chosen_test == "EEG") or \
+               (dx == "Pneumonia" and chosen_test == "CBC"):
+                result += "Results confirm clinical suspicion."
+                st.session_state.score += 10
+            else:
+                result += "Results inconclusive."
+
+            st.session_state.test_results = result
+            st.session_state.treatment_history.append(result)
+            st.success(result)
 
 # --------------------------------------
 # MAIN INTERFACE
