@@ -24,15 +24,7 @@ with col1:
         st.write(f"Diagnosis: {patient['diagnosis']}")
         st.write(f"Vitals: {patient['vitals']}")
 
-        # Treatment History
-        st.subheader("Treatment History")
-        if st.session_state.treatment_history:
-            for treatment in st.session_state.treatment_history:
-                st.write(treatment)
-        else:
-            st.write("No treatments administered yet.")
-
-# Right panel (Vitals and Logs)
+# Right panel
 with col2:
     if st.session_state.patient:
         patient = st.session_state.patient
@@ -49,6 +41,14 @@ with col2:
 
     else:
         st.write("No patient selected.")
+
+    # Treatment History
+        st.subheader("Treatment History")
+        if st.session_state.treatment_history:
+            for treatment in st.session_state.treatment_history:
+                st.write(treatment)
+        else:
+            st.write("No treatments administered yet.")
 
 # --------------------------------------
 # STREAMLIT SETUP
