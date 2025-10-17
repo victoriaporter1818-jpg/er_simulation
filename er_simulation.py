@@ -1,4 +1,4 @@
-import streamlit as st
+i fixed up some things in the code. please use this code to add updates on: import streamlit as st
 import random
 
 # --------------------------------------
@@ -21,8 +21,6 @@ if "treatment_history" not in st.session_state:
     st.session_state.treatment_history = []
 if "test_results" not in st.session_state:
     st.session_state.test_results = None
-if "role" not in st.session_state:
-    st.session_state.role = "-- Choose --"
 
 # --------------------------------------
 # PATIENT DATABASE
@@ -99,44 +97,26 @@ if st.sidebar.button("🗑️ Clear Inventory"):
     st.sidebar.warning("Inventory cleared.")
 
 # --------------------------------------
-# Diagnostic Tests & Imaging with Images
+# DIAGNOSTIC SYSTEM
 # --------------------------------------
-if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
-    if st.session_state.patient:
-        st.subheader("🔬 Diagnostic Tests & Imaging")
-
-        diagnostic_options = {
-            "Chest X-ray": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Chest_Xray_PA_3-8-2010.png",
-            "CT Scan - Head": "https://upload.wikimedia.org/wikipedia/commons/5/59/CT_of_brain_showing_infarction_of_right_MCA_territory.jpg",
-            "Abdominal Ultrasound": "https://upload.wikimedia.org/wikipedia/commons/0/00/Normal_liver_ultrasound.jpg",
-            "Blood Test - CBC": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Complete_blood_count_report.JPG",
-            "ECG": "https://upload.wikimedia.org/wikipedia/commons/9/99/12_lead_ECG_with_ST_elevation_myocardial_infarction_inferior_leads.png"
-        }
-
-        test_selected = st.selectbox("Select a test or imaging to order:", list(diagnostic_options.keys()))
-
-        if st.button("Order Test / Imaging"):
-            result_text = f"Results for {test_selected}: "
-
-            if "X-ray" in test_selected:
-                result_text += "Findings suggest pneumonia or possible fluid buildup."
-            elif "CT" in test_selected:
-                result_text += "Shows a right-sided ischemic stroke region."
-            elif "Ultrasound" in test_selected:
-                result_text += "Normal liver echotexture, no gallstones or fluid."
-            elif "Blood Test" in test_selected:
-                result_text += "Mild anemia with elevated white count."
-            elif "ECG" in test_selected:
-                result_text += "Sinus tachycardia with mild ST elevation in inferior leads."
-
-            # Display results and image
-            image_url = diagnostic_options[test_selected]
-            st.image(image_url, caption=f"{test_selected} - Sample Result", use_container_width=True)
-            st.success(result_text)
-
-            # Save to session state
-            st.session_state.test_results = result_text
-            st.session_state.treatment_history.append(f"Ordered {test_selected}: {result_text}")
+diagnostic_images = {
+    "X-Ray": {
+        "Chest": "https://upload.wikimedia.org/wikipedia/commons/8/85/Normal_chest_xray.jpg",
+        "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Abdomen_X-ray.jpg",
+        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
+        "Limb": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Hand_xray.jpg"
+    },
+    "CT Scan": {
+        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/e/e8/CT_head.jpg",
+        "Chest": "https://upload.wikimedia.org/wikipedia/commons/4/44/CT_Thorax.jpg"
+    },
+    "MRI": {
+        "Head/Brain": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Brain_MRI.jpg"
+    },
+    "Ultrasound": {
+        "Abdomen": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Ultrasound_liver.jpg"
+    }
+}
 
 def perform_diagnostics(patient):
     st.subheader("🧪 Order Diagnostic Tests")
@@ -149,6 +129,7 @@ def perform_diagnostics(patient):
         if st.button("📸 Perform Imaging", key=f"imaging_{chosen_imaging}_{chosen_body_part}"):
             dx = patient["diagnosis"]
             result = f"{chosen_imaging} of {chosen_body_part} performed. "
+            # patient-specific interpretation
             if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
                (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
                (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen") or \
@@ -160,6 +141,7 @@ def perform_diagnostics(patient):
             st.session_state.test_results = result
             st.session_state.treatment_history.append(result)
             st.success(result)
+            # show sample image if available
             if chosen_body_part in diagnostic_images.get(chosen_imaging, {}):
                 st.image(diagnostic_images[chosen_imaging][chosen_body_part], use_container_width=True)
     else:
@@ -182,72 +164,98 @@ def perform_diagnostics(patient):
 # --------------------------------------
 # MAIN INTERFACE
 # --------------------------------------
-left, right = st.columns([2,1])
+left, right = st.columns([2, 1])
 
 with left:
-    # ER ROOM
+    # --------------------------------------
+# ER ROOM
+# --------------------------------------
     if st.session_state.room == "ER":
         st.subheader("🚨 Emergency Room")
 
-        # Role selection
-        roles = ["-- Choose --", "Nurse", "Doctor", "Surgeon", "Radiologist", "Pharmacist"]
-        st.session_state.role = st.selectbox("Select your role:", roles)
+    # Initialize role in session state if not set
+    if "role" not in st.session_state:
+        st.session_state.role = "-- Choose --"
 
-        # Role description
-        if st.session_state.role != "-- Choose --":
-            role_descriptions = {
-                "Nurse": "🩺 You’re on duty. Take vitals, record patient history, and provide care.",
-                "Doctor": "⚕️ Diagnose patients, order tests, and prescribe medications.",
-                "Surgeon": "🔪 Perform critical surgical procedures in the OR.",
-                "Radiologist": "🩻 Perform and interpret diagnostic imaging.",
-                "Pharmacist": "💊 Verify prescriptions and dispense medications."
-            }
-            st.success(role_descriptions[st.session_state.role])
+    # Role selection
+    roles = ["-- Choose --", "Nurse", "Doctor", "Surgeon", "Radiologist", "Pharmacist"]
+    st.session_state.role = st.selectbox("Select your role:", roles)
 
+    # Show role description if selected
+    if st.session_state.role != "-- Choose --":
+        role_descriptions = {
+            "Nurse": "🩺 You’re on duty. Take vitals, record patient history, and provide care.",
+            "Doctor": "⚕️ Diagnose patients, order tests, and prescribe medications.",
+            "Surgeon": "🔪 Perform critical surgical procedures in the OR.",
+            "Radiologist": "🩻 Perform and interpret diagnostic imaging.",
+            "Pharmacist": "💊 Verify prescriptions and dispense medications."
+        }
+        st.success(role_descriptions[st.session_state.role])
+
+    st.write("---")
+
+    # Generate new patient button
+    if st.button("🚑 Generate New Patient"):
+        st.session_state.patient = random.choice(patients)
+        st.session_state.treatment_history = []
+        st.session_state.test_results = None
+
+    # Display patient info
+    if st.session_state.patient:
+        p = st.session_state.patient
+        st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
+        st.write(f"**Symptoms:** {p['symptoms']}")
         st.write("---")
 
+        # Show vitals
+        st.subheader("🩺 Patient Vitals")
+        for k, v in p["vitals"].items():
+            st.write(f"**{k}:** {v}")
+
+        # Allow diagnostics for Doctors, Radiologists, and Nurses
+        if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
+            perform_diagnostics(p)
+
+        # Show medical history questionnaire
+        st.subheader("📝 Medical History")
+        with st.form("medical_history_form"):
+            chronic_conditions = st.multiselect(
+                "Select chronic conditions the patient has:",
+                ["Diabetes", "Hypertension", "Asthma", "Heart Disease",
+                 "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"]
+            )
+            allergies = st.text_input("List any known allergies (comma separated):")
+            medications_taken = st.text_area("Current medications the patient is taking:")
+            family_history = st.text_area("Relevant family medical history:")
+
+            submitted = st.form_submit_button("Save Medical History")
+            if submitted:
+                st.session_state.treatment_history.append(
+                    f"Medical history recorded: Chronic conditions={chronic_conditions}, "
+                    f"Allergies={allergies}, Medications={medications_taken}, "
+                    f"Family history={family_history}"
+                )
+                st.success("✅ Medical history saved.")
+
+
         # Generate new patient
-        if st.button("🚑 Generate New Patient"):
+        if st.button("🚨 Generate New Patient"):
             st.session_state.patient = random.choice(patients)
             st.session_state.treatment_history = []
             st.session_state.test_results = None
 
-        # Show patient info if exists
         if st.session_state.patient:
             p = st.session_state.patient
-            st.write(f"### 🧍 Patient: {p['name']} (Age {p['age']})")
+            st.subheader(f"🧍 Patient: {p['name']} (Age {p['age']})")
             st.write(f"**Symptoms:** {p['symptoms']}")
             st.write("---")
-
-            st.subheader("🩺 Patient Vitals")
+            # show patient vitals
+            st.subheader("Vitals")
             for k, v in p["vitals"].items():
                 st.write(f"**{k}:** {v}")
-
-        # Medical History Form
-            st.subheader("📝 Medical History")
-            with st.form("medical_history_form"):
-                chronic_conditions = st.multiselect(
-                    "Select chronic conditions the patient has:",
-                    ["Diabetes", "Hypertension", "Asthma", "Heart Disease",
-                     "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"]
-                )
-                allergies = st.text_input("List any known allergies (comma separated):")
-                medications_taken = st.text_area("Current medications the patient is taking:")
-                family_history = st.text_area("Relevant family medical history:")
-
-                submitted = st.form_submit_button("Save Medical History")
-                if submitted:
-                    st.session_state.treatment_history.append(
-                        f"Medical history recorded: Chronic conditions={chronic_conditions}, "
-                        f"Allergies={allergies}, Medications={medications_taken}, "
-                        f"Family history={family_history}"
-                    )
-                    st.success("✅ Medical history saved.")
-
-            # Allow diagnostics for Doctors, Radiologists, Nurses
-            if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
+            # allow diagnostics
+            if role in ["Doctor", "Radiologist", "Nurse"]:
                 perform_diagnostics(p)
-
 
     # -----------------------------
     # Supply Room
@@ -355,6 +363,24 @@ with right:
     st.write("---")
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
