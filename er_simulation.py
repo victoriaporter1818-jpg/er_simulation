@@ -104,12 +104,12 @@ with col1:
     
     # Difficulty and Role Select
     st.subheader("Game Settings")
-    difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
-    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
+    difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty_selectbox")
+    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role_radio")
     
     # Room Navigation
     st.write("---")
-    st.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
+    st.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room), key="room_navigation")
     
     # Inventory display
     st.write("---")
@@ -120,7 +120,7 @@ with col1:
     else:
         st.info("Inventory is empty.")
 
-    if st.button("🗑️ Clear Inventory"):
+    if st.button("🗑️ Clear Inventory", key="clear_inventory"):
         st.session_state.inventory = []
         st.warning("Inventory cleared.")
 
