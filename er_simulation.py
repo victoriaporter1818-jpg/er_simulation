@@ -142,9 +142,6 @@ def perform_diagnostics(patient):
         chosen_imaging = st.selectbox("Select Imaging Type:", imaging_types)
         chosen_body_part = st.selectbox("Select Body Part:", body_parts)
 
-        # Debugging Information
-        st.write(f"Debug: Selected Imaging: {chosen_imaging} | Body Part: {chosen_body_part} | Patient Diagnosis: {patient['diagnosis']}")
-
         if st.button("📸 Perform Imaging", key=f"imaging_{chosen_imaging}_{chosen_body_part}"):
             dx = patient["diagnosis"]
             result = f"{chosen_imaging} of {chosen_body_part} performed. "
