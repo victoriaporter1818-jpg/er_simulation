@@ -101,7 +101,7 @@ if st.sidebar.button("🗑️ Clear Inventory"):
 # --------------------------------------
 # Diagnostic Tests & Imaging with Images
 # --------------------------------------
-if role in ["Doctor", "Radiologist", "Nurse"]:
+if st.session_state.role != ["Doctor", "Radiologist", "Nurse"]:
     st.subheader("🔬 Diagnostic Tests & Imaging")
 
     diagnostic_options = {
