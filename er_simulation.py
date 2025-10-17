@@ -155,15 +155,32 @@ def perform_diagnostics(patient):
             st.session_state.treatment_history.append(result)
             st.success(result)
             # ✅ Display diagnostic image (robust version)
-if chosen_imaging in diagnostic_images and chosen_body_part in diagnostic_images[chosen_imaging]:
-    image_url = diagnostic_images[chosen_imaging][chosen_body_part]
-    st.image(
-        image_url,
-        caption=f"{chosen_imaging} - {chosen_body_part} (Sample Result)",
-        use_container_width=True
-    )
-else:
-    st.warning("No image available for this selection.")
+if st.button("📸 Perform Imaging", key=f"imaging_{chosen_imaging}_{chosen_body_part}"):
+    dx = patient["diagnosis"]
+    result = f"{chosen_imaging} of {chosen_body_part} performed. "
+    # patient-specific interpretation
+    if (dx == "Pneumonia" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest") or \
+       (dx == "Stroke" and chosen_imaging == "CT Scan" and chosen_body_part == "Head/Brain") or \
+       (dx == "Appendicitis" and chosen_imaging == "Ultrasound" and chosen_body_part == "Abdomen") or \
+       (dx == "Heart attack" and chosen_imaging == "X-Ray" and chosen_body_part == "Chest"):
+        result += "Findings consistent with suspected diagnosis."
+        st.session_state.score += 10
+    else:
+        result += "No significant findings."
+    st.session_state.test_results = result
+    st.session_state.treatment_history.append(result)
+    st.success(result)
+
+    # ✅ Display diagnostic image (move this block inside)
+    if chosen_imaging in diagnostic_images and chosen_body_part in diagnostic_images[chosen_imaging]:
+        image_url = diagnostic_images[chosen_imaging][chosen_body_part]
+        st.image(
+            image_url,
+            caption=f"{chosen_imaging} - {chosen_body_part} (Sample Result)",
+            use_container_width=True
+        )
+    else:
+        st.warning("No image available for this selection.")
     
 # 🧬 Lab Tests Section
 lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
