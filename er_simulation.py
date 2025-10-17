@@ -53,6 +53,16 @@ if st.sidebar.button("🗑️ Clear Inventory"):
     st.session_state.inventory = []
     st.sidebar.warning("Inventory cleared.")
 
+# Medications and Supplies for each room
+hospital_supplies = {
+    "ER": ["Role Select", "Generate New Patient", "Patient Information", "Patient Medical History"],
+    "Supply Room": ["Bandages", "Gauze", "Needles", "Sterile Kits", "IV Lines"],
+    "Medstation": ["Aspirin", "Nitroglycerin", "tPA (Clot Buster)", "Insulin", "Morphine"],
+    "Operating Room": ["Scalpel", "Sutures", "Surgical Gloves", "Surgical Drapes"],
+    "Radiology Lab": ["X-Ray Machine", "CT Scanner", "MRI Scanner", "Ultrasound Machine"],
+    "Pharmacy": ["Antibiotics", "Painkillers", "Blood Pressure Meds", "Antihistamines"]
+}
+
 # Main layout with 2 columns
 col1, col2 = st.columns([3, 1])
 
@@ -60,26 +70,67 @@ col1, col2 = st.columns([3, 1])
 with col1:
     st.title("AI Emergency Room Simulation")
 
-    # Display patient information if assigned
-    if st.session_state.patient:
-        patient = st.session_state.patient
-        st.subheader(f"Patient: {patient['name']} - {patient['age']} years old")
-        st.write(f"**Symptoms:** {patient['symptoms']}")
-        st.write(f"**Diagnosis:** {patient['diagnosis']}")
-        
-        # Treatment History
-        st.subheader("Treatment History")
-        if st.session_state.treatment_history:
-            for treatment in st.session_state.treatment_history:
-                st.write(treatment)
+    # ER specific content
+    if st.session_state.room == "ER":
+        st.subheader("ER - Emergency Room")
+        if st.session_state.patient:
+            patient = st.session_state.patient
+            st.subheader(f"Patient: {patient['name']} - {patient['age']} years old")
+            st.write(f"**Symptoms:** {patient['symptoms']}")
+            st.write(f"**Diagnosis:** {patient['diagnosis']}")
+            st.write(f"**Vitals:** {patient['vitals']}")
+            st.subheader("Patient Medical History")
+            for history in st.session_state.treatment_history:
+                st.write(history)
         else:
-            st.write("No treatments administered yet.")
-    else:
-        st.info("No patient assigned yet.")
+            st.info("No patient assigned yet.")
+        if st.button("🚑 Generate New Patient", on_click=assign_patient):
+            pass
 
-    # Assign a patient button
-    if st.button("🚑 Assign Patient", on_click=assign_patient):
-        pass
+    # Supply Room specific content
+    elif st.session_state.room == "Supply Room":
+        st.subheader("Supply Room")
+        for item in hospital_supplies["Supply Room"]:
+            st.write(f"- {item}")
+        if st.button("Add Bandages to Inventory"):
+            st.session_state.inventory.append("Bandages")
+            st.success("Bandages added to inventory.")
+
+    # Medstation specific content
+    elif st.session_state.room == "Medstation":
+        st.subheader("Medstation")
+        for item in hospital_supplies["Medstation"]:
+            st.write(f"- {item}")
+        if st.button("Add Aspirin to Inventory"):
+            st.session_state.inventory.append("Aspirin")
+            st.success("Aspirin added to inventory.")
+
+    # Operating Room specific content
+    elif st.session_state.room == "Operating Room":
+        st.subheader("Operating Room")
+        for item in hospital_supplies["Operating Room"]:
+            st.write(f"- {item}")
+        if st.button("Perform Surgery"):
+            st.session_state.score += 20
+            st.success("Surgery performed successfully.")
+
+    # Radiology Lab specific content
+    elif st.session_state.room == "Radiology Lab":
+        st.subheader("Radiology Lab")
+        for item in hospital_supplies["Radiology Lab"]:
+            st.write(f"- {item}")
+        if st.button("Order X-Ray"):
+            st.session_state.score += 15
+            st.success("X-Ray ordered successfully.")
+
+    # Pharmacy specific content
+    elif st.session_state.room == "Pharmacy":
+        st.subheader("Pharmacy")
+        for item in hospital_supplies["Pharmacy"]:
+            st.write(f"- {item}")
+        if st.button("Fill Prescription for Antibiotics"):
+            st.session_state.inventory.append("Antibiotics")
+            st.success("Antibiotics prescription filled.")
 
 # Right Column - Vitals, Action Log, and Score
 with col2:
@@ -99,3 +150,4 @@ with col2:
         st.metric("Total Score", st.session_state.score)
     else:
         st.info("No active patient.")
+
