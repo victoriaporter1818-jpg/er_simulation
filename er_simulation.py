@@ -303,6 +303,7 @@ patients_data = [
             "Family history of heart disease"
         ]
     }
+]
 
         # Allow diagnostics for Doctors, Radiologists, and Nurses
         if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
