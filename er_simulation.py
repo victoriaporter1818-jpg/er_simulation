@@ -1,7 +1,4 @@
 import streamlit as st
-import random
-
-import streamlit as st
 
 # Create two columns for layout
 col1, col2 = st.columns([3, 1])  # Main content (col1) will take 3 parts, and right panel (col2) will take 1 part
@@ -9,6 +6,12 @@ col1, col2 = st.columns([3, 1])  # Main content (col1) will take 3 parts, and ri
 # Left panel (main content)
 with col1:
     st.title("AI Emergency Room Simulation")
+
+    # Difficulty Selection Dropdown
+    difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
+
+    # Display the selected difficulty
+    st.write(f"Selected Difficulty: {difficulty}")
 
     # Select role (Doctor, Nurse, etc.)
     role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
