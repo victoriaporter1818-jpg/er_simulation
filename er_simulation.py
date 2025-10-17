@@ -71,11 +71,14 @@ with col2:
             st.write(f"**Diagnosis**: {patient['diagnosis']}")
             st.write("---")
 
-            # Display the advanced medical history form
-            st.subheader("📄 Medical History")
-            medical_history = patient['medical_history']
-            for key, value in medical_history.items():
-                st.write(f"**{key}**: {value}")
+            # Display the Medical History
+            if "medical_history" in patient:
+                st.subheader("📄 Medical History")
+                medical_history = patient['medical_history']
+                for key, value in medical_history.items():
+                    st.write(f"**{key}**: {value}")
+            else:
+                st.warning("Medical history not available for this patient.")
             
         else:
             st.info("No active patient. Please assign a patient.")
@@ -189,12 +192,12 @@ def add_to_inventory(item):
 
 def start_surgery():
     # Simulate surgery action
-    st.session_state.treatment_history.append("Surgery started in Operating Room.")
+    st.session_state.treatment_history.append("Surgery started.")
 
 def take_xray():
-    # Simulate X-ray procedure
-    st.session_state.treatment_history.append("X-ray taken in Radiology Lab.")
+    # Simulate X-ray action
+    st.session_state.treatment_history.append("X-ray completed.")
 
 def dispense_painkillers():
     # Simulate dispensing painkillers
-    st.session_state.treatment_history.append("Painkillers dispensed in Pharmacy.")
+    st.session_state.treatment_history.append("Painkillers dispensed.")
