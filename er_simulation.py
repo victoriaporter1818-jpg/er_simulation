@@ -1,104 +1,35 @@
 import streamlit as st
-import random
 
-# Set up Streamlit page
-st.set_page_config(page_title="AI Emergency Room Simulation", layout="wide")
-
-# Initialize session state variables if not already present
-if "patient" not in st.session_state:
-    st.session_state.patient = None
-if "treatment_history" not in st.session_state:
-    st.session_state.treatment_history = []
-if "score" not in st.session_state:
-    st.session_state.score = 0
+# --------------------------------------
+# INITIAL SESSION STATE
+# --------------------------------------
 if "inventory" not in st.session_state:
     st.session_state.inventory = []
 if "room" not in st.session_state:
     st.session_state.room = "ER"
+if "score" not in st.session_state:
+    st.session_state.score = 0
+if "patient" not in st.session_state:
+    st.session_state.patient = None
+if "treatment_history" not in st.session_state:
+    st.session_state.treatment_history = []
 
-# Patient database
-patients = [
-    {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath", "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}, "diagnosis": "Heart attack"},
-    {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen", "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}, "diagnosis": "Pneumonia"},
-    {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech", "vitals": {"BP": "150/90", "HR": 82, "O2": "97%"}, "diagnosis": "Stroke"},
-    {"name": "Emma Brown", "age": 8, "symptoms": "abdominal pain and vomiting for 12 hours", "vitals": {"BP": "100/65", "HR": 110, "O2": "98%"}, "diagnosis": "Appendicitis"},
-]
-
-# Difficulty and Role Selection
-difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
-role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
-
-# Assign patient logic
-def assign_patient():
-    patient = random.choice(patients)
-    st.session_state.patient = patient
-    st.session_state.treatment_history.append(f"Assigned patient: {patient['name']}")
-    st.session_state.score += 10
-
-# Room navigation logic
+# Room List
 rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
-room = st.sidebar.radio("Move to another room:", rooms, index=rooms.index(st.session_state.room))
-st.session_state.room = room
 
-# Inventory display
-st.sidebar.write("---")
-st.sidebar.subheader("📦 Current Inventory")
-if st.session_state.inventory:
-    for item in st.session_state.inventory:
-        st.sidebar.write(f"- {item}")
-else:
-    st.sidebar.info("Inventory is empty.")
+# --------------------------------------
+# PAGE CONFIGURATION
+# --------------------------------------
+st.set_page_config(page_title="AI Emergency Room Simulation", layout="wide")
 
-if st.sidebar.button("🗑️ Clear Inventory"):
-    st.session_state.inventory = []
-    st.sidebar.warning("Inventory cleared.")
+# --------------------------------------
+# UI Layout with 3 Columns
+# --------------------------------------
+col1, col2, col3 = st.columns([1, 3, 1])  # Left (1), Center (3), Right (1)
 
-# Medications and Supplies for each room with descriptions
-hospital_supplies = {
-    "ER": {
-        "Role Select": "Choose your role in the ER (Doctor, Nurse, etc.).",
-        "Generate New Patient": "Create a new patient for diagnosis and treatment.",
-        "Patient Information": "View the patient's personal information and diagnosis.",
-        "Patient Medical History": "View the patient's medical history and treatment log."
-    },
-    "Supply Room": {
-        "Bandages": "Used for dressing wounds and cuts.",
-        "Gauze": "Used for cleaning and dressing wounds.",
-        "Needles": "Used for injections or IVs.",
-        "Sterile Kits": "Used for performing procedures in a sterile environment.",
-        "IV Lines": "Used for administering fluids and medications."
-    },
-    "Medstation": {
-        "Aspirin": "Used for pain relief and heart attacks.",
-        "Nitroglycerin": "Used for chest pain and heart attack treatment.",
-        "tPA (Clot Buster)": "Used to dissolve blood clots in stroke patients.",
-        "Insulin": "Used for diabetic patients to regulate blood sugar.",
-        "Morphine": "Used for severe pain relief."
-    },
-    "Operating Room": {
-        "Scalpel": "A small, sharp knife used in surgeries.",
-        "Sutures": "Used to stitch wounds or surgical incisions.",
-        "Surgical Gloves": "Used to maintain a sterile field during surgeries.",
-        "Surgical Drapes": "Used to cover and maintain sterile areas during surgery."
-    },
-    "Radiology Lab": {
-        "X-Ray Machine": "Used to capture images of bones and organs.",
-        "CT Scanner": "Used to create detailed cross-sectional images of the body.",
-        "MRI Scanner": "Used for imaging soft tissues like the brain and muscles.",
-        "Ultrasound Machine": "Used for imaging organs and tissues using sound waves."
-    },
-    "Pharmacy": {
-        "Antibiotics": "Used to treat bacterial infections.",
-        "Painkillers": "Used for managing mild to severe pain.",
-        "Blood Pressure Meds": "Used to control high blood pressure.",
-        "Antihistamines": "Used to treat allergic reactions."
-    }
-}
-
-# Main layout with 3 columns
-col1, col2, col3 = st.columns([1, 3, 1])
-
-# Left Column - Difficulty, Role, Room Navigation, and Inventory
+# --------------------------------------
+# Left Column (Game Settings, Room Navigation, Inventory)
+# --------------------------------------
 with col1:
     st.title("AI Emergency Room Simulation")
     
@@ -124,60 +55,93 @@ with col1:
         st.session_state.inventory = []
         st.warning("Inventory cleared.")
 
-# Center Column - Main Content of the Current Room
+# --------------------------------------
+# Center Column (Main Content for Rooms)
+# --------------------------------------
 with col2:
-    # ER specific content
     if st.session_state.room == "ER":
-        st.subheader("ER - Emergency Room")
+        st.header("Emergency Room")
+        # Show the role-specific details and patient data
         if st.session_state.patient:
             patient = st.session_state.patient
-            st.subheader(f"Patient: {patient['name']} - {patient['age']} years old")
-            st.write(f"**Symptoms:** {patient['symptoms']}")
-            st.write(f"**Diagnosis:** {patient['diagnosis']}")
-            st.write(f"**Vitals:** {patient['vitals']}")
-            st.subheader("Patient Medical History")
-            for history in st.session_state.treatment_history:
-                st.write(history)
+            st.subheader(f"Patient: {patient['name']}")
+            st.write(f"**Age**: {patient['age']}")
+            st.write(f"**Symptoms**: {patient['symptoms']}")
+            st.write(f"**Diagnosis**: {patient['diagnosis']}")
+            st.write("---")
+            # Patient Treatment History
+            st.subheader("Treatment History")
+            if st.session_state.treatment_history:
+                for treatment in st.session_state.treatment_history:
+                    st.write(treatment)
+            else:
+                st.write("No treatments administered yet.")
         else:
-            st.info("No patient assigned yet.")
-        if st.button("🚑 Generate New Patient", on_click=assign_patient):
-            pass
+            st.info("No active patient. Please assign a patient.")
+        
+        if st.button("🚑 Assign Patient", on_click=lambda: assign_patient()):
+            st.session_state.score += 10  # Add points for assigning a patient
 
-    # Supply Room specific content
     elif st.session_state.room == "Supply Room":
-        st.subheader("Supply Room")
-        for item, description in hospital_supplies["Supply Room"].items():
-            st.write(f"**{item}:** {description}")
-            if st.button(f"Add {item} to Inventory"):
-                st.session_state.inventory.append(item)
-                st.success(f"{item} added to inventory.")
+        st.header("Supply Room")
+        st.write("Here you can manage medical supplies.")
+        st.write("Add supplies to your inventory.")
+        if st.button("Add Oxygen Mask", on_click=lambda: add_to_inventory("Oxygen Mask")):
+            st.session_state.inventory.append("Oxygen Mask")
+            st.success("Oxygen Mask added to inventory.")
+        if st.button("Add Intubation Kit", on_click=lambda: add_to_inventory("Intubation Kit")):
+            st.session_state.inventory.append("Intubation Kit")
+            st.success("Intubation Kit added to inventory.")
+        # You can add more supplies here with similar buttons.
 
-    # Medstation specific content
     elif st.session_state.room == "Medstation":
-        st.subheader("Medstation")
-        for item, description in hospital_supplies["Medstation"].items():
-            st.write(f"**{item}:** {description}")
-            if st.button(f"Add {item} to Inventory"):
-                st.session_state.inventory.append(item)
-                st.success(f"{item} added to inventory.")
+        st.header("Medstation")
+        st.write("Here you can add medications.")
+        if st.button("Add Aspirin", on_click=lambda: add_to_inventory("Aspirin")):
+            st.session_state.inventory.append("Aspirin")
+            st.success("Aspirin added to inventory.")
+        if st.button("Add Epinephrine", on_click=lambda: add_to_inventory("Epinephrine")):
+            st.session_state.inventory.append("Epinephrine")
+            st.success("Epinephrine added to inventory.")
+        # You can add more medications here with similar buttons.
 
-    # Operating Room specific content
-    elif st.session_state.room == "Operating Room":
-        st.subheader("Operating Room")
-        for item, description in hospital_supplies["Operating Room"].items():
-            st.write(f"**{item}:** {description}")
-            if st.button(f"Add {item} to Inventory"):
-                st.session_state.inventory.append(item)
-                st.success(f"{item} added to inventory.")
-        if st.button("Perform Surgery"):
-            st.session_state.score += 20
-            st.success("Surgery performed successfully.")
+    # Additional rooms can follow the same pattern
 
-    # Radiology Lab specific content
-    elif st.session_state.room == "Radiology Lab":
-        st.subheader("Radiology Lab")
-        for item, description in hospital_supplies["Radiology Lab"].items():
-            st.write(f"**{item}:** {description}")
-            if st.button(f"Add {item} to Inventory"):
-                st.session_state.inventory.append(item)
-                st.success(f)
+# --------------------------------------
+# Right Column (Vitals, Logs, and Score)
+# --------------------------------------
+with col3:
+    if st.session_state.patient:
+        patient = st.session_state.patient
+        st.subheader("Patient Vitals")
+        st.write(f"**Blood Pressure**: {patient['vitals']['BP']}")
+        st.write(f"**Heart Rate**: {patient['vitals']['HR']}")
+        st.write(f"**Oxygen Saturation**: {patient['vitals']['O2']}")
+    else:
+        st.info("No active patient.")
+    
+    st.write("---")
+    st.subheader("📝 Action Log")
+    for line in reversed(st.session_state.treatment_history[-10:]):
+        st.write(line)
+
+    st.write("---")
+    st.subheader("🏆 Score")
+    st.metric("Total Score", st.session_state.score)
+
+# --------------------------------------
+# Helper Functions
+# --------------------------------------
+def assign_patient():
+    # Randomly assign a patient from the list
+    patient_list = [
+        {"name": "John Doe", "age": 45, "symptoms": "severe chest pain", "diagnosis": "Heart Attack", "vitals": {"BP": "90/60", "HR": 120, "O2": "85%"}},
+        {"name": "Sarah Li", "age": 29, "symptoms": "high fever", "diagnosis": "Pneumonia", "vitals": {"BP": "110/70", "HR": 95, "O2": "88%"}},
+    ]
+    selected_patient = patient_list[0]  # For simplicity, we'll always assign the first patient
+    st.session_state.patient = selected_patient
+    st.session_state.treatment_history.append(f"Assigned patient: {selected_patient['name']}")
+
+def add_to_inventory(item):
+    # Helper function to add items to the inventory
+    st.session_state.inventory.append(item)
