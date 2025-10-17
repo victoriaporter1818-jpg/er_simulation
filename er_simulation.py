@@ -208,37 +208,6 @@ def perform_diagnostics(patient):
                 image_url = diagnostic_images["ECG"]["12-lead"]
                 st.image(image_url, caption="EKG - Sample Result", use_container_width=True)
             elif chosen_test == "EEG":
-
-    # -------------------------
-    # Lab Tests
-    # -------------------------
-    elif test_type == "Lab Test":
-        lab_tests = ["CBC", "Urinalysis", "Biopsy", "Endoscopy", "EKG", "EEG"]
-        chosen_test = st.selectbox("Select Lab Test:", lab_tests)
-
-        if st.button("🧬 Perform Test", key=f"lab_{chosen_test}"):
-            dx = patient["diagnosis"]
-            result = f"{chosen_test} completed. "
-            if (dx == "Heart attack" and chosen_test == "EKG") or \
-               (dx == "Seizure" and chosen_test == "EEG") or \
-               (dx == "Pneumonia" and chosen_test == "CBC"):
-                result += "Results confirm clinical suspicion."
-                st.session_state.score += 10
-            else:
-                result += "Results inconclusive."
-
-            st.session_state.test_results = result
-            st.session_state.treatment_history.append(result)
-            st.success(result)
-
-            # 🧬 Show lab test images based on test type
-            if chosen_test == "CBC":
-                image_url = diagnostic_images["Blood Test"]["CBC"]
-                st.image(image_url, caption="Complete Blood Count (CBC) - Sample Result", use_container_width=True)
-            elif chosen_test == "EKG":
-                image_url = diagnostic_images["ECG"]["12-lead"]
-                st.image(image_url, caption="EKG - Sample Result", use_container_width=True)
-            elif chosen_test == "EEG":
                 image_url = diagnostic_images["EEG"]["Brain"]
                 st.image(image_url, caption="EEG - Sample Result", use_container_width=True)
             else:
