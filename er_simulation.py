@@ -333,14 +333,21 @@ if st.session_state.room == "ER":
 # --------------------------------------
 with right:
     st.header("🩺 Patient Vitals & Logs")
+    
+    # Check if a patient exists before displaying vitals
     if st.session_state.patient:
         p = st.session_state.patient
         st.subheader(f"{p['name']} - Vitals")
-        for k, v in p["vitals"].items():
-            st.write(f"**{k}:** {v}")
+        
+        if "vitals" in p:
+            for k, v in p["vitals"].items():
+                st.write(f"**{k}:** {v}")
+        else:
+            st.warning("Vitals data not available for this patient.")
     else:
         st.info("No active patient.")
 
+    # Display test results if available
     if st.session_state.test_results:
         st.write("---")
         st.subheader("🧠 Test Results")
