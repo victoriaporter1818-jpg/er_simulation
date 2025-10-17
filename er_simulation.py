@@ -92,24 +92,27 @@ with col1:
         st.subheader("Supply Room")
         for item in hospital_supplies["Supply Room"]:
             st.write(f"- {item}")
-        if st.button("Add Bandages to Inventory"):
-            st.session_state.inventory.append("Bandages")
-            st.success("Bandages added to inventory.")
+            if st.button(f"Add {item} to Inventory"):
+                st.session_state.inventory.append(item)
+                st.success(f"{item} added to inventory.")
 
     # Medstation specific content
     elif st.session_state.room == "Medstation":
         st.subheader("Medstation")
         for item in hospital_supplies["Medstation"]:
             st.write(f"- {item}")
-        if st.button("Add Aspirin to Inventory"):
-            st.session_state.inventory.append("Aspirin")
-            st.success("Aspirin added to inventory.")
+            if st.button(f"Add {item} to Inventory"):
+                st.session_state.inventory.append(item)
+                st.success(f"{item} added to inventory.")
 
     # Operating Room specific content
     elif st.session_state.room == "Operating Room":
         st.subheader("Operating Room")
         for item in hospital_supplies["Operating Room"]:
             st.write(f"- {item}")
+            if st.button(f"Add {item} to Inventory"):
+                st.session_state.inventory.append(item)
+                st.success(f"{item} added to inventory.")
         if st.button("Perform Surgery"):
             st.session_state.score += 20
             st.success("Surgery performed successfully.")
@@ -119,6 +122,9 @@ with col1:
         st.subheader("Radiology Lab")
         for item in hospital_supplies["Radiology Lab"]:
             st.write(f"- {item}")
+            if st.button(f"Add {item} to Inventory"):
+                st.session_state.inventory.append(item)
+                st.success(f"{item} added to inventory.")
         if st.button("Order X-Ray"):
             st.session_state.score += 15
             st.success("X-Ray ordered successfully.")
@@ -128,6 +134,9 @@ with col1:
         st.subheader("Pharmacy")
         for item in hospital_supplies["Pharmacy"]:
             st.write(f"- {item}")
+            if st.button(f"Add {item} to Inventory"):
+                st.session_state.inventory.append(item)
+                st.success(f"{item} added to inventory.")
         if st.button("Fill Prescription for Antibiotics"):
             st.session_state.inventory.append("Antibiotics")
             st.success("Antibiotics prescription filled.")
@@ -150,4 +159,5 @@ with col2:
         st.metric("Total Score", st.session_state.score)
     else:
         st.info("No active patient.")
+
 
