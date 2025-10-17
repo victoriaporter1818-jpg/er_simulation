@@ -53,14 +53,46 @@ if st.sidebar.button("🗑️ Clear Inventory"):
     st.session_state.inventory = []
     st.sidebar.warning("Inventory cleared.")
 
-# Medications and Supplies for each room
+# Medications and Supplies for each room with descriptions
 hospital_supplies = {
-    "ER": ["Role Select", "Generate New Patient", "Patient Information", "Patient Medical History"],
-    "Supply Room": ["Bandages", "Gauze", "Needles", "Sterile Kits", "IV Lines"],
-    "Medstation": ["Aspirin", "Nitroglycerin", "tPA (Clot Buster)", "Insulin", "Morphine"],
-    "Operating Room": ["Scalpel", "Sutures", "Surgical Gloves", "Surgical Drapes"],
-    "Radiology Lab": ["X-Ray Machine", "CT Scanner", "MRI Scanner", "Ultrasound Machine"],
-    "Pharmacy": ["Antibiotics", "Painkillers", "Blood Pressure Meds", "Antihistamines"]
+    "ER": {
+        "Role Select": "Choose your role in the ER (Doctor, Nurse, etc.).",
+        "Generate New Patient": "Create a new patient for diagnosis and treatment.",
+        "Patient Information": "View the patient's personal information and diagnosis.",
+        "Patient Medical History": "View the patient's medical history and treatment log."
+    },
+    "Supply Room": {
+        "Bandages": "Used for dressing wounds and cuts.",
+        "Gauze": "Used for cleaning and dressing wounds.",
+        "Needles": "Used for injections or IVs.",
+        "Sterile Kits": "Used for performing procedures in a sterile environment.",
+        "IV Lines": "Used for administering fluids and medications."
+    },
+    "Medstation": {
+        "Aspirin": "Used for pain relief and heart attacks.",
+        "Nitroglycerin": "Used for chest pain and heart attack treatment.",
+        "tPA (Clot Buster)": "Used to dissolve blood clots in stroke patients.",
+        "Insulin": "Used for diabetic patients to regulate blood sugar.",
+        "Morphine": "Used for severe pain relief."
+    },
+    "Operating Room": {
+        "Scalpel": "A small, sharp knife used in surgeries.",
+        "Sutures": "Used to stitch wounds or surgical incisions.",
+        "Surgical Gloves": "Used to maintain a sterile field during surgeries.",
+        "Surgical Drapes": "Used to cover and maintain sterile areas during surgery."
+    },
+    "Radiology Lab": {
+        "X-Ray Machine": "Used to capture images of bones and organs.",
+        "CT Scanner": "Used to create detailed cross-sectional images of the body.",
+        "MRI Scanner": "Used for imaging soft tissues like the brain and muscles.",
+        "Ultrasound Machine": "Used for imaging organs and tissues using sound waves."
+    },
+    "Pharmacy": {
+        "Antibiotics": "Used to treat bacterial infections.",
+        "Painkillers": "Used for managing mild to severe pain.",
+        "Blood Pressure Meds": "Used to control high blood pressure.",
+        "Antihistamines": "Used to treat allergic reactions."
+    }
 }
 
 # Main layout with 2 columns
@@ -90,8 +122,8 @@ with col1:
     # Supply Room specific content
     elif st.session_state.room == "Supply Room":
         st.subheader("Supply Room")
-        for item in hospital_supplies["Supply Room"]:
-            st.write(f"- {item}")
+        for item, description in hospital_supplies["Supply Room"].items():
+            st.write(f"**{item}:** {description}")
             if st.button(f"Add {item} to Inventory"):
                 st.session_state.inventory.append(item)
                 st.success(f"{item} added to inventory.")
@@ -99,8 +131,8 @@ with col1:
     # Medstation specific content
     elif st.session_state.room == "Medstation":
         st.subheader("Medstation")
-        for item in hospital_supplies["Medstation"]:
-            st.write(f"- {item}")
+        for item, description in hospital_supplies["Medstation"].items():
+            st.write(f"**{item}:** {description}")
             if st.button(f"Add {item} to Inventory"):
                 st.session_state.inventory.append(item)
                 st.success(f"{item} added to inventory.")
@@ -108,8 +140,8 @@ with col1:
     # Operating Room specific content
     elif st.session_state.room == "Operating Room":
         st.subheader("Operating Room")
-        for item in hospital_supplies["Operating Room"]:
-            st.write(f"- {item}")
+        for item, description in hospital_supplies["Operating Room"].items():
+            st.write(f"**{item}:** {description}")
             if st.button(f"Add {item} to Inventory"):
                 st.session_state.inventory.append(item)
                 st.success(f"{item} added to inventory.")
@@ -120,8 +152,8 @@ with col1:
     # Radiology Lab specific content
     elif st.session_state.room == "Radiology Lab":
         st.subheader("Radiology Lab")
-        for item in hospital_supplies["Radiology Lab"]:
-            st.write(f"- {item}")
+        for item, description in hospital_supplies["Radiology Lab"].items():
+            st.write(f"**{item}:** {description}")
             if st.button(f"Add {item} to Inventory"):
                 st.session_state.inventory.append(item)
                 st.success(f"{item} added to inventory.")
@@ -132,8 +164,8 @@ with col1:
     # Pharmacy specific content
     elif st.session_state.room == "Pharmacy":
         st.subheader("Pharmacy")
-        for item in hospital_supplies["Pharmacy"]:
-            st.write(f"- {item}")
+        for item, description in hospital_supplies["Pharmacy"].items():
+            st.write(f"**{item}:** {description}")
             if st.button(f"Add {item} to Inventory"):
                 st.session_state.inventory.append(item)
                 st.success(f"{item} added to inventory.")
@@ -159,5 +191,3 @@ with col2:
         st.metric("Total Score", st.session_state.score)
     else:
         st.info("No active patient.")
-
-
