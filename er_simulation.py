@@ -1,7 +1,5 @@
 import streamlit as st
 
-import streamlit as st
-
 # Create two columns for layout
 col1, col2 = st.columns([3, 1])  # Main content (col1) will take 3 parts, and right panel (col2) will take 1 part
 
