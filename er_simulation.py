@@ -207,16 +207,12 @@ with left:
         st.write(f"**Symptoms:** {p['symptoms']}")
         st.write("---")
 
-        # Show vitals
+    # Show vitals
         st.subheader("🩺 Patient Vitals")
         for k, v in p["vitals"].items():
             st.write(f"**{k}:** {v}")
 
-        # Allow diagnostics for Doctors, Radiologists, and Nurses
-        if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
-            perform_diagnostics(p)
-
-        # Show medical history questionnaire
+    # Show medical history questionnaire
         st.subheader("📝 Medical History")
         with st.form("medical_history_form"):
             chronic_conditions = st.multiselect(
@@ -237,6 +233,9 @@ with left:
                 )
                 st.success("✅ Medical history saved.")
 
+        # Allow diagnostics for Doctors, Radiologists, and Nurses
+        if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
+            perform_diagnostics(p)
 
         # Generate new patient
         if st.button("🚨 Generate New Patient"):
