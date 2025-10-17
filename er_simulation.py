@@ -197,31 +197,31 @@ with left:
             for k, v in p["vitals"].items():
                 st.write(f"**{k}:** {v}")
 
+        # Medical History Form
+            st.subheader("📝 Medical History")
+            with st.form("medical_history_form"):
+                chronic_conditions = st.multiselect(
+                    "Select chronic conditions the patient has:",
+                    ["Diabetes", "Hypertension", "Asthma", "Heart Disease",
+                     "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"]
+                )
+                allergies = st.text_input("List any known allergies (comma separated):")
+                medications_taken = st.text_area("Current medications the patient is taking:")
+                family_history = st.text_area("Relevant family medical history:")
+
+                submitted = st.form_submit_button("Save Medical History")
+                if submitted:
+                    st.session_state.treatment_history.append(
+                        f"Medical history recorded: Chronic conditions={chronic_conditions}, "
+                        f"Allergies={allergies}, Medications={medications_taken}, "
+                        f"Family history={family_history}"
+                    )
+                    st.success("✅ Medical history saved.")
+
             # Allow diagnostics for Doctors, Radiologists, Nurses
             if st.session_state.role in ["Doctor", "Radiologist", "Nurse"]:
                 perform_diagnostics(p)
 
-        # Medical History Form
-st.subheader("📝 Medical History")
-
-with st.form("medical_history_form"):
-    chronic_conditions = st.multiselect(
-        "Select chronic conditions the patient has:",
-        ["Diabetes", "Hypertension", "Asthma", "Heart Disease",
-         "Kidney Disease", "Liver Disease", "Seizure Disorder", "Other"]
-    )
-    allergies = st.text_input("List any known allergies (comma separated):")
-    medications_taken = st.text_area("Current medications the patient is taking:")
-    family_history = st.text_area("Relevant family medical history:")
-
-    submitted = st.form_submit_button("Save Medical History")
-    if submitted:
-        st.session_state.treatment_history.append(
-            f"Medical history recorded: Chronic conditions={chronic_conditions}, "
-            f"Allergies={allergies}, Medications={medications_taken}, "
-            f"Family history={family_history}"
-        )
-        st.success("✅ Medical history saved.")
 
     # -----------------------------
     # Supply Room
@@ -329,6 +329,7 @@ with right:
     st.write("---")
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
+
 
 
 
