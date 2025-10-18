@@ -78,19 +78,28 @@ with st.container():
                     else:
                         st.warning(f"{item} is already in the inventory.")
         
-        elif st.session_state.room == "ER":
-            st.header("🏥 Emergency Room")
-            
-            # Show the Next Patient button and patient details in the center column only
-            if st.button("Next Patient", key="next_patient_button", on_click=assign_patient):  # Correctly passed function without parentheses
-
-            # Display patient data in the center column only
-            if st.session_state.patient:
-                patient = st.session_state.patient
-                st.subheader("Patient Information")
-                st.write(f"**Name:** {patient['name']}")
-                st.write(f"**Age:** {patient['age']}")
-                st.write(f"**Symptoms:** {patient['symptoms']}")
+elif st.session_state.room == "ER":
+    st.header("🏥 Emergency Room")
+    
+    # Show the Next Patient button and patient details in the center column only
+    if st.button("Next Patient", key="next_patient_button", on_click=assign_patient):  # Correctly passed function without parentheses
+        pass  # This is where you can add any actions for when the button is pressed (currently only calling `assign_patient`)
+    
+    # Display patient data in the center column only
+    if st.session_state.patient:
+        patient = st.session_state.patient
+        st.subheader("Patient Information")
+        st.write(f"**Name:** {patient['name']}")
+        st.write(f"**Age:** {patient['age']}")
+        st.write(f"**Symptoms:** {patient['symptoms']}")
+        
+        # Patient-specific Medical History Form (ONLY in the center column)
+        st.subheader("📜 Medical History Form")
+        medical_history = patient['medical_history']
+        for key, value in medical_history.items():
+            st.write(f"**{key}:** {value}")
+    else:
+        st.info("No active patient.")
                 
                 # Patient-specific Medical History Form (ONLY in the center column)
                 st.subheader("📜 Medical History Form")
