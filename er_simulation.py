@@ -13,94 +13,35 @@ st.set_page_config(
 # Custom CSS for tighter alignment and positioning
 st.markdown("""
 <style>
-/* Remove Streamlit default padding */
-.block-container {
-    padding-top: 2rem !important;
-    padding-bottom: 0rem !important;
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-}
-
-/* Make all column blocks top-aligned */
-div[data-testid="stHorizontalBlock"] {
-    align-items: flex-start !important;
-    gap: 0.5rem !important;
-}
-
-/* ---- Fix for center column width ---- */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-    text-align: left !important;
-    margin-top: 2rem !important;
-    padding-top: 0rem !important;
-    width: 100% !important;
-}
-
-/* Expand all widgets and text in center column to fill full width */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
-    max-width: 100% !important;
-    width: 100% !important;
-}
-
-/* Remove inner padding from center column */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) > div {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Optional: tighten expander style and center area look */
-details {
-    max-width: 100% !important;
-    margin-left: 0rem !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<style>
-/* Center column full-width fix */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-    width: 100% !important;
-    flex-grow: 1 !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-    text-align: left !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Force all center content to align left */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
-    margin-left: 0 !important;
-    text-align: left !important;
-    max-width: 100% !important;
-}
-
-/* Optional: tighten vertical spacing */
-.block-container {
-    padding-top: 1rem !important;
-    padding-bottom: 0 !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<style>
-/* Remove blank space between sidebar and center column */
-div[data-testid="stHorizontalBlock"] {
-    gap: 0rem !important;  /* removes the space between columns */
-}
-
-/* Force center column to start directly beside sidebar */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+/* Remove all gaps between sidebar and main page */
+section.main > div {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
 }
 
-/* Keep everything left-aligned and full width */
+/* Remove padding from the center content area */
+.block-container {
+    padding-left: 0rem !important;
+    margin-left: 0rem !important;
+    padding-right: 1rem !important;
+    padding-top: 1rem !important;
+}
+
+/* Remove column spacing */
+div[data-testid="stHorizontalBlock"] {
+    gap: 0rem !important;
+}
+
+/* Force center column content to left edge */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    margin-left: 0rem !important;
+    padding-left: 0rem !important;
+    width: 100% !important;
+}
+
+/* Ensure all widgets and expanders hug the left edge */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
     text-align: left !important;
     margin-left: 0 !important;
@@ -108,7 +49,6 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * 
 }
 </style>
 """, unsafe_allow_html=True)
-
 
 # --------------------------------------
 # SESSION STATE INITIALIZATION
