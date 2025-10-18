@@ -82,8 +82,7 @@ with st.container():
             st.header("🏥 Emergency Room")
             
             # Show the Next Patient button and patient details in the center column only
-            if st.button("Next Patient", key="next_patient_button"):  # Unique key added here
-                assign_patient()  # This will call the assign_patient function and generate the next patient.
+            st.button("Next Patient", key="next_patient_button", on_click=assign_patient)
 
             # Display patient data in the center column only
             if st.session_state.patient:
@@ -100,7 +99,7 @@ with st.container():
                     st.write(f"**{key}:** {value}")
             else:
                 st.info("No active patient.")
-
+                
 # --------------------------------------
 # RIGHT COLUMN (Patient Data & Logs)
 # --------------------------------------
