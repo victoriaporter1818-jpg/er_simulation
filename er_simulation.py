@@ -11,20 +11,11 @@ st.set_page_config(
 )
 
 # --------------------------------------
-# STRONG CSS FIX – FLUSH CENTER COLUMN TO SIDEBAR
+# CSS for Layout Alignment
 # --------------------------------------
 st.markdown("""
 <style>
-/* Remove Streamlit’s internal padding and margins */
 main[data-testid="stAppViewContainer"] {
-    padding-left: 0rem !important;
-    margin-left: 0rem !important;
-}
-main[data-testid="stAppViewContainer"] > div:first-child {
-    padding-left: 0rem !important;
-    margin-left: 0rem !important;
-}
-section.main > div {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
 }
@@ -33,49 +24,13 @@ section.main > div {
     margin-left: 0rem !important;
     width: 100% !important;
 }
-
-/* Remove column spacing */
 div[data-testid="stHorizontalBlock"] {
-    gap: 0rem !important;
+    gap: 1rem !important; /* Small gap between columns */
 }
-
-/* Center column: flush left, dynamic right spacing */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-    margin-left: 0rem !important;
-    padding-left: 0rem !important;
-    padding-right: 1.2rem !important;  /* Default padding */
-    width: 100% !important;
+    padding-left: 1rem !important; /* Add left margin to center content */
+    padding-right: 1rem !important; /* ✅ Adds small gap on the right side */
     justify-content: flex-start !important;
-    align-items: flex-start !important;
-}
-
-/* Align text and widgets inside center column */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
-    text-align: left !important;
-    margin-left: 0 !important;
-    max-width: 100% !important;
-}
-
-/* RESPONSIVE ADJUSTMENTS */
-@media (max-width: 1600px) {
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-        padding-right: 1rem !important;  /* Medium screens */
-    }
-}
-@media (max-width: 1200px) {
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-        padding-right: 0.8rem !important;  /* Tablets */
-    }
-}
-@media (max-width: 900px) {
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-        padding-right: 0.5rem !important;  /* Narrow tablets */
-    }
-}
-@media (max-width: 600px) {
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-        padding-right: 0.3rem !important;  /* Phones */
-    }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -175,9 +130,8 @@ with st.sidebar:
 # --------------------------------------
 # MAIN LAYOUT
 # --------------------------------------
-col1, col2, col3 = st.columns([0.3, 3.4, 1.3])  # Wider center column flush with sidebar
+col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 
-# ---- CENTER COLUMN ----
 with col2:
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
@@ -254,19 +208,17 @@ with col2:
                                 st.warning(f"{item} is already in the inventory.")
                                 st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
 
-     elif st.session_state.room == "Medstation":
+    elif st.session_state.room == "Medstation":
         st.header("💉 Medstation")
 
-        # Define color categories
         med_color_map = {
-            "Pain & Fever Relief": "#fddede",     # light red
-            "Seizure & Neurological": "#e0d0ff",  # lavender
-            "Cardiac & Emergency": "#d0f0fd",     # light blue
-            "Blood Pressure & Circulation": "#d0ffd0",  # light green
-            "Fluid & Metabolic": "#fff6d0"        # light yellow
+            "Pain & Fever Relief": "#fddede",
+            "Seizure & Neurological": "#e0d0ff",
+            "Cardiac & Emergency": "#d0f0fd",
+            "Blood Pressure & Circulation": "#d0ffd0",
+            "Fluid & Metabolic": "#fff6d0"
         }
 
-        # Categorized medication dictionary
         categorized_meds = {
             "Pain & Fever Relief": {
                 "Acetaminophen": "Used to relieve mild to moderate pain and reduce fever.",
@@ -292,14 +244,11 @@ with col2:
             }
         }
 
-        # Display categorized medications with colors
         for category, meds in categorized_meds.items():
             st.markdown(
-                f"<h4 style='background-color:{med_color_map[category]};"
-                "padding:6px;border-radius:8px;margin-top:10px;'>"
-                f"{category}</h4>", unsafe_allow_html=True
+                f"<h4 style='background-color:{med_color_map[category]};padding:6px;border-radius:8px;margin-top:10px;'>{category}</h4>",
+                unsafe_allow_html=True
             )
-
             items = list(meds.items())
             for i in range(0, len(items), 2):
                 colA, colB = st.columns(2)
@@ -315,7 +264,6 @@ with col2:
                             else:
                                 st.warning(f"{med} is already in the inventory.")
                                 st.toast(f"⚠️ {med} already in inventory.", icon="⚠️")
-
 
 # ---- RIGHT COLUMN ----
 with col3:
