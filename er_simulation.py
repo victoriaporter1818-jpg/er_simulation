@@ -2,7 +2,7 @@ import streamlit as st
 import random
 
 # --------------------------------------
-# PAGE SETUP (Fullscreen + Alignment)
+# PAGE CONFIGURATION
 # --------------------------------------
 st.set_page_config(
     page_title="Emergency Room Simulation",
@@ -10,44 +10,70 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for tighter alignment and positioning
+# --------------------------------------
+# STRONG CSS FIX FOR CENTER COLUMN ALIGNMENT
+# --------------------------------------
 st.markdown("""
 <style>
-/* Remove all gaps between sidebar and main page */
+/* Make center column fully flush with sidebar */
 section.main > div {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
 }
 
-/* Remove padding from the center content area */
+/* Remove internal spacing between sidebar and main columns */
 .block-container {
+    padding-top: 1rem !important;
+    padding-bottom: 0rem !important;
     padding-left: 0rem !important;
     margin-left: 0rem !important;
-    padding-right: 1rem !important;
-    padding-top: 1rem !important;
 }
 
-/* Remove column spacing */
+/* Force columns to sit flush together */
 div[data-testid="stHorizontalBlock"] {
     gap: 0rem !important;
 }
 
-/* Force center column content to left edge */
+/* Force center column to fully expand and left-align all contents */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
     justify-content: flex-start !important;
     align-items: flex-start !important;
-    margin-left: 0rem !important;
     padding-left: 0rem !important;
+    margin-left: 0rem !important;
     width: 100% !important;
 }
 
-/* Ensure all widgets and expanders hug the left edge */
+/* Make sure all widgets inside center column align left */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
     text-align: left !important;
     margin-left: 0 !important;
     max-width: 100% !important;
 }
+
+/* Kill any stray container padding */
+div[data-testid="stVerticalBlock"] {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* JS-assisted correction (runs post-render to fix Streamlit layout reset) */
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const adjustLayout = () => {
+        const centerCols = document.querySelectorAll('div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2)');
+        centerCols.forEach(c => {
+            c.style.marginLeft = '0rem';
+            c.style.paddingLeft = '0rem';
+            c.style.width = '100%';
+            c.style.justifyContent = 'flex-start';
+            c.style.alignItems = 'flex-start';
+        });
+    };
+    adjustLayout();
+    setTimeout(adjustLayout, 1000);
+});
+</script>
 """, unsafe_allow_html=True)
 
 # --------------------------------------
@@ -95,9 +121,6 @@ def assign_patient():
     st.session_state.treatment_history = []
     st.session_state.score += 10
 
-def perform_diagnostics(patient):
-    pass  # placeholder for future logic
-
 # --------------------------------------
 # SUPPLY ROOM ITEMS
 # --------------------------------------
@@ -119,7 +142,7 @@ emergency_supplies = {
 }
 
 # --------------------------------------
-# LEFT SIDEBAR
+# SIDEBAR
 # --------------------------------------
 with st.sidebar:
     st.header("🏥 Emergency Room Simulation")
@@ -130,140 +153,82 @@ with st.sidebar:
     role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
     st.write(f"Selected Role: {role}")
 
-    # Room Navigation
     rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
-    st.session_state.room = st.sidebar.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
+    st.session_state.room = st.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
 
-    # Inventory Display
-    st.sidebar.write("---")
-    st.sidebar.subheader("📦 Current Inventory")
+    st.write("---")
+    st.subheader("📦 Current Inventory")
     if st.session_state.inventory:
         for item in st.session_state.inventory:
-            st.sidebar.write(f"- {item}")
+            st.write(f"- {item}")
     else:
-        st.sidebar.info("Inventory is empty.")
+        st.info("Inventory is empty.")
 
-    if st.sidebar.button("🗑️ Clear Inventory"):
+    if st.button("🗑️ Clear Inventory"):
         st.session_state.inventory = []
-        st.sidebar.warning("Inventory cleared.")
+        st.warning("Inventory cleared.")
 
 # --------------------------------------
-# MAIN LAYOUT (Three Columns)
+# MAIN LAYOUT
 # --------------------------------------
-col1, col2, col3 = st.columns([1.1, 2.9, 1.0])  # Center wider and dominant
+col1, col2, col3 = st.columns([0.5, 3.0, 1.2])
 
-# ---- CENTER COLUMN (Main Room Content)
 with col2:
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
-
         if st.button("Next Patient"):
             st.session_state.next_patient_button_clicked = True
-
         if st.session_state.get("next_patient_button_clicked", False):
             assign_patient()
             st.session_state.next_patient_button_clicked = False
-
         if st.session_state.patient:
-            patient = st.session_state.patient
+            p = st.session_state.patient
             st.subheader("Patient Information")
-            st.write(f"**Name:** {patient['name']}")
-            st.write(f"**Age:** {patient['age']}")
-            st.write(f"**Symptoms:** {patient['symptoms']}")
-
+            st.write(f"**Name:** {p['name']}")
+            st.write(f"**Age:** {p['age']}")
+            st.write(f"**Symptoms:** {p['symptoms']}")
             st.subheader("📜 Medical History Form")
-            for key, value in patient["medical_history"].items():
-                st.write(f"**{key}:** {value}")
+            for k, v in p["medical_history"].items():
+                st.write(f"**{k}:** {v}")
         else:
             st.info("No active patient.")
 
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
+        for item, desc in emergency_supplies.items():
+            with st.expander(item):
+                st.write(desc)
+                if st.button(f"Add {item}", key=f"add_{item}"):
+                    if item not in st.session_state.inventory:
+                        st.session_state.inventory.append(item)
+                        st.toast(f"✅ {item} added to inventory!", icon="📦")
+                        st.rerun()
+                    else:
+                        st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
 
-    # Define color categories for different types of supplies
-    color_map = {
-        "Airway & Breathing": "#d0f0fd",   # light blue
-        "Circulation & IV": "#d0ffd0",     # light green
-        "Diagnostics": "#fff6d0",          # light yellow
-        "Immobilization": "#ffe0d0",       # light peach
-        "General Care": "#e0d0ff"          # light lavender
-    }
+    else:
+        st.header(f"🚪 {st.session_state.room}")
+        st.info("Room functionality coming soon!")
 
-    # Assign categories to each item
-    categorized_supplies = {
-        "Airway & Breathing": {
-            "Oxygen Mask": "Used to deliver oxygen to patients with breathing difficulties.",
-            "Intubation Kit": "Contains tools required to insert a breathing tube into the airway.",
-            "Defibrillator and Pads": "Delivers electric shocks to the heart in case of cardiac arrest."
-        },
-        "Circulation & IV": {
-            "IV Kit": "Includes catheter and supplies for IV fluids or medications.",
-            "Saline and Other IV Fluids": "Used to hydrate or deliver IV medications.",
-            "Tourniquet": "Stops blood flow to a limb in severe bleeding."
-        },
-        "Diagnostics": {
-            "Test Swabs": "Used to take samples of bodily fluids for infection testing.",
-            "Glucometer": "Measures blood glucose levels.",
-            "Thermometer": "Measures body temperature."
-        },
-        "Immobilization": {
-            "Cervical Collar": "Immobilizes the neck to prevent further injury.",
-            "Arm Splint": "Used to immobilize broken or injured limbs."
-        },
-        "General Care": {
-            "Catheter Kit": "Used for urinary drainage in immobile patients.",
-            "Bed Pan": "For bedridden patients to use safely.",
-            "Sutures": "Used to close wounds or surgical incisions."
-        }
-    }
-
-    # Two-column grid layout
-    for category, supplies in categorized_supplies.items():
-        st.markdown(f"<h4 style='background-color:{color_map[category]};padding:6px;border-radius:8px;'>{category}</h4>", unsafe_allow_html=True)
-
-        items = list(supplies.items())
-        for i in range(0, len(items), 2):
-            colA, colB = st.columns(2)
-            for col, (item, description) in zip((colA, colB), items[i:i+2]):
-                with col.expander(item):
-                    st.write(description)
-                    if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
-                        if item not in st.session_state.inventory:
-                            st.session_state.inventory.append(item)
-                            st.success(f"{item} added to inventory.")
-                            st.toast(f"✅ {item} added to inventory!", icon="📦")
-                            st.rerun()
-                        else:
-                            st.warning(f"{item} is already in the inventory.")
-                            st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
-
-
-# ---- RIGHT COLUMN (Vitals, Score, Treatments)
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
-
     if st.session_state.patient:
-        patient = st.session_state.patient
-        st.write(f"**Name:** {patient['name']}")
-        st.write(f"**Age:** {patient['age']}")
-        st.write(f"**Symptoms:** {patient['symptoms']}")
-
+        p = st.session_state.patient
+        st.write(f"**Name:** {p['name']}")
+        st.write(f"**Age:** {p['age']}")
+        st.write(f"**Symptoms:** {p['symptoms']}")
+        vitals = p["vitals"]
         st.subheader("🩺 Patient Vitals")
-        vitals = patient["vitals"]
-        st.write(f"**Blood Pressure (BP):** {vitals['BP']}")
-        st.write(f"**Heart Rate (HR):** {vitals['HR']}")
-        st.write(f"**Oxygen Saturation (O2):** {vitals['O2']}")
-
+        st.write(f"**BP:** {vitals['BP']}")
+        st.write(f"**HR:** {vitals['HR']}")
+        st.write(f"**O2:** {vitals['O2']}")
         st.subheader("Treatment History")
         if st.session_state.treatment_history:
-            for treatment in st.session_state.treatment_history:
-                st.write(treatment)
+            for t in st.session_state.treatment_history:
+                st.write(t)
         else:
             st.write("No treatments administered yet.")
-
-        st.write("---")
     else:
         st.info("No active patient.")
-
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
