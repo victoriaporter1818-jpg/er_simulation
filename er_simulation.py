@@ -185,7 +185,7 @@ with col2:
             st.info("No active patient.")
 
     elif st.session_state.room == "Supply Room":
-    st.header("🛒 Supply Room")
+        st.header("🛒 Supply Room")
 
     # Define color categories for different types of supplies
     color_map = {
