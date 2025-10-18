@@ -78,28 +78,20 @@ with st.container():
                     else:
                         st.warning(f"{item} is already in the inventory.")
         
-elif st.session_state.room == "ER":
-    st.header("🏥 Emergency Room")
-    
-    # Show the Next Patient button and patient details in the center column only
-    if st.button("Next Patient", key="next_patient_button", on_click=assign_patient):  # Correctly passed function without parentheses
-        pass  # This is where you can add any actions for when the button is pressed (currently only calling `assign_patient`)
-    
-    # Display patient data in the center column only
-    if st.session_state.patient:
-        patient = st.session_state.patient
-        st.subheader("Patient Information")
-        st.write(f"**Name:** {patient['name']}")
-        st.write(f"**Age:** {patient['age']}")
-        st.write(f"**Symptoms:** {patient['symptoms']}")
-        
-        # Patient-specific Medical History Form (ONLY in the center column)
-        st.subheader("📜 Medical History Form")
-        medical_history = patient['medical_history']
-        for key, value in medical_history.items():
-            st.write(f"**{key}:** {value}")
-    else:
-        st.info("No active patient.")
+        elif st.session_state.room == "ER":
+            st.header("🏥 Emergency Room")
+            
+            # Show the Next Patient button and patient details in the center column only
+            if st.button("Next Patient", key="next_patient_button", on_click=assign_patient):  # Correctly passed function without parentheses
+                pass  # This is where you can add any actions for when the button is pressed (currently only calling `assign_patient`)
+            
+            # Display patient data in the center column only
+            if st.session_state.patient:
+                patient = st.session_state.patient
+                st.subheader("Patient Information")
+                st.write(f"**Name:** {patient['name']}")
+                st.write(f"**Age:** {patient['age']}")
+                st.write(f"**Symptoms:** {patient['symptoms']}")
                 
                 # Patient-specific Medical History Form (ONLY in the center column)
                 st.subheader("📜 Medical History Form")
@@ -108,6 +100,42 @@ elif st.session_state.room == "ER":
                     st.write(f"**{key}:** {value}")
             else:
                 st.info("No active patient.")
+    
+    # Right Column (Patient Data & Logs)
+    with col2:
+        # Show Patient Data in the Right Column
+        if st.session_state.patient:
+            patient = st.session_state.patient
+            st.header("👨‍⚕️ Patient Data")
+
+            # Display Patient Information
+            st.subheader("Patient Information")
+            st.write(f"**Name:** {patient['name']}")
+            st.write(f"**Age:** {patient['age']}")
+            st.write(f"**Symptoms:** {patient['symptoms']}")
+
+            # Display Patient Vitals
+            st.subheader("Vitals")
+            if "vitals" in patient:
+                st.write(f"**Blood Pressure:** {patient['vitals']['BP']}")
+                st.write(f"**Heart Rate:** {patient['vitals']['HR']}")
+                st.write(f"**Oxygen Saturation:** {patient['vitals']['O2']}")
+            else:
+                st.warning("Vitals data not available for this patient.")
+
+            # Display Treatment History (for context)
+            st.subheader("Treatment History")
+            if st.session_state.treatment_history:
+                for treatment in st.session_state.treatment_history:
+                    st.write(treatment)
+            else:
+                st.write("No treatments administered yet.")
+
+            # Display Score (for context)
+            st.subheader("🏆 Score")
+            st.metric("Total Score", st.session_state.score)
+        else:
+            st.info("No active patient.")
 
 # --------------------------------------
 # RIGHT COLUMN (Patient Data & Logs)
