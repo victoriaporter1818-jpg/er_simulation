@@ -99,7 +99,7 @@ with st.container():
                     st.write(f"**{key}:** {value}")
             else:
                 st.info("No active patient.")
-                
+
 # --------------------------------------
 # RIGHT COLUMN (Patient Data & Logs)
 # --------------------------------------
@@ -180,11 +180,17 @@ def assign_patient():
     patient = random.choice(patients)
     st.session_state.patient = patient
     st.session_state.treatment_history = []  # Clear previous treatment history when new patient is assigned
-    st.session_state.score += 10
+    st.session_state.score += 10  # Update score when new patient is assigned
 
     # Perform Diagnostics (just a placeholder function here)
     perform_diagnostics(patient)
 
+# Perform diagnostics for the patient (can be expanded further)
+def perform_diagnostics(patient):
+    # Placeholder for diagnostics process
+    # For now, we'll just simulate diagnostic results
+    st.session_state.test_results = "Test results pending."
+
 # Display Assign Button
 if st.session_state.room == "ER":
-    st.button("Next Patient", on_click=lambda: assign_patient())
+    st.button("Next Patient", on_click=assign_patient)
