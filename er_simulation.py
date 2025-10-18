@@ -189,4 +189,3 @@ def assign_patient():
 # Display Assign Button
 if st.session_state.room == "ER":
     st.button("Next Patient", on_click=lambda: assign_patient())
-``
