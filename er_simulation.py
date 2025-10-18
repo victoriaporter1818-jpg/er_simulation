@@ -10,18 +10,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Optional: CSS for consistent full-screen width
-st.markdown("""
-    <style>
-        .block-container {
-            padding-top: 2rem;
-            padding-bottom: 0rem;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
 st.markdown("""
     <style>
         .block-container {
