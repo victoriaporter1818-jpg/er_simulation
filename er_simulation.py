@@ -190,7 +190,3 @@ def perform_diagnostics(patient):
     # Placeholder for diagnostics process
     # For now, we'll just simulate diagnostic results
     st.session_state.test_results = "Test results pending."
-
-# Display Assign Button
-if st.session_state.room == "ER":
-    st.button("Next Patient", on_click=assign_patient)
