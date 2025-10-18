@@ -130,22 +130,62 @@ with col2:
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
 
-    # Convert supply items into pairs for 2-column layout
-    items = list(emergency_supplies.items())
-    for i in range(0, len(items), 2):
-        colA, colB = st.columns(2)
-        for col, (item, description) in zip((colA, colB), items[i:i+2]):
-            with col.expander(item):
-                st.write(description)
-                if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
-                    if item not in st.session_state.inventory:
-                        st.session_state.inventory.append(item)
-                        st.success(f"{item} added to inventory.")
-                        st.toast(f"✅ {item} added to inventory!", icon="📦")
-                        st.rerun()
-                    else:
-                        st.warning(f"{item} is already in the inventory.")
-                        st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
+    # Define color categories for different types of supplies
+    color_map = {
+        "Airway & Breathing": "#d0f0fd",   # light blue
+        "Circulation & IV": "#d0ffd0",     # light green
+        "Diagnostics": "#fff6d0",          # light yellow
+        "Immobilization": "#ffe0d0",       # light peach
+        "General Care": "#e0d0ff"          # light lavender
+    }
+
+    # Assign categories to each item
+    categorized_supplies = {
+        "Airway & Breathing": {
+            "Oxygen Mask": "Used to deliver oxygen to patients with breathing difficulties.",
+            "Intubation Kit": "Contains tools required to insert a breathing tube into the airway.",
+            "Defibrillator and Pads": "Delivers electric shocks to the heart in case of cardiac arrest."
+        },
+        "Circulation & IV": {
+            "IV Kit": "Includes catheter and supplies for IV fluids or medications.",
+            "Saline and Other IV Fluids": "Used to hydrate or deliver IV medications.",
+            "Tourniquet": "Stops blood flow to a limb in severe bleeding."
+        },
+        "Diagnostics": {
+            "Test Swabs": "Used to take samples of bodily fluids for infection testing.",
+            "Glucometer": "Measures blood glucose levels.",
+            "Thermometer": "Measures body temperature."
+        },
+        "Immobilization": {
+            "Cervical Collar": "Immobilizes the neck to prevent further injury.",
+            "Arm Splint": "Used to immobilize broken or injured limbs."
+        },
+        "General Care": {
+            "Catheter Kit": "Used for urinary drainage in immobile patients.",
+            "Bed Pan": "For bedridden patients to use safely.",
+            "Sutures": "Used to close wounds or surgical incisions."
+        }
+    }
+
+    # Two-column grid layout
+    for category, supplies in categorized_supplies.items():
+        st.markdown(f"<h4 style='background-color:{color_map[category]};padding:6px;border-radius:8px;'>{category}</h4>", unsafe_allow_html=True)
+
+        items = list(supplies.items())
+        for i in range(0, len(items), 2):
+            colA, colB = st.columns(2)
+            for col, (item, description) in zip((colA, colB), items[i:i+2]):
+                with col.expander(item):
+                    st.write(description)
+                    if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
+                        if item not in st.session_state.inventory:
+                            st.session_state.inventory.append(item)
+                            st.success(f"{item} added to inventory.")
+                            st.toast(f"✅ {item} added to inventory!", icon="📦")
+                            st.rerun()
+                        else:
+                            st.warning(f"{item} is already in the inventory.")
+                            st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
 
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
