@@ -2,23 +2,6 @@ import streamlit as st
 import random
 
 # --------------------------------------
-# Logic to Assign New Patient
-# --------------------------------------
-def assign_patient():
-    # Randomly select a patient and reset their medical history
-    patient = random.choice(patients)
-    st.session_state.patient = patient
-    st.session_state.treatment_history = []  # Clear previous treatment history when new patient is assigned
-    st.session_state.score += 10
-
-    # Perform Diagnostics (just a placeholder function here)
-    perform_diagnostics(patient)
-
-# Placeholder function for diagnostics (currently empty)
-def perform_diagnostics(patient):
-    pass
-
-# --------------------------------------
 # INITIALIZATION (Session State)
 # --------------------------------------
 
@@ -36,6 +19,23 @@ if "test_results" not in st.session_state:
     st.session_state.test_results = None
 if "next_patient_button_clicked" not in st.session_state:
     st.session_state.next_patient_button_clicked = False  # Track button click state
+
+# --------------------------------------
+# Logic to Assign New Patient
+# --------------------------------------
+def assign_patient():
+    # Randomly select a patient and reset their medical history
+    patient = random.choice(patients)
+    st.session_state.patient = patient
+    st.session_state.treatment_history = []  # Clear previous treatment history when new patient is assigned
+    st.session_state.score += 10
+
+    # Perform Diagnostics (just a placeholder function here)
+    perform_diagnostics(patient)
+
+# Placeholder function for diagnostics (currently empty)
+def perform_diagnostics(patient):
+    pass
 
 # --------------------------------------
 # SUPPLY ROOM ITEMS WITH DESCRIPTIONS
