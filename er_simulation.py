@@ -145,18 +145,18 @@ with main_col:
         else:
             st.info("No active patient.")
 
-    elif st.session_state.room == "Supply Room":
-    st.header("🛒 Supply Room")
-    for item, description in emergency_supplies.items():
-        st.subheader(item)
-        st.write(description)
-        if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
-            if item not in st.session_state.inventory:
-                st.session_state.inventory.append(item)
-                st.success(f"{item} added to inventory.")
-                st.rerun()  # ✅ Immediately refresh the sidebar to show update
-            else:
-                st.warning(f"{item} is already in the inventory.")
+        elif st.session_state.room == "Supply Room":
+        st.header("🛒 Supply Room")
+        for item, description in emergency_supplies.items():
+            st.subheader(item)
+            st.write(description)
+            if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
+                if item not in st.session_state.inventory:
+                    st.session_state.inventory.append(item)
+                    st.success(f"{item} added to inventory.")
+                    st.rerun()  # ✅ Immediately refresh the sidebar to show update
+                else:
+                    st.warning(f"{item} is already in the inventory.")
 
 else:
     st.header(f"🚪 {st.session_state.room}")
