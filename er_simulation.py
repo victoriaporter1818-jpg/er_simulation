@@ -25,7 +25,7 @@ section.main > div {
 .block-container {
     padding-top: 2rem !important;
     padding-bottom: 0rem !important;
-    padding-left: 0rem !important;
+    padding-left: -2rem !important;
     margin-left: 0rem !important;
 }
 
