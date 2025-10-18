@@ -12,27 +12,6 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* 1) Slightly tighten the space between the 3 columns */
-div[data-testid="stHorizontalBlock"] {
-  gap: 0.75rem !important; /* default ~1.5rem; smaller = closer to the left */
-}
-
-/* 2) Remove inner padding/margin from the CENTER (2nd) column’s content wrapper */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) > div {
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-}
-
-/* 3) Ensure the center column aligns items to the left (no centering) */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-  align-items: flex-start !important;
-  text-align: left !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<style>
 /* Tighten vertical padding at top and push content upward */
 div[data-testid="stVerticalBlock"] > div:nth-child(2) {
     margin-top: -2rem !important;  /* moves content up */
