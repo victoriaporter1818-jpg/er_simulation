@@ -481,7 +481,7 @@ if st.session_state.get("show_summary", False):
     diag = payload.get("diagnostic_accuracy", 75)
     res = payload.get("resource_efficiency", 75)
 
-    # Build overlay HTML
+    # Inject proper HTML overlay (rendered, not escaped)
     overlay_html = f"""
     <div id="overlay-backdrop">
       <div id="overlay-panel">
@@ -520,26 +520,19 @@ if st.session_state.get("show_summary", False):
             </div>
           </div>
         </div>
-        <div class="overlay-footer">
-          <form action="#" method="get">
-            <!-- Buttons are rendered via Streamlit below; this is visual spacing -->
-          </form>
-        </div>
       </div>
     </div>
     """
-    st.markdown(overlay_html, unsafe_allow_html=True)
 
-    # Footer buttons rendered via Streamlit to capture clicks
-    # Place them below to ensure Streamlit can process events
+    st.markdown(overlay_html, unsafe_allow_html=True)  # ✅ Renders as styled HTML
+
     footer_cols = st.columns([5, 1.2, 1.6])
     with footer_cols[1]:
-        cancel = st.button("Close", key="close_overlay")  # optional close without reset
+        cancel = st.button("Close", key="close_overlay")
     with footer_cols[2]:
         new_case = st.button("🆕 Start New Case", key="overlay_new_case")
 
     if new_case:
-        # Clear for a fresh start
         st.session_state.patient = None
         st.session_state.treatment_history = []
         st.session_state.score = 0
@@ -548,7 +541,6 @@ if st.session_state.get("show_summary", False):
         st.rerun()
 
     if cancel:
-        # Hide overlay but keep case intact
         st.session_state.show_summary = False
         st.session_state.summary_payload = {}
         st.rerun()
