@@ -126,7 +126,7 @@ with st.sidebar:
     if st.button("🗑️ Clear Inventory"):
         st.session_state.inventory = []
         st.warning("Inventory cleared.")
-        st.experimental_rerun()  # ✅ Immediately refreshes UI
+        st.rerun()  # ✅ Instantly refreshes UI — modern method
 
 # --------------------------------------
 # MAIN LAYOUT
