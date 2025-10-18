@@ -104,7 +104,7 @@ with st.sidebar:
         st.sidebar.warning("Inventory cleared.")
 
 # --------------------------------------
-# MAIN INTERFACE (UPDATED FOR CENTERING)
+# MAIN INTERFACE (UPDATED FOR UNIQUE KEYS)
 # --------------------------------------
 
 with st.container():
@@ -115,15 +115,16 @@ with st.container():
     with col1:
         st.sidebar.header("🏥 Emergency Room Simulation")
 
-        difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
+        # Use unique keys for each widget in the sidebar
+        difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="sidebar_difficulty")
         st.write(f"Selected Difficulty: {difficulty}")
 
-        role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
+        role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="sidebar_role")
         st.write(f"Selected Role: {role}")
 
         # Room Navigation
         rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
-        st.session_state.room = st.sidebar.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
+        st.session_state.room = st.sidebar.radio("Select a Room", rooms, index=rooms.index(st.session_state.room), key="sidebar_room")
 
         # Inventory Display
         st.sidebar.write("---")
@@ -134,7 +135,7 @@ with st.container():
         else:
             st.sidebar.info("Inventory is empty.")
 
-        if st.sidebar.button("🗑️ Clear Inventory"):
+        if st.sidebar.button("🗑️ Clear Inventory", key="sidebar_clear_inventory"):
             st.session_state.inventory = []
             st.sidebar.warning("Inventory cleared.")
 
@@ -155,7 +156,7 @@ with st.container():
         elif st.session_state.room == "ER":
             st.header("🏥 Emergency Room")
 
-            if st.button("Next Patient"):
+            if st.button("Next Patient", key="next_patient_button"):
                 st.session_state.next_patient_button_clicked = True
 
             if st.session_state.get("next_patient_button_clicked", False):
