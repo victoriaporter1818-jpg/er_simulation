@@ -104,14 +104,42 @@ with st.sidebar:
         st.sidebar.warning("Inventory cleared.")
 
 # --------------------------------------
-# MAIN INTERFACE
+# MAIN INTERFACE (UPDATED FOR CENTERING)
 # --------------------------------------
 
 with st.container():
-    col1, col2 = st.columns([2, 1])
+    # Define the column distribution
+    col1, col2, col3 = st.columns([1, 2, 1])  # 1 unit left and right, 2 units center
 
-    # Main Column (left/main content)
+    # Left Column (col1) - Sidebar (no changes)
     with col1:
+        st.sidebar.header("🏥 Emergency Room Simulation")
+
+        difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
+        st.write(f"Selected Difficulty: {difficulty}")
+
+        role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
+        st.write(f"Selected Role: {role}")
+
+        # Room Navigation
+        rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
+        st.session_state.room = st.sidebar.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
+
+        # Inventory Display
+        st.sidebar.write("---")
+        st.sidebar.subheader("📦 Current Inventory")
+        if st.session_state.inventory:
+            for item in st.session_state.inventory:
+                st.sidebar.write(f"- {item}")
+        else:
+            st.sidebar.info("Inventory is empty.")
+
+        if st.sidebar.button("🗑️ Clear Inventory"):
+            st.session_state.inventory = []
+            st.sidebar.warning("Inventory cleared.")
+
+    # Center Column (col2) - Main content (where you display your ER or supply room info)
+    with col2:
         if st.session_state.room == "Supply Room":
             st.header("🛒 Supply Room")
             for item, description in emergency_supplies.items():
@@ -147,10 +175,8 @@ with st.container():
             else:
                 st.info("No active patient.")
 
-        # Add logic for other rooms as needed
-
-    # Right Column (Patient Data, Vitals, Score)
-    with col2:
+    # Right Column (col3) - Patient Data, Vitals, and Score (no changes)
+    with col3:
         st.subheader("👩‍⚕️ Patient Data")
         if st.session_state.patient:
             patient = st.session_state.patient
