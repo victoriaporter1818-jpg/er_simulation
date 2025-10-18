@@ -200,8 +200,8 @@ if st.session_state.inventory:
 else:
     st.info("No available supplies in your inventory to use.")
 
-        else:
-            st.info("No active patient.")
+else:
+    st.info("No active patient.")
 
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
