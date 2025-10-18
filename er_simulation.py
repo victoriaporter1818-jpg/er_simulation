@@ -75,6 +75,24 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * 
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Make center column headers sticky (pinned at top while scrolling) */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) h1,
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) h2,
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) h3,
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) h4 {
+    position: sticky !important;
+    top: 0rem !important;
+    background-color: white !important;
+    z-index: 999 !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    border-bottom: 2px solid #e0e0e0 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
