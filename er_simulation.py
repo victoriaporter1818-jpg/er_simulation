@@ -2,6 +2,25 @@ import streamlit as st
 import random
 
 # --------------------------------------
+# INITIALIZATION (Session State)
+# --------------------------------------
+
+if "inventory" not in st.session_state:
+    st.session_state.inventory = []
+if "room" not in st.session_state:
+    st.session_state.room = "ER"  # Set default room to "ER" or any room you'd like
+if "score" not in st.session_state:
+    st.session_state.score = 0
+if "patient" not in st.session_state:
+    st.session_state.patient = None
+if "treatment_history" not in st.session_state:
+    st.session_state.treatment_history = []
+if "test_results" not in st.session_state:
+    st.session_state.test_results = None
+if "next_patient_button_clicked" not in st.session_state:
+    st.session_state.next_patient_button_clicked = False  # Track button click state
+
+# --------------------------------------
 # SUPPLY ROOM ITEMS WITH DESCRIPTIONS
 # --------------------------------------
 
@@ -145,25 +164,6 @@ with col2:
     # Score
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
-
-# --------------------------------------
-# INITIALIZATION (Session State)
-# --------------------------------------
-
-if "inventory" not in st.session_state:
-    st.session_state.inventory = []
-if "room" not in st.session_state:
-    st.session_state.room = "ER"  # Set default room to "ER" or any room you'd like
-if "score" not in st.session_state:
-    st.session_state.score = 0
-if "patient" not in st.session_state:
-    st.session_state.patient = None
-if "treatment_history" not in st.session_state:
-    st.session_state.treatment_history = []
-if "test_results" not in st.session_state:
-    st.session_state.test_results = None
-if "next_patient_button_clicked" not in st.session_state:
-    st.session_state.next_patient_button_clicked = False  # Track button click state
 
 # --------------------------------------
 # Example Patient Data (with Medical History)
