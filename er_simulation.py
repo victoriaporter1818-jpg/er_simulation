@@ -10,6 +10,39 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+st.markdown("""
+<style>
+/* Remove Streamlit's default left padding from the main container */
+.block-container {
+    padding-left: 0rem !important;
+    margin-left: 0rem !important;
+    width: 100% !important;
+}
+
+/* Remove horizontal gaps between columns */
+div[data-testid="stHorizontalBlock"] {
+    gap: 0rem !important;
+}
+
+/* Force first column (main center area) to fully expand and align to sidebar */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+    padding-left: 0rem !important;
+    margin-left: 0rem !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+}
+
+/* Fix main page wrapper padding (Streamlit adds invisible padding above sidebar) */
+section.main > div {
+    padding-left: 0rem !important;
+    margin-left: 0rem !important;
+}
+
+/* Prevent Streamlit updates from resetting layout */
+</style>
+""", unsafe_allow_html=True)
+
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
