@@ -10,7 +10,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Style for simulated modal (Transfer Patient Summary)
+# --------------------------------------
+# STYLE FOR TRANSFER MODAL
+# --------------------------------------
 st.markdown("""
 <style>
 div[data-testid="stExpander"] {
@@ -67,35 +69,12 @@ def assign_patient():
     st.session_state.score = 0
 
 # --------------------------------------
-# MEDSTATION MEDICATIONS
-# --------------------------------------
-medstation_meds = {
-    "Acetaminophen": "Used for mild pain and fever reduction.",
-    "Morphine": "Strong painkiller for severe pain.",
-    "Motrin": "Used for fever and inflammation.",
-    "Ondansetron": "Prevents nausea and vomiting.",
-    "Phenytoin": "Used for seizure control.",
-    "Epinephrine": "Used for anaphylaxis or cardiac arrest.",
-    "Glucose": "Used for low blood sugar emergencies.",
-    "Hydralazine": "Used to treat high blood pressure.",
-    "Midodrine": "Used for low blood pressure.",
-    "Heparin": "Blood thinner to prevent clots.",
-    "Lasix": "Used to remove excess fluid in heart failure.",
-    "Naloxone": "Reverses opioid overdose effects."
-}
-
-# --------------------------------------
 # SIDEBAR
 # --------------------------------------
 with st.sidebar:
     st.header("🏥 Emergency Room Simulation")
-
-    difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
-    st.write(f"Selected Difficulty: {difficulty}")
-
-    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist"], key="role")
-    st.write(f"Selected Role: {role}")
-
+    difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"])
+    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist"])
     rooms = ["ER", "Supply Room", "Medstation"]
     st.session_state.room = st.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
 
@@ -106,7 +85,6 @@ with st.sidebar:
             st.write(f"- {item}")
     else:
         st.info("Inventory is empty.")
-
     if st.button("🗑️ Clear Inventory"):
         st.session_state.inventory = []
         st.warning("Inventory cleared.")
@@ -119,6 +97,7 @@ col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 
 # ---- CENTER COLUMN ----
 with col2:
+    # ---------------- ER ROOM ----------------
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
 
@@ -135,7 +114,6 @@ with col2:
             st.write(f"**Name:** {p['name']}")
             st.write(f"**Age:** {p['age']}")
             st.write(f"**Symptoms:** {p['symptoms']}")
-
             st.subheader("📜 Medical History Form")
             for k, v in p["medical_history"].items():
                 st.write(f"**{k}:** {v}")
@@ -143,7 +121,7 @@ with col2:
             # ---------------- USE SUPPLIES ----------------
             if st.session_state.inventory:
                 st.subheader("🧰 Use Supplies")
-                selected_item = st.selectbox("Select an item to use from inventory:", st.session_state.inventory)
+                selected_item = st.selectbox("Select an item to use:", st.session_state.inventory)
                 if st.button("Use Selected Item"):
                     diagnosis = p["diagnosis"]
                     correct_uses = {
@@ -169,11 +147,9 @@ with col2:
                 "acetaminophen", "morphine", "motrin", "ondansetron", "phenytoin",
                 "epinephrine", "glucose", "hydralazine", "midodrine", "heparin", "lasix", "naloxone"
             ]]
-
             if meds_in_inventory:
                 st.subheader("💊 Give Medication")
                 selected_med = st.selectbox("Select a medication to administer:", meds_in_inventory)
-
                 if st.button("Give Medication"):
                     diagnosis = p["diagnosis"]
                     correct_meds = {
@@ -181,13 +157,11 @@ with col2:
                         "Pneumonia": ["Motrin", "Acetaminophen", "Oxygen Mask"],
                         "Stroke": ["Heparin", "Glucose"]
                     }
-
                     if selected_med in correct_meds.get(diagnosis, []):
                         st.session_state.score += 10
                         feedback = f"💊 Correct treatment! {selected_med} helped improve the patient's condition. (+10 points)"
                     else:
                         feedback = f"⚠️ {selected_med} was not very effective for this condition."
-
                     st.session_state.treatment_history.append(f"Gave {selected_med} to {p['name']}. {feedback}")
                     st.session_state.inventory.remove(selected_med)
                     st.success(feedback)
@@ -203,7 +177,6 @@ with col2:
                 ["-- Select --", "Discharge", "Send to Surgery", "Send to ICU"],
                 key="transfer_destination"
             )
-
             if st.button("Confirm Transfer", key="confirm_transfer"):
                 with st.expander("🏁 Patient Transfer Summary", expanded=True):
                     total_score = max(0, min(100, int(st.session_state.score)))
@@ -236,11 +209,8 @@ with col2:
                     st.progress(resource_efficiency / 100)
 
                     st.write("---")
-
                     correct_acts = sum("✅" in line for line in st.session_state.treatment_history)
-                    limited_acts = sum("limited effect" in line.lower() or "not very effective" in line.lower()
-                                       for line in st.session_state.treatment_history)
-
+                    limited_acts = sum("limited" in line.lower() for line in st.session_state.treatment_history)
                     st.markdown("**Action Summary**")
                     st.write(f"- ✅ Effective actions: **{correct_acts}**")
                     st.write(f"- ⚠️ Limited/ineffective actions: **{limited_acts}**")
@@ -255,7 +225,6 @@ with col2:
                     st.write("---")
                     st.markdown(f"**Feedback:** {random.choice(feedback_pool)}")
 
-                    st.write("---")
                     if st.button("🆕 Start New Case", key="start_new_case"):
                         st.session_state.patient = None
                         st.session_state.treatment_history = []
@@ -264,13 +233,109 @@ with col2:
         else:
             st.info("No active patient.")
 
+    # ---------------- SUPPLY ROOM ----------------
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
-        # (Supply Room contents retained...)
+        color_map = {
+            "Airway & Breathing": "#d0f0fd",
+            "Circulation & IV": "#d0ffd0",
+            "Diagnostics": "#fff6d0",
+            "Immobilization": "#ffe0d0",
+            "General Care": "#e0d0ff"
+        }
+        categorized_supplies = {
+            "Airway & Breathing": {
+                "Oxygen Mask": "Used to deliver oxygen to patients with breathing difficulties.",
+                "Intubation Kit": "Contains tools for airway management.",
+                "Defibrillator and Pads": "Delivers shocks for cardiac arrest."
+            },
+            "Circulation & IV": {
+                "IV Kit": "For IV fluids or medication administration.",
+                "Saline and Other IV Fluids": "Hydrates patients or delivers IV meds.",
+                "Tourniquet": "Stops bleeding on limbs."
+            },
+            "Diagnostics": {
+                "Test Swabs": "Collect samples for testing.",
+                "Glucometer": "Measures blood glucose levels.",
+                "Thermometer": "Measures body temperature."
+            },
+            "Immobilization": {
+                "Cervical Collar": "Neck immobilization for trauma.",
+                "Arm Splint": "Immobilizes broken or injured limbs."
+            },
+            "General Care": {
+                "Catheter Kit": "For urinary drainage.",
+                "Bed Pan": "For bedridden patients.",
+                "Sutures": "Used to close wounds."
+            }
+        }
+        for category, supplies in categorized_supplies.items():
+            st.markdown(f"<h4 style='background-color:{color_map[category]};padding:6px;border-radius:8px;'>{category}</h4>", unsafe_allow_html=True)
+            items = list(supplies.items())
+            for i in range(0, len(items), 2):
+                colA, colB = st.columns(2)
+                for col, (item, desc) in zip((colA, colB), items[i:i+2]):
+                    with col.expander(item):
+                        st.write(desc)
+                        if st.button(f"Add {item} to Inventory", key=f"supply_{item}"):
+                            if item not in st.session_state.inventory:
+                                st.session_state.inventory.append(item)
+                                st.success(f"{item} added to inventory.")
+                                st.toast(f"✅ {item} added!", icon="📦")
+                                st.rerun()
+                            else:
+                                st.warning(f"{item} already in inventory.")
 
+    # ---------------- MEDSTATION ----------------
     elif st.session_state.room == "Medstation":
         st.header("💊 Medstation")
-        # (Medstation contents retained...)
+        med_categories = {
+            "Pain Relief": {
+                "Acetaminophen": "Used for fever or mild pain.",
+                "Morphine": "For severe pain.",
+                "Motrin": "Anti-inflammatory pain relief."
+            },
+            "Antiemetics": {
+                "Ondansetron": "Prevents nausea and vomiting."
+            },
+            "Neurological": {
+                "Phenytoin": "Used for seizure control.",
+                "Midodrine": "Used for low blood pressure."
+            },
+            "Cardiac & Emergency": {
+                "Epinephrine": "Used for anaphylaxis or cardiac arrest.",
+                "Hydralazine": "Lowers blood pressure.",
+                "Heparin": "Prevents blood clots.",
+                "Lasix": "Removes excess fluid.",
+                "Naloxone": "Reverses opioid overdose."
+            },
+            "Metabolic": {
+                "Glucose": "Used to treat low blood sugar."
+            }
+        }
+        color_map_meds = {
+            "Pain Relief": "#fde0dc",
+            "Antiemetics": "#fff5d7",
+            "Neurological": "#e3f2fd",
+            "Cardiac & Emergency": "#e8f5e9",
+            "Metabolic": "#f3e5f5"
+        }
+        for category, meds in med_categories.items():
+            st.markdown(f"<h4 style='background-color:{color_map_meds[category]};padding:6px;border-radius:8px;'>{category}</h4>", unsafe_allow_html=True)
+            meds_list = list(meds.items())
+            for i in range(0, len(meds_list), 2):
+                colA, colB = st.columns(2)
+                for col, (med, desc) in zip((colA, colB), meds_list[i:i+2]):
+                    with col.expander(med):
+                        st.write(desc)
+                        if st.button(f"Add {med} to Inventory", key=f"med_{med}"):
+                            if med not in st.session_state.inventory:
+                                st.session_state.inventory.append(med)
+                                st.success(f"{med} added to inventory.")
+                                st.toast(f"💊 {med} collected!", icon="💊")
+                                st.rerun()
+                            else:
+                                st.warning(f"{med} already in inventory.")
 
 # ---- RIGHT COLUMN ----
 with col3:
@@ -280,7 +345,6 @@ with col3:
         st.write(f"**Name:** {p['name']}")
         st.write(f"**Age:** {p['age']}")
         st.write(f"**Symptoms:** {p['symptoms']}")
-
         if "vitals" in p and p["vitals"]:
             vitals = p["vitals"]
             st.subheader("🩺 Patient Vitals")
@@ -289,16 +353,14 @@ with col3:
             st.write(f"**O2:** {vitals.get('O2', 'N/A')}")
             st.write(f"**Temp:** {vitals.get('Temp', 'N/A')}")
         else:
-            st.warning("⚠️ No vitals available for this patient.")
-
+            st.warning("⚠️ No vitals available.")
         st.subheader("Treatment History")
         if st.session_state.treatment_history:
             for t in st.session_state.treatment_history:
                 st.write(t)
         else:
-            st.write("No treatments administered yet.")
+            st.write("No treatments yet.")
     else:
         st.info("No active patient.")
-
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
