@@ -1,13 +1,16 @@
 import streamlit as st
 import random
 
-# Make full use of the browser width
+# --------------------------------------
+# STREAMLIT PAGE CONFIGURATION
+# --------------------------------------
 st.set_page_config(
     page_title="Emergency Room Simulation",
-    layout="wide",  # <-- This makes it span the full screen width
+    layout="wide",
     initial_sidebar_state="expanded"
 )
-# Optional: Light CSS to remove padding and align content neatly
+
+# Optional: CSS for consistent full-screen width
 st.markdown("""
     <style>
         .block-container {
@@ -63,7 +66,6 @@ def assign_patient():
     st.session_state.patient = patient
     st.session_state.treatment_history = []
     st.session_state.score += 10
-    perform_diagnostics(patient)
 
 def perform_diagnostics(patient):
     pass  # placeholder for future logic
@@ -89,7 +91,7 @@ emergency_supplies = {
 }
 
 # --------------------------------------
-# LEFT SIDEBAR
+# SIDEBAR
 # --------------------------------------
 with st.sidebar:
     st.header("🏥 Emergency Room Simulation")
@@ -100,11 +102,9 @@ with st.sidebar:
     role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
     st.write(f"Selected Role: {role}")
 
-    # Room Navigation
     rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
     st.session_state.room = st.sidebar.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
 
-    # Inventory Display
     st.sidebar.write("---")
     st.sidebar.subheader("📦 Current Inventory")
     if st.session_state.inventory:
@@ -120,9 +120,9 @@ with st.sidebar:
 # --------------------------------------
 # MAIN LAYOUT (Three Columns)
 # --------------------------------------
-col1, col2, col3 = st.columns([1.2, 2.6, 1.2])  # wider center
+col1, col2, col3 = st.columns([1.2, 2.6, 1.2])  # wide center layout
 
-# ---- CENTER COLUMN (Main Room Content)
+# ---- CENTER COLUMN (Room Content)
 with col2:
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
@@ -160,7 +160,7 @@ with col2:
                     st.session_state.inventory.append(item)
                     st.success(f"{item} added to inventory.")
                     st.toast(f"✅ {item} added to inventory!", icon="📦")
-                    st.rerun()  # ✅ refresh sidebar immediately
+                    st.rerun()  # 🔄 instantly refresh sidebar
                 else:
                     st.warning(f"{item} is already in the inventory.")
                     st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
@@ -169,7 +169,7 @@ with col2:
         st.header(f"🚪 {st.session_state.room}")
         st.info("Room functionality coming soon!")
 
-# ---- RIGHT COLUMN (Vitals, Score, Treatments)
+# ---- RIGHT COLUMN (Vitals & Score)
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
 
@@ -198,4 +198,3 @@ with col3:
 
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
-
