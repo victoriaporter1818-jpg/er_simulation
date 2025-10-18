@@ -181,41 +181,40 @@ with col2:
             else:
                 st.info("No available supplies in your inventory to use.")
 
-            # -------------------- GIVE MEDICATION --------------------
-            meds_in_inventory = [m for m in st.session_state.inventory if m.lower() in [
-                "acetaminophen", "morphine", "motrin", "ondansetron", "phenytoin",
-                "epinephrine", "glucose", "hydralazine", "midodrine", "heparin", "lasix", "naloxone"
-            ]]
+# -------------------- GIVE MEDICATION --------------------
+meds_in_inventory = [m for m in st.session_state.inventory if m.lower() in [
+    "acetaminophen", "morphine", "motrin", "ondansetron", "phenytoin",
+    "epinephrine", "glucose", "hydralazine", "midodrine", "heparin", "lasix", "naloxone"
+]]
 
-            if meds_in_inventory:
-                st.subheader("💊 Give Medication")
-                selected_med = st.selectbox("Select a medication to administer:", meds_in_inventory)
+if meds_in_inventory:
+    st.subheader("💊 Give Medication")
+    selected_med = st.selectbox("Select a medication to administer:", meds_in_inventory)
 
-                if st.button("Give Medication"):
-                    diagnosis = p["diagnosis"]
-                    correct_meds = {
-                        "Heart attack": ["Morphine", "Heparin", "Oxygen Mask"],
-                        "Pneumonia": ["Motrin", "Acetaminophen", "Oxygen Mask"],
-                        "Stroke": ["Heparin", "Glucose"]
-                    }
+    if st.button("Give Medication"):
+        diagnosis = p["diagnosis"]
+        correct_meds = {
+            "Heart attack": ["Morphine", "Heparin", "Oxygen Mask"],
+            "Pneumonia": ["Motrin", "Acetaminophen", "Oxygen Mask"],
+            "Stroke": ["Heparin", "Glucose"]
+        }
 
-                    if selected_med in correct_meds.get(diagnosis, []):
-                        st.session_state.score += 10
-                        feedback = f"💊 Correct treatment! {selected_med} helped improve the patient's condition. (+10 points)"
-                    else:
-                        feedback = f"⚠️ {selected_med} was not very effective for this condition."
-
-                    st.session_state.treatment_history.append(f"Gave {selected_med} to {p['name']}. {feedback}")
-                    st.session_state.inventory.remove(selected_med)
-                    st.success(feedback)
-                    st.toast(feedback, icon="💊")
-                    st.rerun()
-            else:
-                st.info("No medications available in your inventory.")
-    st.header("🏥 Emergency Room")
-
+        if selected_med in correct_meds.get(diagnosis, []):
+            st.session_state.score += 10
+            feedback = f"💊 Correct treatment! {selected_med} helped improve the patient's condition. (+10 points)"
         else:
-            st.info("No active patient.")
+            feedback = f"⚠️ {selected_med} was not very effective for this condition."
+
+        st.session_state.treatment_history.append(f"Gave {selected_med} to {p['name']}. {feedback}")
+        st.session_state.inventory.remove(selected_med)
+        st.success(feedback)
+        st.toast(feedback, icon='💊')
+        st.rerun()
+else:
+    st.info("No medications available in your inventory.")
+
+# Make sure this is still inside the ER block
+st.header("🏥 Emergency Room")
 
     # --------------------------- SUPPLY ROOM ---------------------------
     elif st.session_state.room == "Supply Room":
