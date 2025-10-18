@@ -1,4 +1,5 @@
 import streamlit as st
+import random
 
 # --------------------------------------
 # SUPPLY ROOM ITEMS WITH DESCRIPTIONS
@@ -76,6 +77,31 @@ with st.container():
                         st.success(f"{item} added to inventory.")
                     else:
                         st.warning(f"{item} is already in the inventory.")
+        
+        elif st.session_state.room == "ER":
+            st.header("🏥 Emergency Room")
+
+            # Show the Next Patient button
+            if st.button("Next Patient"):
+                assign_patient()
+
+            # Display patient data, treatment history, and score in the right panel
+            if st.session_state.patient:
+                patient = st.session_state.patient
+                st.subheader("Patient Information")
+                st.write(f"**Name:** {patient['name']}")
+                st.write(f"**Age:** {patient['age']}")
+                st.write(f"**Symptoms:** {patient['symptoms']}")
+                
+                # Patient-specific Medical History Form
+                st.subheader("📜 Medical History Form")
+                medical_history = patient['medical_history']
+                for key, value in medical_history.items():
+                    st.write(f"**{key}:** {value}")
+            else:
+                st.info("No active patient.")
+
+        # Add other room conditions as needed (Medstation, Operating Room, etc.)
 
 # --------------------------------------
 # RIGHT PANEL (Patient Information & Score)
@@ -89,7 +115,6 @@ with col2:
         st.write(f"**Name:** {patient['name']}")
         st.write(f"**Age:** {patient['age']}")
         st.write(f"**Symptoms:** {patient['symptoms']}")
-        st.write(f"**Diagnosis:** {patient['diagnosis']}")
         
         # Medical History Form
         st.subheader("📜 Medical History Form")
@@ -150,12 +175,13 @@ patients = [
 # Logic to Assign New Patient
 # --------------------------------------
 def assign_patient():
+    # Randomly select a patient and reset their medical history
     patient = random.choice(patients)
     st.session_state.patient = patient
-    st.session_state.treatment_history.append(f"Assigned patient: {patient['name']}")
+    st.session_state.treatment_history = []  # Clear previous treatment history when new patient is assigned
     st.session_state.score += 10
 
-    # Perform Diagnostics
+    # Perform Diagnostics (just a placeholder function here)
     perform_diagnostics(patient)
 
 # Display Assign Button
