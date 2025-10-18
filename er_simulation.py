@@ -524,7 +524,7 @@ if st.session_state.get("show_summary", False):
     </div>
     """
 
-    st.markdown(overlay_html, unsafe_allow_html=True)  # ✅ Renders as styled HTML
+    st.html(overlay_html)  # ✅ Renders as styled HTML
 
     footer_cols = st.columns([5, 1.2, 1.6])
     with footer_cols[1]:
