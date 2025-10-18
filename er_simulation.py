@@ -135,7 +135,7 @@ col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 with col2:
     # --------------------------- ER ROOM ---------------------------
     if st.session_state.room == "ER":
-    st.header("🏥 Emergency Room")
+        st.header("🏥 Emergency Room")
 
     # Generate next patient
     if st.button("Next Patient"):
