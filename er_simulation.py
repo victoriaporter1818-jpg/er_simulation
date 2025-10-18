@@ -238,16 +238,17 @@ with col3:
         st.write(f"**Name:** {p['name']}")
         st.write(f"**Age:** {p['age']}")
         st.write(f"**Symptoms:** {p['symptoms']}")
+
         if "vitals" in p and p["vitals"]:
-    vitals = p["vitals"]
-    st.subheader("🩺 Patient Vitals")
-    st.write(f"**BP:** {vitals.get('BP', 'N/A')}")
-    st.write(f"**HR:** {vitals.get('HR', 'N/A')}")
-    st.write(f"**O2:** {vitals.get('O2', 'N/A')}")
-    st.write(f"**Temp:** {vitals.get('Temp', 'N/A')}")
-else:
-    st.warning("⚠️ No vitals available for this patient.")
-    
+            vitals = p["vitals"]
+            st.subheader("🩺 Patient Vitals")
+            st.write(f"**BP:** {vitals.get('BP', 'N/A')}")
+            st.write(f"**HR:** {vitals.get('HR', 'N/A')}")
+            st.write(f"**O2:** {vitals.get('O2', 'N/A')}")
+            st.write(f"**Temp:** {vitals.get('Temp', 'N/A')}")
+        else:
+            st.warning("⚠️ No vitals available for this patient.")
+        
         st.subheader("Treatment History")
         if st.session_state.treatment_history:
             for t in st.session_state.treatment_history:
@@ -256,5 +257,6 @@ else:
             st.write("No treatments administered yet.")
     else:
         st.info("No active patient.")
+
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
