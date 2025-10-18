@@ -156,7 +156,7 @@ with st.sidebar:
 # --------------------------------------
 # MAIN LAYOUT
 # --------------------------------------
-col1, col2, col3 = st.columns([0.3, 3, 1.3])  # Wider center column flush with sidebar
+col1, col2, col3 = st.columns([0.3, 3.4, 1.3])  # Wider center column flush with sidebar
 
 # ---- CENTER COLUMN ----
 with col2:
