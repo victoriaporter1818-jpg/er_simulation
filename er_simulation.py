@@ -133,12 +133,6 @@ with col2:
                 st.write(treatment)
         else:
             st.write("No treatments administered yet.")
-
-        # Display Medical History Form (Patient-Specific)
-        st.subheader("📜 Medical History Form")
-        medical_history = patient['medical_history']
-        for key, value in medical_history.items():
-            st.write(f"**{key}:** {value}")
         
         # Display Score (for context)
         st.subheader("🏆 Score")
