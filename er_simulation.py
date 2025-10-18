@@ -82,7 +82,7 @@ with st.container():
             st.header("🏥 Emergency Room")
             
             # Show the Next Patient button and patient details in the center column only
-            st.button("Next Patient", key="next_patient_button", on_click=assign_patient)  # This is where you pass the function reference without parentheses
+            if st.button("Next Patient", key="next_patient_button", on_click=assign_patient):  # Correctly passed function without parentheses
 
             # Display patient data in the center column only
             if st.session_state.patient:
@@ -190,4 +190,3 @@ def perform_diagnostics(patient):
     # Placeholder for diagnostics process
     # For now, we'll just simulate diagnostic results
     st.session_state.test_results = "Test results pending."
-
