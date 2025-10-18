@@ -253,6 +253,68 @@ with col2:
                             else:
                                 st.warning(f"{item} is already in the inventory.")
                                 st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
+        elif st.session_state.room == "Medstation":
+        st.header("💉 Medstation")
+
+        # Define color categories
+        med_color_map = {
+            "Pain & Fever Relief": "#fddede",     # light red
+            "Seizure & Neurological": "#e0d0ff",  # lavender
+            "Cardiac & Emergency": "#d0f0fd",     # light blue
+            "Blood Pressure & Circulation": "#d0ffd0",  # light green
+            "Fluid & Metabolic": "#fff6d0"        # light yellow
+        }
+
+        # Categorized medication dictionary
+        categorized_meds = {
+            "Pain & Fever Relief": {
+                "Acetaminophen": "Used to relieve mild to moderate pain and reduce fever.",
+                "Morphine": "A potent opioid for severe pain management.",
+                "Motrin (Ibuprofen)": "An NSAID that reduces pain, inflammation, and fever."
+            },
+            "Seizure & Neurological": {
+                "Phenytoin": "Used to control seizures and prevent epileptic episodes.",
+                "Naloxone": "Reverses the effects of opioid overdose quickly and safely."
+            },
+            "Cardiac & Emergency": {
+                "Epinephrine": "Used for anaphylaxis or cardiac arrest; increases heart rate and blood pressure.",
+                "Heparin": "Prevents and treats blood clots and deep vein thrombosis.",
+                "Lasix (Furosemide)": "A diuretic that removes excess fluid in heart failure or pulmonary edema."
+            },
+            "Blood Pressure & Circulation": {
+                "Hydralazine": "A vasodilator used to lower blood pressure during hypertensive crises.",
+                "Midodrine": "Raises blood pressure by constricting blood vessels."
+            },
+            "Fluid & Metabolic": {
+                "Glucose": "Quickly raises blood sugar in hypoglycemic emergencies.",
+                "Ondansetron": "Prevents nausea and vomiting post-operation or during chemotherapy."
+            }
+        }
+
+        # Display categorized medications with colors
+        for category, meds in categorized_meds.items():
+            st.markdown(
+                f"<h4 style='background-color:{med_color_map[category]};"
+                "padding:6px;border-radius:8px;margin-top:10px;'>"
+                f"{category}</h4>", unsafe_allow_html=True
+            )
+
+            items = list(meds.items())
+            for i in range(0, len(items), 2):
+                colA, colB = st.columns(2)
+                for col, (med, desc) in zip((colA, colB), items[i:i+2]):
+                    with col.expander(med):
+                        st.write(desc)
+                        if st.button(f"Add {med} to Inventory", key=f"add_{med}"):
+                            if med not in st.session_state.inventory:
+                                st.session_state.inventory.append(med)
+                                st.success(f"{med} added to inventory.")
+                                st.toast(f"✅ {med} added to inventory!", icon="💊")
+                                st.rerun()
+                            else:
+                                st.warning(f"{med} is already in the inventory.")
+                                st.toast(f"⚠️ {med} already in inventory.", icon="⚠️")
+
 
 # ---- RIGHT COLUMN ----
 with col3:
