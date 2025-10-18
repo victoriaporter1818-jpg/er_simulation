@@ -1,6 +1,25 @@
 import streamlit as st
 import random
 
+# Make full use of the browser width
+st.set_page_config(
+    page_title="Emergency Room Simulation",
+    layout="wide",  # <-- This makes it span the full screen width
+    initial_sidebar_state="expanded"
+)
+
+# Optional: Light CSS to remove padding and align content neatly
+st.markdown("""
+    <style>
+        .block-container {
+            padding-top: 1rem;
+            padding-bottom: 0rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
