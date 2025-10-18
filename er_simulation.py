@@ -31,6 +31,30 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Tighten vertical padding at top and push content upward */
+div[data-testid="stVerticalBlock"] > div:nth-child(2) {
+    margin-top: -2rem !important;  /* moves content up */
+}
+
+/* Reduce left padding inside center column */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) > div {
+    padding-left: 0rem !important;
+    margin-left: 0rem !important;
+}
+
+/* Ensure top alignment for the center column */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
