@@ -157,6 +157,7 @@ with col2:
 
         if st.button("Next Patient"):
             st.session_state.next_patient_button_clicked = True
+
         if st.session_state.get("next_patient_button_clicked", False):
             assign_patient()
             st.session_state.next_patient_button_clicked = False
@@ -172,36 +173,40 @@ with col2:
                 st.write(f"**{k}:** {v}")
 
             # 🧰 USE SUPPLIES SECTION WITH SMART SCORING
-if st.session_state.inventory:
-    st.subheader("🧰 Use Supplies")
-    selected_item = st.selectbox("Select an item to use from inventory:", st.session_state.inventory)
+            if st.session_state.inventory:
+                st.subheader("🧰 Use Supplies")
+                selected_item = st.selectbox(
+                    "Select an item to use from inventory:",
+                    st.session_state.inventory
+                )
 
-    if st.button("Use Selected Item"):
-        p = st.session_state.patient
-        diagnosis = p["diagnosis"]
-        correct_uses = {
-            "Heart attack": ["Defibrillator and Pads", "Oxygen Mask", "IV Kit", "Aspirin"],
-            "Pneumonia": ["Oxygen Mask", "Thermometer", "IV Kit"],
-            "Stroke": ["Oxygen Mask", "IV Kit", "Glucometer", "Blood Pressure Cuff"]
-        }
+                if st.button("Use Selected Item"):
+                    p = st.session_state.patient
+                    diagnosis = p["diagnosis"]
+                    correct_uses = {
+                        "Heart attack": ["Defibrillator and Pads", "Oxygen Mask", "IV Kit", "Aspirin"],
+                        "Pneumonia": ["Oxygen Mask", "Thermometer", "IV Kit"],
+                        "Stroke": ["Oxygen Mask", "IV Kit", "Glucometer", "Blood Pressure Cuff"]
+                    }
 
-        if selected_item in correct_uses.get(diagnosis, []):
-            st.session_state.score += 5
-            feedback = f"✅ Correct use! {selected_item} was appropriate for {diagnosis}. (+5 points)"
+                    if selected_item in correct_uses.get(diagnosis, []):
+                        st.session_state.score += 5
+                        feedback = f"✅ Correct use! {selected_item} was appropriate for {diagnosis}. (+5 points)"
+                    else:
+                        feedback = f"⚠️ {selected_item} had limited effect for {diagnosis}."
+
+                    st.session_state.treatment_history.append(
+                        f"Used {selected_item} on {p['name']}. {feedback}"
+                    )
+                    st.session_state.inventory.remove(selected_item)
+                    st.success(feedback)
+                    st.toast(feedback, icon="💉")
+                    st.rerun()
+
+            else:
+                st.info("No available supplies in your inventory to use.")
         else:
-            feedback = f"⚠️ {selected_item} had limited effect for {diagnosis}."
-
-        st.session_state.treatment_history.append(f"Used {selected_item} on {p['name']}. {feedback}")
-        st.session_state.inventory.remove(selected_item)
-        st.success(feedback)
-        st.toast(feedback, icon="💉")
-        st.rerun()
-
-else:
-    st.info("No available supplies in your inventory to use.")
-
-else:
-    st.info("No active patient.")
+            st.info("No active patient.")
 
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
