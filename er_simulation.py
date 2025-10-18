@@ -253,7 +253,8 @@ with col2:
                             else:
                                 st.warning(f"{item} is already in the inventory.")
                                 st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
-        elif st.session_state.room == "Medstation":
+
+     elif st.session_state.room == "Medstation":
         st.header("💉 Medstation")
 
         # Define color categories
