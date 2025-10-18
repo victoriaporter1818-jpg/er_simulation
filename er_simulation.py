@@ -128,7 +128,7 @@ with col2:
             st.info("No active patient.")
 
     elif st.session_state.room == "Supply Room":
-    st.header("🛒 Supply Room")
+        st.header("🛒 Supply Room")
 
     # Convert supply items into pairs for 2-column layout
     items = list(emergency_supplies.items())
