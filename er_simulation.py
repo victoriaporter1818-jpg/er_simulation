@@ -433,10 +433,6 @@ with col2:
             st.write(f"**Age:** {p['age']}")
             st.write(f"**Symptoms:** {p['symptoms']}")
 
-            # Show baseline reminder (optional)
-            st.caption(f"Diagnosis: {p['diagnosis']} — vitals reset to diagnosis baseline on Next Patient.")
-
-            # Show simple history
             st.subheader("📜 Medical History")
             for k, v in p["medical_history"].items():
                 st.write(f"**{k}:** {v}")
@@ -462,7 +458,6 @@ with col2:
                     st.session_state.treatment_history.append(
                         f"Used {selected_supply} on {p['name']}. {feedback}"
                     )
-                    # Supplies are generally reusable; do NOT remove from inventory
                     st.success(feedback)
                     st.toast(feedback, icon="🧰")
                     st.rerun()
@@ -490,7 +485,6 @@ with col2:
                     st.session_state.treatment_history.append(
                         f"Gave {selected_med} to {p['name']}. {feedback}"
                     )
-                    # Meds are consumed on use
                     st.session_state.inventory.remove(selected_med)
                     st.success(feedback)
                     st.toast(feedback, icon="💊")
