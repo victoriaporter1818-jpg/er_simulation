@@ -94,7 +94,7 @@ with st.sidebar:
     difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
     st.write(f"Selected Difficulty: {difficulty}")
 
-    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
+    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist"], key="role")
     st.write(f"Selected Role: {role}")
 
     rooms = ["ER", "Supply Room", "Medstation"]
