@@ -11,10 +11,11 @@ st.set_page_config(
 )
 
 # --------------------------------------
-# CSS for Layout Alignment
+# CSS FOR LAYOUT SPACING
 # --------------------------------------
 st.markdown("""
 <style>
+/* Align center column flush to sidebar, add small gaps between columns */
 main[data-testid="stAppViewContainer"] {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
@@ -25,12 +26,13 @@ main[data-testid="stAppViewContainer"] {
     width: 100% !important;
 }
 div[data-testid="stHorizontalBlock"] {
-    gap: 1rem !important; /* Small gap between columns */
+    gap: 1.5rem !important;
 }
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-    padding-left: 1rem !important; /* Add left margin to center content */
-    padding-right: 1rem !important; /* ✅ Adds small gap on the right side */
-    justify-content: flex-start !important;
+    margin-left: 0rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 1.5rem !important;
+    width: 100% !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -81,7 +83,7 @@ def assign_patient():
     st.session_state.score += 10
 
 # --------------------------------------
-# SUPPLY ROOM ITEMS
+# SUPPLIES & MEDS
 # --------------------------------------
 emergency_supplies = {
     "Defibrillator and Pads": "Used to deliver electric shocks to the heart in case of cardiac arrest.",
@@ -98,6 +100,21 @@ emergency_supplies = {
     "Test Swabs": "Used for taking samples of bodily fluids, commonly for testing infections.",
     "Glucometer": "A device used to measure blood glucose levels.",
     "Thermometer": "A device used to measure a patient's body temperature."
+}
+
+medstation_meds = {
+    "Acetaminophen": "Used for fever and mild pain relief.",
+    "Morphine": "Strong opioid used for severe pain management.",
+    "Motrin (Ibuprofen)": "NSAID used to reduce inflammation and pain.",
+    "Ondansetron": "Used to treat nausea and vomiting.",
+    "Phenytoin": "Anticonvulsant used to control seizures.",
+    "Epinephrine": "Used in cases of anaphylaxis or severe allergic reactions.",
+    "Glucose": "Used to treat hypoglycemia (low blood sugar).",
+    "Hydralazine": "Used to lower blood pressure in hypertensive emergencies.",
+    "Midodrine": "Used to raise blood pressure in patients with hypotension.",
+    "Heparin": "Anticoagulant used to prevent blood clots.",
+    "Lasix (Furosemide)": "Diuretic used to treat fluid overload and hypertension.",
+    "Naloxone": "Used to reverse opioid overdose."
 }
 
 # --------------------------------------
@@ -126,21 +143,24 @@ with st.sidebar:
     if st.button("🗑️ Clear Inventory"):
         st.session_state.inventory = []
         st.warning("Inventory cleared.")
-        st.rerun()  # ✅ Instantly refreshes UI — modern method
+        st.rerun()
 
 # --------------------------------------
 # MAIN LAYOUT
 # --------------------------------------
 col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 
+# ---- CENTER COLUMN ----
 with col2:
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
+
         if st.button("Next Patient"):
             st.session_state.next_patient_button_clicked = True
         if st.session_state.get("next_patient_button_clicked", False):
             assign_patient()
             st.session_state.next_patient_button_clicked = False
+
         if st.session_state.patient:
             p = st.session_state.patient
             st.subheader("Patient Information")
@@ -150,121 +170,51 @@ with col2:
             st.subheader("📜 Medical History Form")
             for k, v in p["medical_history"].items():
                 st.write(f"**{k}:** {v}")
+
+            # 🧰 USE SUPPLIES SECTION
+            if st.session_state.inventory:
+                st.subheader("🧰 Use Supplies")
+                selected_item = st.selectbox("Select an item to use from inventory:", st.session_state.inventory)
+
+                if st.button("Use Selected Item"):
+                    st.session_state.treatment_history.append(f"Used {selected_item} on {p['name']}.")
+                    st.session_state.inventory.remove(selected_item)
+                    st.success(f"✅ {selected_item} used successfully!")
+                    st.toast(f"🩺 You used {selected_item} on {p['name']}", icon="💉")
+                    st.rerun()
+            else:
+                st.info("No available supplies in your inventory to use.")
+
         else:
             st.info("No active patient.")
 
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
-
-        color_map = {
-            "Airway & Breathing": "#d0f0fd",
-            "Circulation & IV": "#d0ffd0",
-            "Diagnostics": "#fff6d0",
-            "Immobilization": "#ffe0d0",
-            "General Care": "#e0d0ff"
-        }
-
-        categorized_supplies = {
-            "Airway & Breathing": {
-                "Oxygen Mask": "Used to deliver oxygen to patients with breathing difficulties.",
-                "Intubation Kit": "Contains tools required to insert a breathing tube into the airway.",
-                "Defibrillator and Pads": "Delivers electric shocks to the heart in case of cardiac arrest."
-            },
-            "Circulation & IV": {
-                "IV Kit": "Includes catheter and supplies for IV fluids or medications.",
-                "Saline and Other IV Fluids": "Used to hydrate or deliver IV medications.",
-                "Tourniquet": "Stops blood flow to a limb in severe bleeding."
-            },
-            "Diagnostics": {
-                "Test Swabs": "Used to take samples of bodily fluids for infection testing.",
-                "Glucometer": "Measures blood glucose levels.",
-                "Thermometer": "Measures body temperature."
-            },
-            "Immobilization": {
-                "Cervical Collar": "Immobilizes the neck to prevent further injury.",
-                "Arm Splint": "Used to immobilize broken or injured limbs."
-            },
-            "General Care": {
-                "Catheter Kit": "Used for urinary drainage in immobile patients.",
-                "Bed Pan": "For bedridden patients to use safely.",
-                "Sutures": "Used to close wounds or surgical incisions."
-            }
-        }
-
-        for category, supplies in categorized_supplies.items():
-            st.markdown(f"<h4 style='background-color:{color_map[category]};padding:6px;border-radius:8px;'>{category}</h4>", unsafe_allow_html=True)
-            items = list(supplies.items())
-            for i in range(0, len(items), 2):
-                colA, colB = st.columns(2)
-                for col, (item, description) in zip((colA, colB), items[i:i+2]):
-                    with col.expander(item):
-                        st.write(description)
-                        if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
-                            if item not in st.session_state.inventory:
-                                st.session_state.inventory.append(item)
-                                st.success(f"{item} added to inventory.")
-                                st.toast(f"✅ {item} added to inventory!", icon="📦")
-                                st.rerun()
-                            else:
-                                st.warning(f"{item} is already in the inventory.")
-                                st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
+        for item, desc in emergency_supplies.items():
+            with st.expander(item):
+                st.write(desc)
+                if st.button(f"Add {item} to Inventory", key=f"supply_{item}"):
+                    if item not in st.session_state.inventory:
+                        st.session_state.inventory.append(item)
+                        st.success(f"{item} added to inventory.")
+                        st.toast(f"✅ {item} added!", icon="📦")
+                        st.rerun()
+                    else:
+                        st.warning(f"{item} already in inventory.")
 
     elif st.session_state.room == "Medstation":
-        st.header("💉 Medstation")
-
-        med_color_map = {
-            "Pain & Fever Relief": "#fddede",
-            "Seizure & Neurological": "#e0d0ff",
-            "Cardiac & Emergency": "#d0f0fd",
-            "Blood Pressure & Circulation": "#d0ffd0",
-            "Fluid & Metabolic": "#fff6d0"
-        }
-
-        categorized_meds = {
-            "Pain & Fever Relief": {
-                "Acetaminophen": "Used to relieve mild to moderate pain and reduce fever.",
-                "Morphine": "A potent opioid for severe pain management.",
-                "Motrin (Ibuprofen)": "An NSAID that reduces pain, inflammation, and fever."
-            },
-            "Seizure & Neurological": {
-                "Phenytoin": "Used to control seizures and prevent epileptic episodes.",
-                "Naloxone": "Reverses the effects of opioid overdose quickly and safely."
-            },
-            "Cardiac & Emergency": {
-                "Epinephrine": "Used for anaphylaxis or cardiac arrest; increases heart rate and blood pressure.",
-                "Heparin": "Prevents and treats blood clots and deep vein thrombosis.",
-                "Lasix (Furosemide)": "A diuretic that removes excess fluid in heart failure or pulmonary edema."
-            },
-            "Blood Pressure & Circulation": {
-                "Hydralazine": "A vasodilator used to lower blood pressure during hypertensive crises.",
-                "Midodrine": "Raises blood pressure by constricting blood vessels."
-            },
-            "Fluid & Metabolic": {
-                "Glucose": "Quickly raises blood sugar in hypoglycemic emergencies.",
-                "Ondansetron": "Prevents nausea and vomiting post-operation or during chemotherapy."
-            }
-        }
-
-        for category, meds in categorized_meds.items():
-            st.markdown(
-                f"<h4 style='background-color:{med_color_map[category]};padding:6px;border-radius:8px;margin-top:10px;'>{category}</h4>",
-                unsafe_allow_html=True
-            )
-            items = list(meds.items())
-            for i in range(0, len(items), 2):
-                colA, colB = st.columns(2)
-                for col, (med, desc) in zip((colA, colB), items[i:i+2]):
-                    with col.expander(med):
-                        st.write(desc)
-                        if st.button(f"Add {med} to Inventory", key=f"add_{med}"):
-                            if med not in st.session_state.inventory:
-                                st.session_state.inventory.append(med)
-                                st.success(f"{med} added to inventory.")
-                                st.toast(f"✅ {med} added to inventory!", icon="💊")
-                                st.rerun()
-                            else:
-                                st.warning(f"{med} is already in the inventory.")
-                                st.toast(f"⚠️ {med} already in inventory.", icon="⚠️")
+        st.header("💊 Medstation")
+        for med, desc in medstation_meds.items():
+            with st.expander(med):
+                st.write(desc)
+                if st.button(f"Add {med} to Inventory", key=f"med_{med}"):
+                    if med not in st.session_state.inventory:
+                        st.session_state.inventory.append(med)
+                        st.success(f"{med} added to inventory.")
+                        st.toast(f"💊 {med} collected!", icon="💊")
+                        st.rerun()
+                    else:
+                        st.warning(f"{med} already in inventory.")
 
 # ---- RIGHT COLUMN ----
 with col3:
@@ -274,11 +224,9 @@ with col3:
         st.write(f"**Name:** {p['name']}")
         st.write(f"**Age:** {p['age']}")
         st.write(f"**Symptoms:** {p['symptoms']}")
-        vitals = p["vitals"]
         st.subheader("🩺 Patient Vitals")
-        st.write(f"**BP:** {vitals['BP']}")
-        st.write(f"**HR:** {vitals['HR']}")
-        st.write(f"**O2:** {vitals['O2']}")
+        for k, v in p["vitals"].items():
+            st.write(f"**{k}:** {v}")
         st.subheader("Treatment History")
         if st.session_state.treatment_history:
             for t in st.session_state.treatment_history:
