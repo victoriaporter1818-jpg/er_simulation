@@ -39,11 +39,11 @@ div[data-testid="stHorizontalBlock"] {
     gap: 0rem !important;
 }
 
-/* Center column (col2) flush to left but with equal right spacing */
+/* Center column: flush left, dynamic right spacing */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
     margin-left: 0rem !important;
     padding-left: 0rem !important;
-    padding-right: 2rem !important;  /* ✅ Adds same spacing as left side */
+    padding-right: 1.2rem !important;  /* Default padding */
     width: 100% !important;
     justify-content: flex-start !important;
     align-items: flex-start !important;
@@ -54,6 +54,28 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * 
     text-align: left !important;
     margin-left: 0 !important;
     max-width: 100% !important;
+}
+
+/* RESPONSIVE ADJUSTMENTS */
+@media (max-width: 1600px) {
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+        padding-right: 1rem !important;  /* Medium screens */
+    }
+}
+@media (max-width: 1200px) {
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+        padding-right: 0.8rem !important;  /* Tablets */
+    }
+}
+@media (max-width: 900px) {
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+        padding-right: 0.5rem !important;  /* Narrow tablets */
+    }
+}
+@media (max-width: 600px) {
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+        padding-right: 0.3rem !important;  /* Phones */
+    }
 }
 </style>
 """, unsafe_allow_html=True)
