@@ -185,7 +185,6 @@ if st.session_state.inventory:
             "Stroke": ["Oxygen Mask", "IV Kit", "Glucometer", "Blood Pressure Cuff"]
         }
 
-        # Check if the selected supply matches the condition
         if selected_item in correct_uses.get(diagnosis, []):
             st.session_state.score += 5
             feedback = f"✅ Correct use! {selected_item} was appropriate for {diagnosis}. (+5 points)"
@@ -197,6 +196,7 @@ if st.session_state.inventory:
         st.success(feedback)
         st.toast(feedback, icon="💉")
         st.rerun()
+
 else:
     st.info("No available supplies in your inventory to use.")
 
