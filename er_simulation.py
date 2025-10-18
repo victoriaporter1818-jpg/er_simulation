@@ -151,19 +151,17 @@ with col2:
         st.header("🛒 Supply Room")
 
         for item, description in emergency_supplies.items():
-            st.subheader(item)
-            st.write(description)
-
-            # Button for adding items to inventory
-            if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
-                if item not in st.session_state.inventory:
-                    st.session_state.inventory.append(item)
-                    st.success(f"{item} added to inventory.")
-                    st.toast(f"✅ {item} added to inventory!", icon="📦")
-                    st.rerun()  # 🔄 instantly refresh sidebar
-                else:
-                    st.warning(f"{item} is already in the inventory.")
-                    st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
+            with st.expander(item):
+                st.write(description)
+                if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
+                    if item not in st.session_state.inventory:
+                        st.session_state.inventory.append(item)
+                        st.success(f"{item} added to inventory.")
+                        st.toast(f"✅ {item} added to inventory!", icon="📦")
+                        st.rerun()
+                    else:
+                        st.warning(f"{item} is already in the inventory.")
+                        st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
 
     else:
         st.header(f"🚪 {st.session_state.room}")
