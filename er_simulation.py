@@ -177,4 +177,13 @@ patients = [
 def assign_patient():
     # Randomly select a patient and reset their medical history
     patient = random.choice(patients)
-    st.
+    st.session_state.patient = patient
+    st.session_state.treatment_history = []  # Clear previous treatment history when new patient is assigned
+    st.session_state.score += 10
+
+    # Perform Diagnostics (just a placeholder function here)
+    perform_diagnostics(patient)
+
+# Display Assign Button
+if st.session_state.room == "ER":
+    st.button("Next Patient", on_click=lambda: assign_patient())
