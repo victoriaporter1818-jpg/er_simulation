@@ -202,33 +202,126 @@ with col2:
         else:
             st.info("No active patient.")
 
-    elif st.session_state.room == "Supply Room":
-        st.header("🛒 Supply Room")
-        for item, desc in emergency_supplies.items():
-            with st.expander(item):
-                st.write(desc)
-                if st.button(f"Add {item} to Inventory", key=f"supply_{item}"):
-                    if item not in st.session_state.inventory:
-                        st.session_state.inventory.append(item)
-                        st.success(f"{item} added to inventory.")
-                        st.toast(f"✅ {item} added!", icon="📦")
-                        st.rerun()
-                    else:
-                        st.warning(f"{item} already in inventory.")
+    # ----------------------------- SUPPLY ROOM -----------------------------
+elif st.session_state.room == "Supply Room":
+    st.header("🛒 Supply Room")
 
-    elif st.session_state.room == "Medstation":
-        st.header("💊 Medstation")
-        for med, desc in medstation_meds.items():
-            with st.expander(med):
-                st.write(desc)
-                if st.button(f"Add {med} to Inventory", key=f"med_{med}"):
-                    if med not in st.session_state.inventory:
-                        st.session_state.inventory.append(med)
-                        st.success(f"{med} added to inventory.")
-                        st.toast(f"💊 {med} collected!", icon="💊")
-                        st.rerun()
-                    else:
-                        st.warning(f"{med} already in inventory.")
+    color_map = {
+        "Airway & Breathing": "#d0f0fd",
+        "Circulation & IV": "#d0ffd0",
+        "Diagnostics": "#fff6d0",
+        "Immobilization": "#ffe0d0",
+        "General Care": "#e0d0ff"
+    }
+
+    categorized_supplies = {
+        "Airway & Breathing": {
+            "Oxygen Mask": "Used to deliver oxygen to patients with breathing difficulties.",
+            "Intubation Kit": "Contains tools required to insert a breathing tube into the airway.",
+            "Defibrillator and Pads": "Delivers electric shocks to the heart in case of cardiac arrest."
+        },
+        "Circulation & IV": {
+            "IV Kit": "Includes catheter and supplies for IV fluids or medications.",
+            "Saline and Other IV Fluids": "Used to hydrate or deliver IV medications.",
+            "Tourniquet": "Stops blood flow to a limb in severe bleeding."
+        },
+        "Diagnostics": {
+            "Test Swabs": "Used to take samples of bodily fluids for infection testing.",
+            "Glucometer": "Measures blood glucose levels.",
+            "Thermometer": "Measures body temperature."
+        },
+        "Immobilization": {
+            "Cervical Collar": "Immobilizes the neck to prevent further injury.",
+            "Arm Splint": "Used to immobilize broken or injured limbs."
+        },
+        "General Care": {
+            "Catheter Kit": "Used for urinary drainage in immobile patients.",
+            "Bed Pan": "For bedridden patients to use safely.",
+            "Sutures": "Used to close wounds or surgical incisions."
+        }
+    }
+
+    for category, supplies in categorized_supplies.items():
+        st.markdown(
+            f"<h4 style='background-color:{color_map[category]};padding:6px;border-radius:8px;'>{category}</h4>",
+            unsafe_allow_html=True
+        )
+
+        items = list(supplies.items())
+        for i in range(0, len(items), 2):
+            colA, colB = st.columns(2)
+            for col, (item, description) in zip((colA, colB), items[i:i+2]):
+                with col.expander(item):
+                    st.write(description)
+                    if st.button(f"Add {item} to Inventory", key=f"supply_{item}"):
+                        if item not in st.session_state.inventory:
+                            st.session_state.inventory.append(item)
+                            st.success(f"{item} added to inventory.")
+                            st.toast(f"✅ {item} added to inventory!", icon="📦")
+                            st.rerun()
+                        else:
+                            st.warning(f"{item} is already in the inventory.")
+                            st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
+
+
+# ----------------------------- MEDSTATION -----------------------------
+elif st.session_state.room == "Medstation":
+    st.header("💊 Medstation")
+
+    med_categories = {
+        "Pain Relief": {
+            "Acetaminophen": "Used to reduce fever and relieve mild pain.",
+            "Morphine": "Powerful opioid used for severe pain management.",
+            "Motrin": "Anti-inflammatory and pain relief medication (ibuprofen)."
+        },
+        "Antiemetics": {
+            "Ondansetron": "Used to prevent nausea and vomiting."
+        },
+        "Neurological": {
+            "Phenytoin": "Used to control seizures.",
+            "Midodrine": "Used to raise low blood pressure."
+        },
+        "Cardiac & Emergency": {
+            "Epinephrine": "Used for severe allergic reactions and cardiac arrest.",
+            "Hydralazine": "Used to treat high blood pressure.",
+            "Heparin": "Prevents blood clots.",
+            "Lasix": "Diuretic used to remove excess fluid.",
+            "Naloxone": "Used to reverse opioid overdose."
+        },
+        "Metabolic": {
+            "Glucose": "Used to treat low blood sugar."
+        }
+    }
+
+    color_map_meds = {
+        "Pain Relief": "#fde0dc",
+        "Antiemetics": "#fff5d7",
+        "Neurological": "#e3f2fd",
+        "Cardiac & Emergency": "#e8f5e9",
+        "Metabolic": "#f3e5f5"
+    }
+
+    for category, meds in med_categories.items():
+        st.markdown(
+            f"<h4 style='background-color:{color_map_meds[category]};padding:6px;border-radius:8px;'>{category}</h4>",
+            unsafe_allow_html=True
+        )
+
+        meds_list = list(meds.items())
+        for i in range(0, len(meds_list), 2):
+            colA, colB = st.columns(2)
+            for col, (med, desc) in zip((colA, colB), meds_list[i:i+2]):
+                with col.expander(med):
+                    st.write(desc)
+                    if st.button(f"Add {med} to Inventory", key=f"med_{med}"):
+                        if med not in st.session_state.inventory:
+                            st.session_state.inventory.append(med)
+                            st.success(f"{med} added to inventory.")
+                            st.toast(f"💊 {med} collected!", icon="💊")
+                            st.rerun()
+                        else:
+                            st.warning(f"{med} already in inventory.")
+                            st.toast(f"⚠️ {med} already in inventory.", icon="⚠️")
 
 # ---- RIGHT COLUMN ----
 with col3:
