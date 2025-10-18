@@ -43,10 +43,11 @@ div[data-testid="stHorizontalBlock"] {
     gap: 0rem !important;
 }
 
-/* Force the CENTER column (col2) to hug the sidebar */
+/* Force the CENTER column (col2) to hug the sidebar, but leave a right margin */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
     margin-left: 0rem !important;
     padding-left: 0rem !important;
+    padding-right: 2.5rem !important;  /* ✅ about 1 inch of space */
     width: 100% !important;
     justify-content: flex-start !important;
     align-items: flex-start !important;
