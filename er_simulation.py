@@ -151,11 +151,13 @@ with main_col:
             st.subheader(item)
             st.write(description)
             if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
-                if item not in st.session_state.inventory:
-                    st.session_state.inventory.append(item)
-                    st.success(f"{item} added to inventory.")
-                else:
-                    st.warning(f"{item} is already in the inventory.")
+    if item not in st.session_state.inventory:
+        st.session_state.inventory.append(item)
+        st.success(f"{item} added to inventory.")
+        st.rerun()  # ✅ Immediately refresh the sidebar to show update
+    else:
+        st.warning(f"{item} is already in the inventory.")
+
 
     else:
         st.header(f"🚪 {st.session_state.room}")
