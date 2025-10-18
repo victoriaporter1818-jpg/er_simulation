@@ -190,3 +190,4 @@ def perform_diagnostics(patient):
     # Placeholder for diagnostics process
     # For now, we'll just simulate diagnostic results
     st.session_state.test_results = "Test results pending."
+
