@@ -10,6 +10,19 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Style for simulated modal (Transfer Patient Summary)
+st.markdown("""
+<style>
+div[data-testid="stExpander"] {
+    background-color: #f9f9f9;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+</style>
+""", unsafe_allow_html=True)
+
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
@@ -333,7 +346,7 @@ transfer_option = st.selectbox(
 )
 
 if st.button("Confirm Transfer", key="confirm_transfer"):
-    with st.modal("🏁 Patient Transfer Summary"):
+    with st.expander("🏁 Patient Transfer Summary", expanded=True):
         # Normalize score to 0–100
         total_score = max(0, min(100, int(st.session_state.score)))
 
