@@ -244,9 +244,6 @@ with col2:
                             st.warning(f"{item} is already in the inventory.")
                             st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
 
-    else:
-        st.header(f"🚪 {st.session_state.room}")
-        st.info("Room functionality coming soon!")
 
 # ---- RIGHT COLUMN (Vitals, Score, Treatments)
 with col3:
