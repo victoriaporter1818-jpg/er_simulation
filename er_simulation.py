@@ -11,7 +11,7 @@ emergency_supplies = {
     "Oxygen Mask": "Used to deliver oxygen to patients who are experiencing breathing difficulties.",
     "Intubation Kit": "Contains tools required to insert a breathing tube into the airway of a patient.",
     "IV Kit": "Includes intravenous catheter, tape, and other supplies needed to administer IV fluids or medications.",
-    "Saline and Other IV Fluids": "Used to hydrate patients or deliver medications through an IV line.",
+    "Saline": "Used to hydrate patients or deliver medications through an IV line.",
     "Catheter Kit": "Contains the necessary instruments to insert a urinary catheter into a patient.",
     "Bed Pan": "Used for bedridden patients to urinate or defecate in a safe and hygienic manner.",
     "Tourniquet": "A device used to stop blood flow to a limb in cases of severe bleeding.",
