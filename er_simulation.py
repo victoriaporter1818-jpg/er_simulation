@@ -191,9 +191,9 @@ with col2:
 
                     if selected_item in correct_uses.get(diagnosis, []):
                         st.session_state.score += 5
-                        feedback = f"✅ Correct use! {selected_item} was appropriate for {diagnosis}. (+5 points)"
+                        feedback = f"✅ Correct use! {selected_item} was appropriate. (+5 points)"
                     else:
-                        feedback = f"⚠️ {selected_item} had limited effect for {diagnosis}."
+                        feedback = f"⚠️ {selected_item} had limited effect."
 
                     st.session_state.treatment_history.append(
                         f"Used {selected_item} on {p['name']}. {feedback}"
