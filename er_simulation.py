@@ -15,7 +15,7 @@ st.set_page_config(
 # --------------------------------------
 st.markdown("""
 <style>
-/* Remove Streamlit’s internal padding and side margins completely */
+/* Remove Streamlit’s internal padding and margins */
 main[data-testid="stAppViewContainer"] {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
@@ -24,14 +24,10 @@ main[data-testid="stAppViewContainer"] > div:first-child {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
 }
-
-/* Remove padding inside the main section */
 section.main > div {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
 }
-
-/* Flatten all content blocks */
 .block-container {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
@@ -43,16 +39,17 @@ div[data-testid="stHorizontalBlock"] {
     gap: 0rem !important;
 }
 
-/* Force the CENTER column (col2) to hug the sidebar */
+/* Center column (col2) flush to left but with equal right spacing */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
     margin-left: 0rem !important;
     padding-left: 0rem !important;
+    padding-right: 1.5rem !important;  /* ✅ Adds same spacing as left side */
     width: 100% !important;
     justify-content: flex-start !important;
     align-items: flex-start !important;
 }
 
-/* Align all text and widgets inside center column to left edge */
+/* Align text and widgets inside center column */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
     text-align: left !important;
     margin-left: 0 !important;
