@@ -128,21 +128,24 @@ with col2:
             st.info("No active patient.")
 
     elif st.session_state.room == "Supply Room":
-        st.header("🛒 Supply Room")
-        for item, desc in emergency_supplies.items():
-            with st.expander(item):
-                st.write(desc)
-                if st.button(f"Add {item}", key=f"add_{item}"):
+    st.header("🛒 Supply Room")
+
+    # Convert supply items into pairs for 2-column layout
+    items = list(emergency_supplies.items())
+    for i in range(0, len(items), 2):
+        colA, colB = st.columns(2)
+        for col, (item, description) in zip((colA, colB), items[i:i+2]):
+            with col.expander(item):
+                st.write(description)
+                if st.button(f"Add {item} to Inventory", key=f"add_{item}"):
                     if item not in st.session_state.inventory:
                         st.session_state.inventory.append(item)
+                        st.success(f"{item} added to inventory.")
                         st.toast(f"✅ {item} added to inventory!", icon="📦")
                         st.rerun()
                     else:
+                        st.warning(f"{item} is already in the inventory.")
                         st.toast(f"⚠️ {item} already in inventory.", icon="⚠️")
-
-    else:
-        st.header(f"🚪 {st.session_state.room}")
-        st.info("Room functionality coming soon!")
 
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
