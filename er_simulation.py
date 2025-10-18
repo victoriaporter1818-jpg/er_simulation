@@ -7,7 +7,6 @@ st.set_page_config(
     layout="wide",  # <-- This makes it span the full screen width
     initial_sidebar_state="expanded"
 )
-
 # Optional: Light CSS to remove padding and align content neatly
 st.markdown("""
     <style>
