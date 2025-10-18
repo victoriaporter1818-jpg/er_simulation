@@ -80,22 +80,6 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * 
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<style>
-/* Add gap between center and right columns */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-    margin-right: 1.5rem !important;  /* ✅ Creates a clear gap before right column */
-}
-
-/* Make sure the right column does not overlap and stays aligned */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(3) {
-    padding-left: 0.5rem !important;
-    border-left: 1px solid #f0f0f0 !important;  /* Optional light divider line */
-}
-</style>
-""", unsafe_allow_html=True)
-)
-
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
