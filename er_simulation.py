@@ -133,8 +133,10 @@ col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 
 # ---- CENTER COLUMN ----
 with col2:
-    # --------------------------- ER ROOM ---------------------------
-       st.header("🏥 Emergency Room")
+ # --------------------------- ER ROOM ---------------------------
+    if st.session_state.room == "ER":
+        st.header("🏥 Emergency Room")
+
         if st.button("Next Patient"):
             st.session_state.next_patient_button_clicked = True
 
