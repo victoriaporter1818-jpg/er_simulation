@@ -43,7 +43,7 @@ div[data-testid="stHorizontalBlock"] {
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
     margin-left: 0rem !important;
     padding-left: 0rem !important;
-    padding-right: 1.5rem !important;  /* ✅ Adds same spacing as left side */
+    padding-right: 2rem !important;  /* ✅ Adds same spacing as left side */
     width: 100% !important;
     justify-content: flex-start !important;
     align-items: flex-start !important;
