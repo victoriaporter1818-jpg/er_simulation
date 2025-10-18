@@ -13,37 +13,39 @@ st.set_page_config(
 # Custom CSS for tighter alignment and positioning
 st.markdown("""
 <style>
-/* General padding cleanup for full-width layout */
+/* Tighten default Streamlit padding for full screen layout */
 .block-container {
-    padding-top: 1.5rem;
-    padding-bottom: 0rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-top: 0rem !important;
+    padding-bottom: 0rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
 }
 
-/* Push center column content up and left */
-div[data-testid="stVerticalBlock"] > div:nth-child(2) {
-    margin-top: -2rem !important;
+/* Make columns stretch across full height and align top-left */
+div[data-testid="stHorizontalBlock"] {
+    align-items: flex-start !important;
+    gap: 0.5rem !important; /* reduces space between columns */
 }
 
-/* Reduce left padding inside the center column */
+/* Remove unnecessary spacing inside the center column */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) > div {
-    padding-left: 0rem !important;
-    margin-left: 0rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* Ensure top-left alignment for the center column */
+/* Push center content fully to top-left */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-    display: flex;
-    flex-direction: column;
     justify-content: flex-start !important;
     align-items: flex-start !important;
     text-align: left !important;
+    margin-top: 0rem !important;
+    padding-top: 0rem !important;
 }
 
-/* Slightly reduce horizontal gap between columns */
-div[data-testid="stHorizontalBlock"] {
-    gap: 0.75rem !important;
+/* Optional: reduce expander width a bit for cleaner look */
+details {
+    max-width: 95%;
+    margin-left: 0rem;
 }
 </style>
 """, unsafe_allow_html=True)
