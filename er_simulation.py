@@ -22,6 +22,28 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+    <style>
+        .block-container {
+            padding-top: 2rem;
+            padding-bottom: 0rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        /* Center column content left-aligned */
+        div[data-testid="column"]:nth-of-type(2) {
+            text-align: left !important;
+            align-items: flex-start !important;
+        }
+
+        /* Optional: make the main content slightly closer to the left edge */
+        div[data-testid="stVerticalBlock"] > div:nth-child(2) {
+            margin-left: 0px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
