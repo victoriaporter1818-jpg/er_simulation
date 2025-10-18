@@ -120,7 +120,8 @@ with st.sidebar:
 # --------------------------------------
 # MAIN LAYOUT (Three Columns)
 # --------------------------------------
-col1, col2, col3 = st.columns([1.2, 8.5, 1.2])  # wide center layout
+# Adjust column proportions to make the center column much wider
+col1, col2, col3 = st.columns([0.5, 3.5, 1])  # Center column now dominant
 
 # ---- CENTER COLUMN (Room Content)
 with col2:
