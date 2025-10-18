@@ -116,7 +116,6 @@ with col2:
         st.write(f"**Name:** {patient['name']}")
         st.write(f"**Age:** {patient['age']}")
         st.write(f"**Symptoms:** {patient['symptoms']}")
-        st.write(f"**Diagnosis:** {patient['diagnosis']}")
 
         # Display Patient Vitals
         st.subheader("Vitals")
@@ -146,7 +145,7 @@ with col2:
         st.metric("Total Score", st.session_state.score)
     else:
         st.info("No active patient.")
-
+        
 # --------------------------------------
 # INITIALIZATION (Session State)
 # --------------------------------------
