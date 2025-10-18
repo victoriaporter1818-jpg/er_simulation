@@ -74,46 +74,45 @@ emergency_supplies = {
 }
 
 # --------------------------------------
-# MAIN INTERFACE (UPDATED FOR DISTINCT COLUMNS)
+# LEFT PANEL (Sidebar: Difficulty, Role, Room Nav)
+# --------------------------------------
+
+with st.sidebar:
+    st.header("🏥 Emergency Room Simulation")
+
+    difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="difficulty")
+    st.write(f"Selected Difficulty: {difficulty}")
+
+    role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
+    st.write(f"Selected Role: {role}")
+
+    # Room Navigation
+    rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
+    st.session_state.room = st.sidebar.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
+
+    # Inventory Display
+    st.sidebar.write("---")
+    st.sidebar.subheader("📦 Current Inventory")
+    if st.session_state.inventory:
+        for item in st.session_state.inventory:
+            st.sidebar.write(f"- {item}")
+    else:
+        st.sidebar.info("Inventory is empty.")
+
+    if st.sidebar.button("🗑️ Clear Inventory"):
+        st.session_state.inventory = []
+        st.sidebar.warning("Inventory cleared.")
+
+
+# --------------------------------------
+# MAIN INTERFACE
 # --------------------------------------
 
 with st.container():
-    # Define the column distribution
-    col1, col2, col3 = st.columns([1, 2, 1])  # 1 unit for left and right, 2 units for the center
+    col1, col2 = st.columns([2, 1])
 
-    # Left Column (col1) - Sidebar with difficulty, role, and inventory (no changes)
+    # Main Column (left/main content)
     with col1:
-        st.sidebar.header("🏥 Emergency Room Simulation")
-
-        # Difficulty selection
-        difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"], key="sidebar_difficulty")
-        st.write(f"Selected Difficulty: {difficulty}")
-
-        # Role selection
-        role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="sidebar_role")
-        st.write(f"Selected Role: {role}")
-
-        # Room Navigation (Sidebar)
-        rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
-        st.session_state.room = st.sidebar.radio("Select a Room", rooms, index=rooms.index(st.session_state.room), key="sidebar_room")
-
-        # Inventory Display
-        st.sidebar.write("---")
-        st.sidebar.subheader("📦 Current Inventory")
-        if st.session_state.inventory:
-            for item in st.session_state.inventory:
-                st.sidebar.write(f"- {item}")
-        else:
-            st.sidebar.info("Inventory is empty.")
-
-        # Button to clear inventory
-        if st.sidebar.button("🗑️ Clear Inventory", key="sidebar_clear_inventory"):
-            st.session_state.inventory = []
-            st.sidebar.warning("Inventory cleared.")
-
-    # Center Column (col2) - Main content (Room content like ER, Supply Room, etc.)
-    with col2:
-        # Conditional rendering based on selected room
         if st.session_state.room == "Supply Room":
             st.header("🛒 Supply Room")
             for item, description in emergency_supplies.items():
@@ -129,7 +128,7 @@ with st.container():
         elif st.session_state.room == "ER":
             st.header("🏥 Emergency Room")
 
-            if st.button("Next Patient", key="next_patient_button"):
+            if st.button("Next Patient"):
                 st.session_state.next_patient_button_clicked = True
 
             if st.session_state.get("next_patient_button_clicked", False):
@@ -149,28 +148,10 @@ with st.container():
             else:
                 st.info("No active patient.")
 
-        elif st.session_state.room == "Medstation":
-            st.header("💉 Medstation")
-            # Add the content for Medstation room
-            st.write("This is where medications and medical supplies are stored.")
+        # Add logic for other rooms as needed
 
-        elif st.session_state.room == "Operating Room":
-            st.header("🦠 Operating Room")
-            # Add the content for Operating Room room
-            st.write("This is where surgeries are performed.")
-
-        elif st.session_state.room == "Radiology Lab":
-            st.header("🩻 Radiology Lab")
-            # Add the content for Radiology Lab room
-            st.write("This is where diagnostic imaging is conducted.")
-
-        elif st.session_state.room == "Pharmacy":
-            st.header("💊 Pharmacy")
-            # Add the content for Pharmacy room
-            st.write("This is where prescriptions are filled and medications are dispensed.")
-
-    # Right Column (col3) - Patient Data, Vitals, Treatment History, and Score (no changes)
-    with col3:
+    # Right Column (Patient Data, Vitals, Score)
+    with col2:
         st.subheader("👩‍⚕️ Patient Data")
         if st.session_state.patient:
             patient = st.session_state.patient
@@ -195,7 +176,5 @@ with st.container():
         else:
             st.info("No active patient.")
 
-        # Score
         st.subheader("🏆 Score")
         st.metric("Total Score", st.session_state.score)
-
