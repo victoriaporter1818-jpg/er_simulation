@@ -23,7 +23,7 @@ section.main > div {
 
 /* Remove internal spacing between sidebar and main columns */
 .block-container {
-    padding-top: 1rem !important;
+    padding-top: 2rem !important;
     padding-bottom: 0rem !important;
     padding-left: 0rem !important;
     margin-left: 0rem !important;
