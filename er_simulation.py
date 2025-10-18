@@ -83,7 +83,7 @@ with st.container():
             
             # Show the Next Patient button and patient details in the center column only
             if st.button("Next Patient", key="next_patient_button"):  # Unique key added here
-                assign_patient()
+                assign_patient()  # This will call the assign_patient function and generate the next patient.
 
             # Display patient data in the center column only
             if st.session_state.patient:
