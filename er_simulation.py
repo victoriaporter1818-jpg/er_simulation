@@ -15,7 +15,7 @@ st.markdown("""
 <style>
 /* Remove Streamlit default padding */
 .block-container {
-    padding-top: 0rem !important;
+    padding-top: 2rem !important;
     padding-bottom: 0rem !important;
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
