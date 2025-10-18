@@ -91,7 +91,7 @@ with st.container():
                 assign_patient()
                 st.session_state.next_patient_button_clicked = False  # Reset button click state
 
-            # Display patient data, treatment history, and score in the right panel
+            # Display patient data
             if st.session_state.patient:
                 patient = st.session_state.patient
                 st.subheader("Patient Information")
@@ -99,11 +99,11 @@ with st.container():
                 st.write(f"**Age:** {patient['age']}")
                 st.write(f"**Symptoms:** {patient['symptoms']}")
                 
-                # Remove the Medical History Form section
-                # st.subheader("📜 Medical History Form")
-                # medical_history = patient['medical_history']
-                # for key, value in medical_history.items():
-                #     st.write(f"**{key}:** {value}")
+                # Medical History Form (added below Patient Information)
+                st.subheader("📜 Medical History Form")
+                medical_history = patient['medical_history']
+                for key, value in medical_history.items():
+                    st.write(f"**{key}:** {value}")
 
             else:
                 st.info("No active patient.")
