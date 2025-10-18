@@ -13,7 +13,7 @@ st.set_page_config(
 # Custom CSS for tighter alignment and positioning
 st.markdown("""
 <style>
-/* Tighten default Streamlit padding for full screen layout */
+/* Remove Streamlit default padding */
 .block-container {
     padding-top: 0rem !important;
     padding-bottom: 0rem !important;
@@ -21,31 +21,38 @@ st.markdown("""
     padding-right: 1.5rem !important;
 }
 
-/* Make columns stretch across full height and align top-left */
+/* Make all column blocks top-aligned */
 div[data-testid="stHorizontalBlock"] {
     align-items: flex-start !important;
-    gap: 0.5rem !important; /* reduces space between columns */
+    gap: 0.5rem !important;
 }
 
-/* Remove unnecessary spacing inside the center column */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) > div {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Push center content fully to top-left */
+/* ---- Fix for center column width ---- */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
     justify-content: flex-start !important;
     align-items: flex-start !important;
     text-align: left !important;
     margin-top: 0rem !important;
     padding-top: 0rem !important;
+    width: 100% !important;
 }
 
-/* Optional: reduce expander width a bit for cleaner look */
+/* Expand all widgets and text in center column to fill full width */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Remove inner padding from center column */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) > div {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Optional: tighten expander style and center area look */
 details {
-    max-width: 95%;
-    margin-left: 0rem;
+    max-width: 100% !important;
+    margin-left: 0rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
