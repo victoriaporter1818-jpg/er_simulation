@@ -83,7 +83,13 @@ with st.container():
 
             # Show the Next Patient button
             if st.button("Next Patient"):
+                # Manually track the button press via session state
+                st.session_state.next_patient_button_clicked = True
+
+            # Check if the button was clicked and assign a new patient
+            if st.session_state.get("next_patient_button_clicked", False):
                 assign_patient()
+                st.session_state.next_patient_button_clicked = False  # Reset button click state
 
             # Display patient data, treatment history, and score in the right panel
             if st.session_state.patient:
@@ -154,6 +160,8 @@ if "treatment_history" not in st.session_state:
     st.session_state.treatment_history = []
 if "test_results" not in st.session_state:
     st.session_state.test_results = None
+if "next_patient_button_clicked" not in st.session_state:
+    st.session_state.next_patient_button_clicked = False  # Track button click state
 
 # --------------------------------------
 # Example Patient Data (with Medical History)
@@ -183,7 +191,3 @@ def assign_patient():
 
     # Perform Diagnostics (just a placeholder function here)
     perform_diagnostics(patient)
-
-# Display Assign Button
-if st.session_state.room == "ER":
-    st.button("Next Patient", on_click=assign_patient)
