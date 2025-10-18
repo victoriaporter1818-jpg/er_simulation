@@ -323,6 +323,84 @@ with col2:
                                 st.warning(f"{med} already in inventory.")
                                 st.toast(f"⚠️ {med} already in inventory.", icon="⚠️")
 
+    # -------------------- TRANSFER PATIENT (MODAL) --------------------
+st.subheader("🏥 Transfer Patient")
+
+transfer_option = st.selectbox(
+    "Select Transfer Destination:",
+    ["-- Select --", "Discharge", "Send to Surgery", "Send to ICU"],
+    key="transfer_destination"
+)
+
+if st.button("Confirm Transfer", key="confirm_transfer"):
+    with st.modal("🏁 Patient Transfer Summary"):
+        # Normalize score to 0–100
+        total_score = max(0, min(100, int(st.session_state.score)))
+
+        # You can refine these later; using a mix of real score + randomized “evaluation” feel
+        effectiveness = total_score                                   # Tied to your score
+        diagnostic_accuracy = random.randint(60, 100)
+        resource_efficiency = random.randint(50, 95)
+
+        # Outcome & color
+        if total_score >= 85:
+            outcome, color = "🏆 Excellent", "#2ecc71"
+        elif total_score >= 70:
+            outcome, color = "🙂 Good", "#27ae60"
+        elif total_score >= 50:
+            outcome, color = "⚠️ Fair", "#f1c40f"
+        else:
+            outcome, color = "💀 Poor", "#e74c3c"
+
+        # Headline
+        st.markdown(
+            f"<h3 style='text-align:center;color:{color};margin-bottom:0;'>"
+            f"{outcome} — Score: {total_score}/100"
+            f"</h3>",
+            unsafe_allow_html=True
+        )
+        st.caption(f"Transfer decision: **{transfer_option}**")
+
+        # Progress bars
+        st.write("**Treatment Effectiveness**")
+        st.progress(effectiveness / 100)
+        st.write("**Diagnostic Accuracy**")
+        st.progress(diagnostic_accuracy / 100)
+        st.write("**Resource Management**")
+        st.progress(resource_efficiency / 100)
+
+        st.write("---")
+
+        # Quick breakdown from your action log (very lightweight signal)
+        correct_acts = sum("✅" in line for line in st.session_state.treatment_history)
+        limited_acts = sum("limited effect" in line.lower() or "not very effective" in line.lower()
+                           for line in st.session_state.treatment_history)
+
+        st.markdown("**Action Summary**")
+        st.write(f"- ✅ Effective actions: **{correct_acts}**")
+        st.write(f"- ⚠️ Limited/ineffective actions: **{limited_acts}**")
+
+        # Feedback suggestions
+        feedback_pool = [
+            "Great clinical judgment and timely interventions!",
+            "Diagnostics were appropriate; consider earlier imaging next time.",
+            "Supplies were used efficiently; watch for redundant meds.",
+            "Good stabilization—optimize sequence of care for better outcomes.",
+            "Consider reassessing vitals before transfer to ensure stability."
+        ]
+        st.write("---")
+        st.markdown(f"**Feedback:** {random.choice(feedback_pool)}")
+
+        st.write("---")
+        col_ok, col_new = st.columns([1, 1])
+        with col_new:
+            if st.button("🆕 Start New Case", key="start_new_case"):
+                # Reset state for a new case
+                st.session_state.patient = None
+                st.session_state.treatment_history = []
+                st.session_state.score = 0
+                st.rerun()
+
 # ---- RIGHT COLUMN ----
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
