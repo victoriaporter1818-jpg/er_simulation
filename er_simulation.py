@@ -16,21 +16,12 @@ st.set_page_config(
 st.markdown("""
 <style>
 /* Remove Streamlit’s internal padding and margins */
-main[data-testid="stAppViewContainer"] {
-    padding-left: 0rem !important;
-    margin-left: 0rem !important;
-}
-main[data-testid="stAppViewContainer"] > div:first-child {
-    padding-left: 0rem !important;
-    margin-left: 0rem !important;
-}
-section.main > div {
-    padding-left: 0rem !important;
-    margin-left: 0rem !important;
-}
+main[data-testid="stAppViewContainer"],
+main[data-testid="stAppViewContainer"] > div:first-child,
+section.main > div,
 .block-container {
-    padding-left: 0rem !important;
-    margin-left: 0rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
     width: 100% !important;
 }
 
@@ -39,17 +30,17 @@ div[data-testid="stHorizontalBlock"] {
     gap: 0rem !important;
 }
 
-/* Center column: flush left, dynamic right spacing */
+/* Center column (col2) — balanced spacing on both sides */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-    margin-left: 0rem !important;
+    margin-left: 1.5rem !important;   /* ✅ Adds small gap from left sidebar */
     padding-left: 0rem !important;
-    padding-right: 1.2rem !important;  /* Default padding */
+    padding-right: 1.5rem !important; /* ✅ Matching right-side spacing */
     width: 100% !important;
     justify-content: flex-start !important;
     align-items: flex-start !important;
 }
 
-/* Align text and widgets inside center column */
+/* Ensure all content aligns left inside center column */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
     text-align: left !important;
     margin-left: 0 !important;
@@ -59,22 +50,26 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * 
 /* RESPONSIVE ADJUSTMENTS */
 @media (max-width: 1600px) {
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-        padding-right: 1rem !important;  /* Medium screens */
+        margin-left: 1rem !important;
+        padding-right: 1rem !important;
     }
 }
 @media (max-width: 1200px) {
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-        padding-right: 0.8rem !important;  /* Tablets */
+        margin-left: 0.8rem !important;
+        padding-right: 0.8rem !important;
     }
 }
 @media (max-width: 900px) {
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-        padding-right: 0.5rem !important;  /* Narrow tablets */
+        margin-left: 0.6rem !important;
+        padding-right: 0.6rem !important;
     }
 }
 @media (max-width: 600px) {
     div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-        padding-right: 0.3rem !important;  /* Phones */
+        margin-left: 0.4rem !important;
+        padding-right: 0.4rem !important;
     }
 }
 </style>
