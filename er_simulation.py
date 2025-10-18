@@ -57,6 +57,35 @@ details {
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Center column full-width fix */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+    width: 100% !important;
+    flex-grow: 1 !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force all center content to align left */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
+    margin-left: 0 !important;
+    text-align: left !important;
+    max-width: 100% !important;
+}
+
+/* Optional: tighten vertical spacing */
+.block-container {
+    padding-top: 1rem !important;
+    padding-bottom: 0 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
