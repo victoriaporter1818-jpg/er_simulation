@@ -32,7 +32,7 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
     justify-content: flex-start !important;
     align-items: flex-start !important;
     text-align: left !important;
-    margin-top: 0rem !important;
+    margin-top: 2rem !important;
     padding-top: 0rem !important;
     width: 100% !important;
 }
