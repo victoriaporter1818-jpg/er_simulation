@@ -217,7 +217,6 @@ with col2:
         else:
             st.info("No active patient.")
 
-
     # --------------------------- SUPPLY ROOM ---------------------------
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
