@@ -2,7 +2,7 @@ import streamlit as st
 import random
 
 # --------------------------------------
-# STREAMLIT PAGE CONFIGURATION
+# PAGE SETUP (Fullscreen + Alignment)
 # --------------------------------------
 st.set_page_config(
     page_title="Emergency Room Simulation",
@@ -10,26 +10,40 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Custom CSS for tighter alignment and positioning
 st.markdown("""
 <style>
-/* Tighten vertical padding at top and push content upward */
-div[data-testid="stVerticalBlock"] > div:nth-child(2) {
-    margin-top: 0rem !important;  /* moves content up */
+/* General padding cleanup for full-width layout */
+.block-container {
+    padding-top: 1.5rem;
+    padding-bottom: 0rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
-/* Reduce left padding inside center column */
+/* Push center column content up and left */
+div[data-testid="stVerticalBlock"] > div:nth-child(2) {
+    margin-top: -2rem !important;
+}
+
+/* Reduce left padding inside the center column */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) > div {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
 }
 
-/* Ensure top alignment for the center column */
+/* Ensure top-left alignment for the center column */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
     display: flex;
     flex-direction: column;
     justify-content: flex-start !important;
     align-items: flex-start !important;
     text-align: left !important;
+}
+
+/* Slightly reduce horizontal gap between columns */
+div[data-testid="stHorizontalBlock"] {
+    gap: 0.75rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -103,7 +117,7 @@ emergency_supplies = {
 }
 
 # --------------------------------------
-# SIDEBAR
+# LEFT SIDEBAR
 # --------------------------------------
 with st.sidebar:
     st.header("🏥 Emergency Room Simulation")
@@ -114,9 +128,11 @@ with st.sidebar:
     role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist", "Admin"], key="role")
     st.write(f"Selected Role: {role}")
 
+    # Room Navigation
     rooms = ["ER", "Supply Room", "Medstation", "Operating Room", "Radiology Lab", "Pharmacy"]
     st.session_state.room = st.sidebar.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
 
+    # Inventory Display
     st.sidebar.write("---")
     st.sidebar.subheader("📦 Current Inventory")
     if st.session_state.inventory:
@@ -132,10 +148,9 @@ with st.sidebar:
 # --------------------------------------
 # MAIN LAYOUT (Three Columns)
 # --------------------------------------
-# Adjust column proportions to make the center column much wider
-col1, col2, col3 = st.columns([0.5, 2.5, 1])  # Center column now dominant
+col1, col2, col3 = st.columns([1.1, 2.9, 1.0])  # Center wider and dominant
 
-# ---- CENTER COLUMN (Room Content)
+# ---- CENTER COLUMN (Main Room Content)
 with col2:
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
@@ -180,7 +195,7 @@ with col2:
         st.header(f"🚪 {st.session_state.room}")
         st.info("Room functionality coming soon!")
 
-# ---- RIGHT COLUMN (Vitals & Score)
+# ---- RIGHT COLUMN (Vitals, Score, Treatments)
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
 
