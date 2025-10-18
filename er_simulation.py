@@ -153,7 +153,7 @@ with col2:
 if "inventory" not in st.session_state:
     st.session_state.inventory = []
 if "room" not in st.session_state:
-    st.session_state.room = "ER"
+    st.session_state.room = "ER"  # Set default room to "ER" or any room you'd like
 if "score" not in st.session_state:
     st.session_state.score = 0
 if "patient" not in st.session_state:
