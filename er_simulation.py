@@ -14,7 +14,7 @@ st.markdown("""
 <style>
 /* Tighten vertical padding at top and push content upward */
 div[data-testid="stVerticalBlock"] > div:nth-child(2) {
-    margin-top: -1rem !important;  /* moves content up */
+    margin-top: 0rem !important;  /* moves content up */
 }
 
 /* Reduce left padding inside center column */
