@@ -85,6 +85,30 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * 
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Remove blank space between sidebar and center column */
+div[data-testid="stHorizontalBlock"] {
+    gap: 0rem !important;  /* removes the space between columns */
+}
+
+/* Force center column to start directly beside sidebar */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+    padding-left: 0rem !important;
+    margin-left: 0rem !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+}
+
+/* Keep everything left-aligned and full width */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
+    text-align: left !important;
+    margin-left: 0 !important;
+    max-width: 100% !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 # --------------------------------------
 # SESSION STATE INITIALIZATION
