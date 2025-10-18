@@ -95,6 +95,24 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(3) {
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Align all content in the right column to the right edge */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(3) {
+    text-align: right !important;
+    justify-content: flex-end !important;
+    align-items: flex-end !important;
+    padding-right: 1.5rem !important;  /* keeps text off the very edge */
+}
+
+/* Specifically target text and widgets inside the right column */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(3) * {
+    text-align: right !important;
+    margin-right: 0 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # --------------------------------------
 # SESSION STATE INITIALIZATION
 # --------------------------------------
