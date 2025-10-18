@@ -1,5 +1,4 @@
 import streamlit as st
-import random
 
 # --------------------------------------
 # SUPPLY ROOM ITEMS WITH DESCRIPTIONS
@@ -77,13 +76,6 @@ with st.container():
                         st.success(f"{item} added to inventory.")
                     else:
                         st.warning(f"{item} is already in the inventory.")
-
-        elif st.session_state.room == "ER":
-            # Show content for the ER room when selected
-            st.header("🏥 Emergency Room")
-            # Additional ER room content here...
-        
-        # Add other room conditions as needed (Medstation, Operating Room, etc.)
 
 # --------------------------------------
 # RIGHT PANEL (Patient Information & Score)
