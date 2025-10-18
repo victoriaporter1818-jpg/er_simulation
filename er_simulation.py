@@ -99,18 +99,19 @@ with st.container():
                 st.write(f"**Age:** {patient['age']}")
                 st.write(f"**Symptoms:** {patient['symptoms']}")
                 
-                # Patient-specific Medical History Form
-                st.subheader("📜 Medical History Form")
-                medical_history = patient['medical_history']
-                for key, value in medical_history.items():
-                    st.write(f"**{key}:** {value}")
+                # Remove the Medical History Form section
+                # st.subheader("📜 Medical History Form")
+                # medical_history = patient['medical_history']
+                # for key, value in medical_history.items():
+                #     st.write(f"**{key}:** {value}")
+
             else:
                 st.info("No active patient.")
 
         # Add other room conditions as needed (Medstation, Operating Room, etc.)
 
 # --------------------------------------
-# RIGHT PANEL (Patient Information & Score)
+# RIGHT PANEL (Patient Information & Vitals)
 # --------------------------------------
 
 with col2:
@@ -121,12 +122,13 @@ with col2:
         st.write(f"**Name:** {patient['name']}")
         st.write(f"**Age:** {patient['age']}")
         st.write(f"**Symptoms:** {patient['symptoms']}")
-        
-        # Medical History Form
-        st.subheader("📜 Medical History Form")
-        medical_history = patient['medical_history']
-        for key, value in medical_history.items():
-            st.write(f"**{key}:** {value}")
+
+        # New section for patient-specific vitals
+        st.subheader("🩺 Patient Vitals")
+        vitals = patient['vitals']
+        st.write(f"**Blood Pressure (BP):** {vitals['BP']}")
+        st.write(f"**Heart Rate (HR):** {vitals['HR']}")
+        st.write(f"**Oxygen Saturation (O2):** {vitals['O2']}")
         
         # Treatment History
         st.subheader("Treatment History")
@@ -191,3 +193,7 @@ def assign_patient():
 
     # Perform Diagnostics (just a placeholder function here)
     perform_diagnostics(patient)
+
+# Placeholder function for diagnostics (currently empty)
+def perform_diagnostics(patient):
+    pass
