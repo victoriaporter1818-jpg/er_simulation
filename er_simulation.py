@@ -12,34 +12,44 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* Remove Streamlit's default left padding from the main container */
+/* Completely remove Streamlit’s built-in horizontal padding */
 .block-container {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
     width: 100% !important;
 }
 
-/* Remove horizontal gaps between columns */
-div[data-testid="stHorizontalBlock"] {
-    gap: 0rem !important;
-}
-
-/* Force first column (main center area) to fully expand and align to sidebar */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-    padding-left: 0rem !important;
-    margin-left: 0rem !important;
-    width: 100% !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-}
-
-/* Fix main page wrapper padding (Streamlit adds invisible padding above sidebar) */
+/* Remove invisible padding between sidebar and main body */
 section.main > div {
     padding-left: 0rem !important;
     margin-left: 0rem !important;
 }
 
-/* Prevent Streamlit updates from resetting layout */
+/* Force the internal main content wrapper to hug the sidebar */
+main[data-testid="stAppViewContainer"] > div:first-child {
+    padding-left: 0rem !important;
+    margin-left: 0rem !important;
+}
+
+/* Remove column spacing entirely */
+div[data-testid="stHorizontalBlock"] {
+    gap: 0rem !important;
+}
+
+/* Force the center column content to the far left */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+    margin-left: 0rem !important;
+    padding-left: 0rem !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+}
+
+/* Keep text and widgets aligned to left */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) * {
+    text-align: left !important;
+    margin-left: 0 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
