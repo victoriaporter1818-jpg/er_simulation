@@ -337,7 +337,7 @@ with col2:
                             else:
                                 st.warning(f"{med} already in inventory.")
                                 
-            # ----------------    # ---------------- DIAGNOSTIC LAB ----------------
+                # ---------------- DIAGNOSTIC LAB ----------------
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
 
@@ -391,9 +391,13 @@ with col2:
             )
             for test_name, desc in imaging_tests.items():
                 st.write(f"**{test_name}** — {desc}")
-                if st.button(f"Run {test_name}", key=f"imaging_{test_name.replace(' ', '_')}"):
-                    p = st.session_state.patient
-                    diagnosis = p["diagnosis"] if p else None
+                if st.button(f"Run {test_name}", key="imaging_" + test_name.replace(" ", "_")):
+                    p = st.session_state.get("patient")
+                    if not p:
+                        st.warning("No active patient.")
+                        st.stop()
+
+                    diagnosis = p.get("diagnosis")
                     result_text = results.get(test_name, "Results pending.")
                     feedback = f"🧾 {test_name} completed.\n\n**Result:** {result_text}"
 
@@ -406,7 +410,7 @@ with col2:
                     st.session_state.treatment_history.append(f"Ran {test_name}. {feedback}")
                     st.success(feedback)
                     st.toast(f"✅ {test_name} completed!", icon="🧪")
-                    st.rerun()
+                    st.experimental_rerun()
 
         # ---- Lab Tests column ----
         with col_lab:
@@ -416,9 +420,13 @@ with col2:
             )
             for test_name, desc in lab_tests.items():
                 st.write(f"**{test_name}** — {desc}")
-                if st.button(f"Run {test_name}", key=f"lab_{test_name.replace(' ', '_')}"):
-                    p = st.session_state.patient
-                    diagnosis = p["diagnosis"] if p else None
+                if st.button(f"Run {test_name}", key="lab_" + test_name.replace(" ", "_")):
+                    p = st.session_state.get("patient")
+                    if not p:
+                        st.warning("No active patient.")
+                        st.stop()
+
+                    diagnosis = p.get("diagnosis")
                     result_text = results.get(test_name, "Results pending.")
                     feedback = f"🧾 {test_name} completed.\n\n**Result:** {result_text}"
 
@@ -430,7 +438,8 @@ with col2:
 
                     st.session_state.treatment_history.append(f"Ran {test_name}. {feedback}")
                     st.success(feedback)
-                    st.toast(f"✅ {test
+                    st.toast(f"✅ {test_name} completed!", icon="🧪")
+                    st.experimental_rerun()
 
 # ---- RIGHT COLUMN ----
 with col3:
