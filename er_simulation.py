@@ -177,8 +177,9 @@ with col2:
                 ["-- Select --", "Discharge", "Send to Surgery", "Send to ICU"],
                 key="transfer_destination"
             )
+            
             if st.button("Confirm Transfer", key="confirm_transfer"):
-        with st.expander("🏁 Patient Transfer Summary", expanded=True):
+    with st.expander("🏁 Patient Transfer Summary", expanded=True):
         total_score = max(0, min(100, int(st.session_state.score)))
         effectiveness = total_score
 
@@ -196,6 +197,7 @@ with col2:
 
         # --- Resource efficiency (still random for now) ---
         resource_efficiency = random.randint(50, 95)
+
 
                     if total_score >= 85:
                         outcome, color = "🏆 Excellent", "#2ecc71"
