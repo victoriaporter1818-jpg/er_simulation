@@ -177,8 +177,8 @@ with col2:
                 ["-- Select --", "Discharge", "Send to Surgery", "Send to ICU"],
                 key="transfer_destination"
             )
-        if st.button("Confirm Transfer", key="confirm_transfer"):
-    with st.expander("🏁 Patient Transfer Summary", expanded=True):
+            if st.button("Confirm Transfer", key="confirm_transfer"):
+        with st.expander("🏁 Patient Transfer Summary", expanded=True):
         total_score = max(0, min(100, int(st.session_state.score)))
         effectiveness = total_score
 
