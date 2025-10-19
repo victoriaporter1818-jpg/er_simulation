@@ -108,6 +108,24 @@ def update_vitals(effect):
     st.session_state.patient["vitals"] = vitals
 
 # --------------------------------------
+# PASSIVE PATIENT DETERIORATION OVER TIME
+# --------------------------------------
+def gradual_deterioration():
+    """Slowly worsens vitals if too much time passes without treatment."""
+    if "last_update" not in st.session_state:
+        st.session_state.last_update = time.time()
+        return
+
+    now = time.time()
+    elapsed = now - st.session_state.last_update
+
+    # Every 45 seconds without treatment = mild deterioration
+    if elapsed > 45:
+        update_vitals("worsen")
+        st.session_state.last_update = now
+        st.toast("⏳ Patient condition is deteriorating due to delay!", icon="⚠️")
+
+# --------------------------------------
 # SIDEBAR
 # --------------------------------------
 with st.sidebar:
