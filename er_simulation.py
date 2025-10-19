@@ -10,6 +10,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+st.experimental_autorefresh(interval=2000, key="ecg_refresh")  # refresh every 2 seconds
 
 # --------------------------------------
 # STYLE FOR TRANSFER MODAL
