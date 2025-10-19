@@ -337,7 +337,7 @@ with col2:
                             else:
                                 st.warning(f"{med} already in inventory.")
                                 
-    # ---------------- DIAGNOSTIC LAB ----------------
+        # ---------------- DIAGNOSTIC LAB ----------------
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
 
@@ -346,6 +346,7 @@ with col2:
         to confirm or refine your diagnosis.
         """)
 
+        # Define possible tests and their descriptions
         diagnostic_tests = {
             "ECG": "Detects abnormal heart rhythms and signs of heart attack.",
             "Chest X-Ray": "Reveals lung infections or fluid accumulation.",
@@ -354,22 +355,48 @@ with col2:
             "Urinalysis": "Detects infection or metabolic issues."
         }
 
-        for test_name, description in diagnostic_tests.items():
-            with st.expander(test_name):
-                st.write(description)
-                if st.button(f"Run {test_name}", key=f"test_{test_name}"):
-                    results = {
-                        "ECG": "Abnormal ST elevation — consistent with myocardial infarction.",
-                        "Chest X-Ray": "Patchy infiltrates in lower lobes — suggests pneumonia.",
-                        "CT Scan": "Left MCA ischemic region visible — indicates stroke.",
-                        "Blood Test": "Elevated WBC count and CRP — likely infection.",
-                        "Urinalysis": "Normal — no infection or glucose present."
-                    }
-                    result_text = results.get(test_name, "Results pending.")
-                    st.session_state.treatment_history.append(f"Ran {test_name}. Result: {result_text}")
-                    st.success(f"🧾 {test_name} completed.\n\n**Result:** {result_text}")
-                    st.toast(f"✅ {test_name} completed!", icon="🧪")
-                    st.rerun()
+        # Define which tests are best for each diagnosis
+        correct_tests = {
+            "Heart attack": ["ECG", "Blood Test"],
+            "Pneumonia": ["Chest X-Ray", "Blood Test"],
+            "Stroke": ["CT Scan", "Blood Test"]
+        }
+
+        # Display each test nicely in two-column layout
+        test_items = list(diagnostic_tests.items())
+        for i in range(0, len(test_items), 2):
+            colA, colB = st.columns(2)
+            for col, (test_name, description) in zip((colA, colB), test_items[i:i+2]):
+                with col.expander(test_name):
+                    st.write(description)
+                    if st.button(f"Run {test_name}", key=f"test_{test_name.replace(' ', '_')}"):
+                        p = st.session_state.patient
+                        diagnosis = p["diagnosis"] if p else None
+
+                        # Define result messages
+                        results = {
+                            "ECG": "Abnormal ST elevation — consistent with myocardial infarction.",
+                            "Chest X-Ray": "Patchy infiltrates in lower lobes — suggests pneumonia.",
+                            "CT Scan": "Left MCA ischemic region visible — indicates stroke.",
+                            "Blood Test": "Elevated WBC count and CRP — likely infection.",
+                            "Urinalysis": "Normal — no infection or glucose present."
+                        }
+
+                        result_text = results.get(test_name, "Results pending.")
+                        feedback = f"🧾 {test_name} completed.\n\n**Result:** {result_text}"
+
+                        # Scoring logic
+                        if diagnosis and test_name in correct_tests.get(diagnosis, []):
+                            st.session_state.score += 7
+                            feedback += " ✅ Correct test ordered! (+7 points)"
+                        else:
+                            feedback += " ⚠️ Test provided limited diagnostic value."
+
+                        st.session_state.treatment_history.append(f"Ran {test_name}. {feedback}")
+                        st.success(feedback)
+                        st.toast(f"✅ {test_name} completed!", icon="🧪")
+                        st.rerun()
+
 
 
 # ---- RIGHT COLUMN ----
