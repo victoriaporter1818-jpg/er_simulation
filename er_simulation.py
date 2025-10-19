@@ -576,15 +576,40 @@ with col3:
         st.write(f"**Symptoms:** {p.get('symptoms', 'N/A')}")
 
         # Safely show vitals
-        vitals = p.get("vitals", {})
-        if vitals:
-            st.subheader("🩺 Patient Vitals")
-            st.write(f"**BP:** {vitals.get('BP', 'N/A')}")
-            st.write(f"**HR:** {vitals.get('HR', 'N/A')}")
-            st.write(f"**O2:** {vitals.get('O2', 'N/A')}")
-            st.write(f"**Temp:** {vitals.get('Temp', 'N/A')}")
-        else:
-            st.warning("⚠️ No vitals available.")
+vitals = p.get("vitals", {})
+if vitals:
+    st.subheader("🩺 Patient Vitals")
+
+    def color_vital(label, value, normal_range=None, suffix=""):
+        """Render a vital with colored indicator depending on whether it's normal."""
+        try:
+            # Extract numeric value for comparison
+            if isinstance(value, str) and "%" in value:
+                numeric = int(value.strip("%"))
+            elif isinstance(value, str) and "/" in value:
+                systolic, diastolic = map(int, value.split("/"))
+                numeric = (systolic + diastolic) // 2
+            else:
+                numeric = int(value)
+        except:
+            numeric = 0
+
+        # Determine status color
+        color = "🟢"
+        if normal_range:
+            if numeric < normal_range[0]:
+                color = "🟠"
+            elif numeric > normal_range[1]:
+                color = "🔴"
+
+        return f"{color} **{label}:** {value}{suffix}"
+
+    st.markdown(color_vital("BP", vitals.get("BP", "N/A"), (90, 140)))
+    st.markdown(color_vital("HR", vitals.get("HR", "N/A"), (60, 110)))
+    st.markdown(color_vital("O₂", vitals.get("O2", "N/A"), (92, 100), "%"))
+    st.markdown(f"**Temp:** {vitals.get('Temp', 'N/A')}")
+else:
+    st.warning("⚠️ No vitals available.")
 
         # Treatment history section
         st.subheader("🧾 Treatment History")
