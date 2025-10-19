@@ -562,6 +562,81 @@ with col3:
         st.write(f"**Age:** {p.get('age', 'N/A')}")
         st.write(f"**Symptoms:** {p.get('symptoms', 'N/A')}")
 
+        # ==== REAL-TIME MONITOR PANEL ====
+if p and "vitals" in p:
+    st.markdown("<h4>📺 Real-Time Monitor</h4>", unsafe_allow_html=True)
+
+    # Generate a simple animated ECG waveform
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(4, 1))
+    x = np.linspace(0, 2*np.pi, 200)
+    # heartbeat-like wave
+    phase = (time.time() % 2) * np.pi
+    y = 0.1*np.sin(8*x + phase) + 0.02*np.sin(60*x + phase*2)
+    ax.plot(x, y, color="#2ecc71", lw=2)
+    ax.set_ylim(-0.3, 0.3)
+    ax.axis("off")
+    st.pyplot(fig, use_container_width=True)
+
+    # Extract vitals safely
+    vitals = p["vitals"]
+    try:
+        hr = int(vitals.get("HR", 0))
+        o2 = int(vitals.get("O2", "0%").strip("%"))
+        temp_str = str(vitals.get("Temp", "0")).replace("°C", "")
+        temp = float(temp_str)
+    except Exception:
+        hr, o2, temp = 0, 0, 0
+
+    # Color-coded readouts
+    hr_color = "🟢"
+    if hr < 50 or hr > 120:
+        hr_color = "🔴"
+    elif hr < 60 or hr > 100:
+        hr_color = "🟠"
+
+    o2_color = "🟢"
+    if o2 < 85:
+        o2_color = "🔴"
+    elif o2 < 92:
+        o2_color = "🟠"
+
+    temp_color = "🟢"
+    if temp < 36 or temp > 38.5:
+        temp_color = "🟠"
+    if temp < 35 or temp > 39.5:
+        temp_color = "🔴"
+
+    st.markdown(
+        f"""
+        **{hr_color} Heart Rate:** {hr} bpm  
+        **{o2_color} O₂ Sat:** {o2}%  
+        **{temp_color} Temp:** {temp:.1f} °C
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Warning banner
+    warn_msgs = []
+    if hr < 50:
+        warn_msgs.append("Bradycardia – HR < 50 bpm")
+    elif hr > 120:
+        warn_msgs.append("Tachycardia – HR > 120 bpm")
+    if o2 < 90:
+        warn_msgs.append("Hypoxia – O₂ < 90%")
+    if temp > 39:
+        warn_msgs.append("High Fever")
+    if temp < 35:
+        warn_msgs.append("Hypothermia")
+
+    if warn_msgs:
+        st.markdown(
+            f"<div style='background:#e74c3c;color:white;padding:6px;border-radius:6px;'>⚠️ {' | '.join(warn_msgs)}</div>",
+            unsafe_allow_html=True,
+        )
+
         # Safely show vitals (color-coded + pulse indicator)
         vitals = p.get("vitals", {})
         if vitals:
