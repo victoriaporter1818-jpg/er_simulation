@@ -1,119 +1,40 @@
-import streamlit as st
-import random
-
-# --------------------------------------
-# PAGE CONFIGURATION
-# --------------------------------------
-st.set_page_config(
-    page_title="Emergency Room Simulation",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# --------------------------------------
-# GLOBAL CSS (layout, spacing, overlay)
-# --------------------------------------
-st.markdown("""
-<style>
-/* Tighten global padding to maximize horizontal space */
-main[data-testid="stAppViewContainer"] { padding: 0 !important; }
-.block-container { padding: 1rem 1.5rem !important; }
-
-/* Columns: small gutter between center and right */
-div[data-testid="stHorizontalBlock"] { gap: 0.75rem !important; }
-
-/* Make center column hug the left (near sidebar) without big gap */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-/* ---------- Transfer Overlay (cinematic, solid white panel) ---------- */
-#overlay-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(10, 20, 30, 0.35);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 9999;
-  animation: fadeIn 250ms ease-out forwards;
-}
-
-#overlay-panel {
-  width: min(860px, 92vw);
-  border-radius: 16px;
-  background: #ffffff; /* SOLID white per request */
-  box-shadow: 0 18px 60px rgba(0,0,0,0.25);
-  overflow: hidden;
-  transform: translateY(24px);
-  opacity: 0;
-  animation: slideUp 320ms ease-out forwards;
-}
-
-/* Colored header strip — color injected inline via Python */
-.overlay-head {
-  padding: 14px 18px;
-  color: #0f172a;
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.2px;
-  background: var(--outcomeColor, #e2e8f0);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-}
-
-/* Body */
-.overlay-body {
-  padding: 16px 18px 10px 18px;
-}
-
-.overlay-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.overlay-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 12px 14px;
-  background: #fff;
-}
-
-.overlay-footer {
-  display: flex; gap: 8px; justify-content: flex-end;
-  padding: 8px 18px 16px 18px;
-}
-
-/* Buttons look */
-.btn-primary {
-  background: #2563eb; color: white; border: none;
-  padding: 9px 14px; border-radius: 10px; font-weight: 600;
-}
-.btn-secondary {
-  background: #f3f4f6; color: #111827; border: 1px solid #e5e7eb;
-  padding: 9px 14px; border-radius: 10px; font-weight: 600;
-}
-
-/* Keyframes */
-@keyframes fadeIn {
-  from { opacity: 0 }
-  to   { opacity: 1 }
-}
-@keyframes slideUp {
-  from { transform: translateY(24px); opacity: 0 }
-  to   { transform: translateY(0);    opacity: 1 }
-(cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/er_simulation.py b/er_simulation.py
-index 234b1dadc952b1561777414fc197a4090993735f..73e9491c3c8c449bc891f04eecca27cc641eaabd 100644
+index 234b1dadc952b1561777414fc197a4090993735f..8c0b8c19c12ab7854c06252e2c7d3e80f35c6815 100644
 --- a/er_simulation.py
 +++ b/er_simulation.py
-@@ -105,85 +105,86 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
-(cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/er_simulation.py b/er_simulation.py
-index 234b1dadc952b1561777414fc197a4090993735f..c0a07dcdd0385c186f70e3c6e36665de7ec2b465 100644
---- a/er_simulation.py
-+++ b/er_simulation.py
-@@ -105,85 +105,128 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+@@ -1,28 +1,30 @@
+-import streamlit as st
+ import random
+ 
++import streamlit as st
++import streamlit.components.v1 as components
++
+ # --------------------------------------
+ # PAGE CONFIGURATION
+ # --------------------------------------
+ st.set_page_config(
+     page_title="Emergency Room Simulation",
+     layout="wide",
+     initial_sidebar_state="expanded"
+ )
+ 
+ # --------------------------------------
+ # GLOBAL CSS (layout, spacing, overlay)
+ # --------------------------------------
+ st.markdown("""
+ <style>
+ /* Tighten global padding to maximize horizontal space */
+ main[data-testid="stAppViewContainer"] { padding: 0 !important; }
+ .block-container { padding: 1rem 1.5rem !important; }
+ 
+ /* Columns: small gutter between center and right */
+ div[data-testid="stHorizontalBlock"] { gap: 0.75rem !important; }
+ 
+ /* Make center column hug the left (near sidebar) without big gap */
+ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+   margin-left: 0 !important;
+   padding-left: 0 !important;
+@@ -105,85 +107,128 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
  }
  
  /* Color tags for room sections */
@@ -255,7 +176,7 @@ index 234b1dadc952b1561777414fc197a4090993735f..c0a07dcdd0385c186f70e3c6e36665de
  # --------------------------------------
  # SUPPLY ROOM ITEMS (GROUPED & COLORED)
  # --------------------------------------
-@@ -234,63 +277,123 @@ med_categories = {
+@@ -234,63 +279,123 @@ med_categories = {
          "Ondansetron": "Used to prevent nausea and vomiting."
      },
      "Neurological": {
@@ -380,7 +301,7 @@ index 234b1dadc952b1561777414fc197a4090993735f..c0a07dcdd0385c186f70e3c6e36665de
  
      # --------------------------- ER ROOM ---------------------------
      if st.session_state.room == "ER":
-@@ -419,73 +522,114 @@ with col2:
+@@ -419,73 +524,114 @@ with col2:
  
      # --------------------------- MEDSTATION ---------------------------
      elif st.session_state.room == "Medstation":
@@ -494,6 +415,51 @@ index 234b1dadc952b1561777414fc197a4090993735f..c0a07dcdd0385c186f70e3c6e36665de
          <div class="overlay-head" style="--outcomeColor:{color}">
            Patient Transfer Summary — <span style="opacity:.9">Score: {total_score}/100</span>
          </div>
-         <div class="overlay-body"> 
-EOF
-)
+         <div class="overlay-body">
+@@ -502,45 +648,45 @@ if st.session_state.get("show_summary", False):
+             <div class="overlay-card">
+               <div style="font-weight:700; margin-bottom:6px;">Diagnostic Accuracy</div>
+               <div style="height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;">
+                 <div style="height:10px;width:{diag}%;background:#60a5fa;"></div>
+               </div>
+             </div>
+             <div class="overlay-card">
+               <div style="font-weight:700; margin-bottom:6px;">Resource Management</div>
+               <div style="height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;">
+                 <div style="height:10px;width:{res}%;background:#f59e0b;"></div>
+               </div>
+             </div>
+             <div class="overlay-card">
+               <div style="font-weight:700; margin-bottom:6px;">Quick Tips</div>
+               <div style="color:#475569;">
+                 Keep stabilizing ABCs, reassess vitals, and match interventions to likely etiology.
+                 Consider earlier imaging and avoid redundant meds.
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+     """
+ 
+-    st.html(overlay_html)  # ✅ Renders as styled HTML
++    components.html(overlay_html, height=620)  # ✅ Renders as styled HTML
+ 
+     footer_cols = st.columns([5, 1.2, 1.6])
+     with footer_cols[1]:
+         cancel = st.button("Close", key="close_overlay")
+     with footer_cols[2]:
+         new_case = st.button("🆕 Start New Case", key="overlay_new_case")
+ 
+     if new_case:
+         st.session_state.patient = None
+         st.session_state.treatment_history = []
+         st.session_state.score = 0
+         st.session_state.show_summary = False
+         st.session_state.summary_payload = {}
+         st.rerun()
+ 
+     if cancel:
+         st.session_state.show_summary = False
+         st.session_state.summary_payload = {}
+         st.rerun()
