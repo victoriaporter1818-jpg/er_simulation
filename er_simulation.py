@@ -75,8 +75,8 @@ with st.sidebar:
     st.header("🏥 Emergency Room Simulation")
     difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"])
     role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist"])
-    rooms = ["ER", "Supply Room", "Medstation"]
-    st.session_state.room = st.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
+    rooms = ["ER", "Supply Room", "Medstation", "Diagnostic Lab"]
+    st.session_state.room = st.radio("Select a Room", rooms, index=rooms.index(st.session_state.room) if st.session_state.room in rooms else 0)
 
     st.write("---")
     st.subheader("📦 Current Inventory")
