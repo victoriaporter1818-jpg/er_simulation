@@ -690,9 +690,9 @@ if p and "vitals" in p:
             st.warning("⚠️ No vitals available.")
 
         # Soft auto-refresh fallback (no extra deps)
-if st.session_state.get("patient"):
-    time.sleep(3)
-    st.experimental_rerun()
+        if st.session_state.get("patient"):
+            time.sleep(3)
+            st.experimental_rerun()
 
         # Treatment history
         st.subheader("🧾 Treatment History")
