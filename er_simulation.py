@@ -336,6 +336,41 @@ with col2:
                                 st.rerun()
                             else:
                                 st.warning(f"{med} already in inventory.")
+                                
+    # ---------------- DIAGNOSTIC LAB ----------------
+    elif st.session_state.room == "Diagnostic Lab":
+        st.header("🧪 Diagnostic Lab")
+
+        st.markdown("""
+        Welcome to the Diagnostic Lab. Here you can order and review test results
+        to confirm or refine your diagnosis.
+        """)
+
+        diagnostic_tests = {
+            "ECG": "Detects abnormal heart rhythms and signs of heart attack.",
+            "Chest X-Ray": "Reveals lung infections or fluid accumulation.",
+            "CT Scan": "Helps identify strokes or internal bleeding.",
+            "Blood Test": "Analyzes infection, glucose, and clotting levels.",
+            "Urinalysis": "Detects infection or metabolic issues."
+        }
+
+        for test_name, description in diagnostic_tests.items():
+            with st.expander(test_name):
+                st.write(description)
+                if st.button(f"Run {test_name}", key=f"test_{test_name}"):
+                    results = {
+                        "ECG": "Abnormal ST elevation — consistent with myocardial infarction.",
+                        "Chest X-Ray": "Patchy infiltrates in lower lobes — suggests pneumonia.",
+                        "CT Scan": "Left MCA ischemic region visible — indicates stroke.",
+                        "Blood Test": "Elevated WBC count and CRP — likely infection.",
+                        "Urinalysis": "Normal — no infection or glucose present."
+                    }
+                    result_text = results.get(test_name, "Results pending.")
+                    st.session_state.treatment_history.append(f"Ran {test_name}. Result: {result_text}")
+                    st.success(f"🧾 {test_name} completed.\n\n**Result:** {result_text}")
+                    st.toast(f"✅ {test_name} completed!", icon="🧪")
+                    st.rerun()
+
 
 # ---- RIGHT COLUMN ----
 with col3:
