@@ -179,9 +179,9 @@ with col2:
             )
             
             if st.button("Confirm Transfer", key="confirm_transfer"):
-    with st.expander("🏁 Patient Transfer Summary", expanded=True):
-        total_score = max(0, min(100, int(st.session_state.score)))
-        effectiveness = total_score
+        with st.expander("🏁 Patient Transfer Summary", expanded=True):
+            total_score = max(0, min(100, int(st.session_state.score)))
+            effectiveness = total_score
 
         # --- Diagnostic accuracy calculation ---
         history = st.session_state.get("treatment_history", [])
