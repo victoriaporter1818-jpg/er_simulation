@@ -435,13 +435,17 @@ with col2:
 # ---- RIGHT COLUMN ----
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
-    if st.session_state.patient:
-        p = st.session_state.patient
-        st.write(f"**Name:** {p['name']}")
-        st.write(f"**Age:** {p['age']}")
-        st.write(f"**Symptoms:** {p['symptoms']}")
-        if "vitals" in p and p["vitals"]:
-            vitals = p["vitals"]
+
+    # Safely check for patient object
+    p = st.session_state.get("patient")
+    if p:
+        st.write(f"**Name:** {p.get('name', 'Unknown')}")
+        st.write(f"**Age:** {p.get('age', 'N/A')}")
+        st.write(f"**Symptoms:** {p.get('symptoms', 'N/A')}")
+
+        # Safely show vitals
+        vitals = p.get("vitals", {})
+        if vitals:
             st.subheader("🩺 Patient Vitals")
             st.write(f"**BP:** {vitals.get('BP', 'N/A')}")
             st.write(f"**HR:** {vitals.get('HR', 'N/A')}")
@@ -449,13 +453,19 @@ with col3:
             st.write(f"**Temp:** {vitals.get('Temp', 'N/A')}")
         else:
             st.warning("⚠️ No vitals available.")
-        st.subheader("Treatment History")
-        if st.session_state.treatment_history:
-            for t in st.session_state.treatment_history:
+
+        # Treatment history section
+        st.subheader("🧾 Treatment History")
+        history = st.session_state.get("treatment_history", [])
+        if history:
+            for t in history:
                 st.write(t)
         else:
-            st.write("No treatments yet.")
+            st.info("No treatments yet.")
+
     else:
         st.info("No active patient.")
+
+    # Always show score at bottom
     st.subheader("🏆 Score")
-    st.metric("Total Score", st.session_state.score)
+    st.metric("Total Score", st.session_state.get("score", 0))
