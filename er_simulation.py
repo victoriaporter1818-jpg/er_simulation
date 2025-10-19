@@ -337,7 +337,7 @@ with col2:
                             else:
                                 st.warning(f"{med} already in inventory.")
                                 
-                # ---------------- DIAGNOSTIC LAB ----------------
+                    # ---------------- DIAGNOSTIC LAB ----------------
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
 
@@ -386,7 +386,7 @@ with col2:
         # ---- Imaging column ----
         with col_imaging:
             st.markdown(
-                "<h4 style='background-color:#d0f0fd;padding:6px;border-radius:8px;'>Diagnostic Imaging</h4>",
+                "<h4 style='background-color:#fff176;padding:6px;border-radius:8px;'>Diagnostic Imaging</h4>",
                 unsafe_allow_html=True
             )
             for test_name, desc in imaging_tests.items():
@@ -415,7 +415,7 @@ with col2:
         # ---- Lab Tests column ----
         with col_lab:
             st.markdown(
-                "<h4 style='background-color:#ffe0d0;padding:6px;border-radius:8px;'>Laboratory Tests</h4>",
+                "<h4 style='background-color:#a5d6a7;padding:6px;border-radius:8px;'>Laboratory Tests</h4>",
                 unsafe_allow_html=True
             )
             for test_name, desc in lab_tests.items():
