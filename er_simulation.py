@@ -178,11 +178,24 @@ with col2:
                 key="transfer_destination"
             )
             if st.button("Confirm Transfer", key="confirm_transfer"):
-                with st.expander("🏁 Patient Transfer Summary", expanded=True):
-                    total_score = max(0, min(100, int(st.session_state.score)))
-                    effectiveness = total_score
-                    diagnostic_accuracy = random.randint(60, 100)
-                    resource_efficiency = random.randint(50, 95)
+    with st.expander("🏁 Patient Transfer Summary", expanded=True):
+        total_score = max(0, min(100, int(st.session_state.score)))
+        effectiveness = total_score
+
+        # --- Diagnostic accuracy calculation ---
+        history = st.session_state.get("treatment_history", [])
+        correct_diagnostics = sum(
+            ("✅" in entry and "test" in entry.lower()) for entry in history
+        )
+        incorrect_diagnostics = sum(
+            ("⚠️" in entry and "test" in entry.lower()) for entry in history
+        )
+
+        diagnostic_accuracy = 60 + (10 * correct_diagnostics) - (5 * incorrect_diagnostics)
+        diagnostic_accuracy = max(0, min(diagnostic_accuracy, 100))
+
+        # --- Resource efficiency (still random for now) ---
+        resource_efficiency = random.randint(50, 95)
 
                     if total_score >= 85:
                         outcome, color = "🏆 Excellent", "#2ecc71"
