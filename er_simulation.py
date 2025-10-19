@@ -102,7 +102,7 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
 @keyframes slideUp {
   from { transform: translateY(24px); opacity: 0 }
   to   { transform: translateY(0);    opacity: 1 }
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+(cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/er_simulation.py b/er_simulation.py
 index 234b1dadc952b1561777414fc197a4090993735f..73e9491c3c8c449bc891f04eecca27cc641eaabd 100644
 --- a/er_simulation.py
