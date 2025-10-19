@@ -170,8 +170,11 @@ with col2:
                     if selected_item in correct_uses.get(diagnosis, []):
                         st.session_state.score += 5
                         feedback = f"✅ Correct use! {selected_item} was appropriate. (+5 points)"
+                        update_vitals("improve")
                     else:
                         feedback = f"⚠️ {selected_item} had limited effect."
+                        update_vitals("worsen")
+
                     st.session_state.treatment_history.append(f"Used {selected_item} on {p['name']}. {feedback}")
                     st.session_state.inventory.remove(selected_item)
                     st.success(feedback)
@@ -179,14 +182,6 @@ with col2:
                     st.rerun()
             else:
                 st.info("No available supplies in your inventory to use.")
-
-            if selected_item in correct_uses.get(diagnosis, []):
-    st.session_state.score += 5
-    feedback = f"✅ Correct use! {selected_item} was appropriate. (+5 points)"
-    update_vitals("improve")
-else:
-    feedback = f"⚠️ {selected_item} had limited effect."
-    update_vitals("worsen")
 
             # ---------------- GIVE MEDICATION ----------------
             meds_in_inventory = [m for m in st.session_state.inventory if m.lower() in [
@@ -206,8 +201,11 @@ else:
                     if selected_med in correct_meds.get(diagnosis, []):
                         st.session_state.score += 10
                         feedback = f"💊 Correct treatment! {selected_med} helped improve the patient's condition. (+10 points)"
+                        update_vitals("improve")
                     else:
                         feedback = f"⚠️ {selected_med} was not very effective for this condition."
+                        update_vitals("worsen")
+
                     st.session_state.treatment_history.append(f"Gave {selected_med} to {p['name']}. {feedback}")
                     st.session_state.inventory.remove(selected_med)
                     st.success(feedback)
@@ -216,13 +214,44 @@ else:
             else:
                 st.info("No medications available in your inventory.")
 
-            if selected_med in correct_meds.get(diagnosis, []):
-    st.session_state.score += 10
-    feedback = f"💊 Correct treatment! {selected_med} helped improve the patient's condition. (+10 points)"
-    update_vitals("improve")
-else:
-    feedback = f"⚠️ {selected_med} was not very effective for this condition."
-    update_vitals("worsen")
+            # ---------------- TRANSFER PATIENT ----------------
+            st.subheader("🏥 Transfer Patient")
+
+            transfer_option = st.selectbox(
+                "Select Transfer Destination:",
+                ["-- Select --", "Discharge", "Send to Surgery", "Send to ICU"],
+                key="transfer_destination"
+            )
+
+            if st.button("Confirm Transfer", key="confirm_transfer"):
+                with st.expander("🏁 Patient Transfer Summary", expanded=True):
+                    total_score = max(0, min(100, int(st.session_state.score)))
+                    effectiveness = total_score
+                    history = st.session_state.get("treatment_history", [])
+
+                    correct_diagnostics = sum(("✅" in e and "test" in e.lower()) for e in history)
+                    incorrect_diagnostics = sum(("⚠️" in e and "test" in e.lower()) for e in history)
+
+                    diagnostic_accuracy = 60 + (10 * correct_diagnostics) - (5 * incorrect_diagnostics)
+                    diagnostic_accuracy = max(0, min(diagnostic_accuracy, 100))
+                    resource_efficiency = random.randint(50, 95)
+
+                    if total_score >= 85:
+                        outcome, color = "🏆 Excellent", "#2ecc71"
+                    elif total_score >= 70:
+                        outcome, color = "🙂 Good", "#27ae60"
+                    elif total_score >= 50:
+                        outcome, color = "⚠️ Fair", "#f1c40f"
+                    else:
+                        outcome, color = "💀 Poor", "#e74c3c"
+
+                    st.markdown(
+                        f"<h3 style='text-align:center;color:{color};margin-bottom:0;'>"
+                        f"{outcome} — Score: {total_score}/100"
+                        f"</h3>",
+                        unsafe_allow_html=True
+                    )
+                    st.caption(f"Transfer decision: **{transfer_option}**")
 
             # ---------------- TRANSFER PATIENT ----------------
             st.subheader("🏥 Transfer Patient")
