@@ -1,5 +1,7 @@
-import streamlit as st
 import random
+
+import streamlit as st
+import streamlit.components.v1 as components
 
 # --------------------------------------
 # PAGE CONFIGURATION
@@ -127,7 +129,7 @@ if "patient" not in st.session_state:
 if "treatment_history" not in st.session_state:
     st.session_state.treatment_history = []
 if "test_results" not in st.session_state:
-    st.session_state.test_results = None
+    st.session_state.test_results = []
 if "next_patient_button_clicked" not in st.session_state:
     st.session_state.next_patient_button_clicked = False
 # overlay state
@@ -140,18 +142,60 @@ if "summary_payload" not in st.session_state:
 # PATIENT DATA
 # --------------------------------------
 patients = [
-    {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath",
-     "vitals": {"BP": "90/60", "HR": 120, "O2": "85%", "Temp": "37.0°C"},
-     "diagnosis": "Heart attack",
-     "medical_history": {"Allergies": "None", "Past Surgeries": "None", "Current Medications": "None", "Chronic Conditions": "None"}},
-    {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen",
-     "vitals": {"BP": "110/70", "HR": 95, "O2": "88%", "Temp": "39.2°C"},
-     "diagnosis": "Pneumonia",
-     "medical_history": {"Allergies": "Penicillin", "Past Surgeries": "Appendectomy", "Current Medications": "Ibuprofen", "Chronic Conditions": "Asthma"}},
-    {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech",
-     "vitals": {"BP": "150/90", "HR": 82, "O2": "97%", "Temp": "36.8°C"},
-     "diagnosis": "Stroke",
-     "medical_history": {"Allergies": "None", "Past Surgeries": "Knee Replacement", "Current Medications": "Aspirin", "Chronic Conditions": "Hypertension"}},
+    {
+        "name": "John Doe",
+        "age": 45,
+        "symptoms": "severe chest pain and shortness of breath",
+        "vitals": {
+            "BP": "90/60",
+            "HR": 120,
+            "O2": "85%",
+            "Temp": "37.0°C",
+        },
+        "diagnosis": "Heart attack",
+        "medical_history": {
+            "Allergies": "None",
+            "Past Surgeries": "None",
+            "Current Medications": "None",
+            "Chronic Conditions": "None",
+        },
+    },
+    {
+        "name": "Sarah Li",
+        "age": 29,
+        "symptoms": "high fever, cough, and low oxygen",
+        "vitals": {
+            "BP": "110/70",
+            "HR": 95,
+            "O2": "88%",
+            "Temp": "39.2°C",
+        },
+        "diagnosis": "Pneumonia",
+        "medical_history": {
+            "Allergies": "Penicillin",
+            "Past Surgeries": "Appendectomy",
+            "Current Medications": "Ibuprofen",
+            "Chronic Conditions": "Asthma",
+        },
+    },
+    {
+        "name": "Carlos Vega",
+        "age": 60,
+        "symptoms": "sudden weakness on one side and slurred speech",
+        "vitals": {
+            "BP": "150/90",
+            "HR": 82,
+            "O2": "97%",
+            "Temp": "36.8°C",
+        },
+        "diagnosis": "Stroke",
+        "medical_history": {
+            "Allergies": "None",
+            "Past Surgeries": "Knee Replacement",
+            "Current Medications": "Aspirin",
+            "Chronic Conditions": "Hypertension",
+        },
+    },
 ]
 
 # --------------------------------------
@@ -162,6 +206,7 @@ def assign_patient():
     st.session_state.patient = patient
     st.session_state.treatment_history = []
     st.session_state.score = 0  # reset score per new case
+    st.session_state.test_results = []
 
 def compute_summary(score: int):
     total = max(0, min(100, int(score)))
@@ -257,6 +302,66 @@ med_color_map = {
 }
 
 # --------------------------------------
+# DIAGNOSTIC LAB (GROUPED & COLORED)
+# --------------------------------------
+diagnostic_tests = {
+    "Imaging": {
+        "Chest X-Ray": "Visualizes lungs, heart, and chest structures to assess respiratory distress.",
+        "CT Scan": "Provides detailed imaging for suspected stroke or internal injuries.",
+        "ECG": "Captures electrical activity of the heart to identify cardiac events."
+    },
+    "Laboratory": {
+        "Cardiac Enzymes": "Measures troponin levels to detect myocardial injury.",
+        "CBC": "Evaluates infection or anemia via complete blood count.",
+        "Blood Gas": "Analyzes oxygenation and acid-base status from arterial blood."
+    },
+    "Rapid Tests": {
+        "Viral Panel": "Screens for viral pathogens causing respiratory symptoms.",
+        "Rapid Strep": "Detects group A strep for throat infections.",
+        "D-Dimer": "Helps assess clot formation or pulmonary embolism risk."
+    }
+}
+
+diagnostic_color_map = {
+    "Imaging": "#e0f2fe",
+    "Laboratory": "#fef3c7",
+    "Rapid Tests": "#ede9fe"
+}
+
+diagnostic_results_map = {
+    "Heart attack": {
+        "ECG": "ST elevations noted in leads II, III, aVF indicative of inferior MI.",
+        "Cardiac Enzymes": "Troponin I markedly elevated at 3.2 ng/mL.",
+        "CT Scan": "No acute intracranial findings; ordered to rule out stroke mimics.",
+        "Blood Gas": "Mild metabolic acidosis with lactate of 3.1 mmol/L.",
+        "D-Dimer": "Within normal range, low suspicion for PE."
+    },
+    "Pneumonia": {
+        "Chest X-Ray": "Right lower lobe consolidation with air bronchograms.",
+        "CBC": "Leukocytosis at 15k with left shift.",
+        "Blood Gas": "PaO2 62 mmHg on room air indicating hypoxemia.",
+        "Viral Panel": "Negative for influenza A/B; COVID-19 PCR pending.",
+        "Rapid Strep": "Negative result."
+    },
+    "Stroke": {
+        "CT Scan": "Hypodensity in left MCA territory consistent with acute ischemic stroke.",
+        "ECG": "Atrial fibrillation with rapid ventricular response.",
+        "CBC": "Within normal limits.",
+        "D-Dimer": "Elevated at 820 ng/mL — consider concurrent thrombotic process.",
+        "Blood Gas": "Normal acid-base status.",
+        "Cardiac Enzymes": "Slightly elevated troponin at 0.08 ng/mL from demand ischemia."
+    }
+}
+
+
+def get_diagnostic_result(test_name: str, patient: dict) -> str:
+    if not patient:
+        return "No patient assigned."
+    diagnosis = patient.get("diagnosis")
+    diagnosis_results = diagnostic_results_map.get(diagnosis, {})
+    return diagnosis_results.get(test_name, "Result pending; follow up with the lab soon.")
+
+# --------------------------------------
 # SIDEBAR
 # --------------------------------------
 with st.sidebar:
@@ -268,7 +373,7 @@ with st.sidebar:
     role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist"], key="role")
     st.write(f"Selected Role: {role}")
 
-    rooms = ["ER", "Supply Room", "Medstation"]
+    rooms = ["ER", "Supply Room", "Medstation", "Diagnostic Lab"]
     st.session_state.room = st.radio("Select a Room", rooms, index=rooms.index(st.session_state.room))
 
     st.write("---")
@@ -441,6 +546,41 @@ with col2:
                                 st.warning(f"{med} already in inventory.")
                                 st.toast(f"⚠️ {med} already in inventory.", icon="⚠️")
 
+    # --------------------------- DIAGNOSTIC LAB ---------------------------
+    elif st.session_state.room == "Diagnostic Lab":
+        st.header("🧪 Diagnostic Lab")
+        patient = st.session_state.patient
+        if not patient:
+            st.info("Assign a patient in the ER to order diagnostic tests.")
+        else:
+            st.write(
+                "Order imaging, laboratory, or rapid tests to gather more data for your working diagnosis."
+            )
+            for category, tests in diagnostic_tests.items():
+                st.markdown(
+                    f"<h4 class='room-tag' style='background:{diagnostic_color_map[category]}'>{category}</h4>",
+                    unsafe_allow_html=True
+                )
+                test_items = list(tests.items())
+                for i in range(0, len(test_items), 2):
+                    colA, colB = st.columns(2)
+                    for col, (test_name, desc) in zip((colA, colB), test_items[i:i+2]):
+                        with col.expander(test_name):
+                            st.write(desc)
+                            if st.button(
+                                f"Order {test_name}",
+                                key=f"diagnostic_{category}_{test_name}"
+                            ):
+                                result_text = get_diagnostic_result(test_name, patient)
+                                st.session_state.test_results.append(
+                                    {"test": test_name, "result": result_text}
+                                )
+                                st.session_state.treatment_history.append(
+                                    f"Ordered {test_name}. Result: {result_text}"
+                                )
+                                st.success(f"Results received for {test_name}.")
+                                st.toast(f"🧪 {test_name} results ready!", icon="🧪")
+
 # ---- RIGHT COLUMN ----
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
@@ -464,6 +604,12 @@ with col3:
                 st.write(t)
         else:
             st.write("No treatments administered yet.")
+        st.subheader("🔬 Diagnostic Results")
+        if st.session_state.test_results:
+            for result in st.session_state.test_results:
+                st.write(f"**{result['test']}:** {result['result']}")
+        else:
+            st.write("No diagnostic tests ordered yet.")
     else:
         st.info("No active patient.")
     st.subheader("🏆 Score")
@@ -524,7 +670,7 @@ if st.session_state.get("show_summary", False):
     </div>
     """
 
-    st.html(overlay_html)  # ✅ Renders as styled HTML
+    components.html(overlay_html, height=620)  # ✅ Renders as styled HTML
 
     footer_cols = st.columns([5, 1.2, 1.6])
     with footer_cols[1]:
