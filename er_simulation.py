@@ -575,7 +575,7 @@ with col3:
         st.write(f"**Age:** {p.get('age', 'N/A')}")
         st.write(f"**Symptoms:** {p.get('symptoms', 'N/A')}")
 
-        # Safely show vitals
+    # Safely show vitals
 vitals = p.get("vitals", {})
 if vitals:
     st.subheader("🩺 Patient Vitals")
@@ -583,7 +583,6 @@ if vitals:
     def color_vital(label, value, normal_range=None, suffix=""):
         """Render a vital with colored indicator depending on whether it's normal."""
         try:
-            # Extract numeric value for comparison
             if isinstance(value, str) and "%" in value:
                 numeric = int(value.strip("%"))
             elif isinstance(value, str) and "/" in value:
@@ -594,7 +593,6 @@ if vitals:
         except:
             numeric = 0
 
-        # Determine status color
         color = "🟢"
         if normal_range:
             if numeric < normal_range[0]:
@@ -608,6 +606,22 @@ if vitals:
     st.markdown(color_vital("HR", vitals.get("HR", "N/A"), (60, 110)))
     st.markdown(color_vital("O₂", vitals.get("O2", "N/A"), (92, 100), "%"))
     st.markdown(f"**Temp:** {vitals.get('Temp', 'N/A')}")
+
+    # --- Pulse / Rhythm Display ---
+    try:
+        hr = int(vitals.get("HR", 0))
+        o2 = int(vitals.get("O2", "0%").strip("%"))
+    except:
+        hr, o2 = 0, 0
+
+    if hr == 0 or o2 == 0:
+        st.markdown("<div style='color:#7f8c8d;'>No pulse detected.</div>", unsafe_allow_html=True)
+    elif hr < 50 or o2 < 85:
+        st.markdown("<div style='font-size:20px;color:#e74c3c;'>💔 Weak Pulse — Patient Deteriorating!</div>", unsafe_allow_html=True)
+    elif hr > 120:
+        st.markdown("<div style='font-size:20px;color:#f39c12;'>💢 Tachycardia — Monitor Closely!</div>", unsafe_allow_html=True)
+    else:
+        st.markdown("<div style='font-size:20px;color:#2ecc71;'>❤️ Stable Pulse — Normal Rhythm</div>", unsafe_allow_html=True)
 else:
     st.warning("⚠️ No vitals available.")
 
