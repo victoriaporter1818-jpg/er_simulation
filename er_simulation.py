@@ -337,84 +337,100 @@ with col2:
                             else:
                                 st.warning(f"{med} already in inventory.")
                                 
-            # ---------------- DIAGNOSTIC LAB ----------------
+            # ----------------    # ---------------- DIAGNOSTIC LAB ----------------
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
 
         st.markdown("""
-        Order and review diagnostic tests to confirm or refine your diagnosis.
-        Choose wisely — correct tests improve diagnostic accuracy!
+        Perform diagnostic imaging and laboratory tests to confirm or refine your diagnosis.  
+        Choose the most relevant tests — accurate selections improve your diagnostic accuracy!
         """)
 
-        # Diagnostic test categories with colors
-        color_map_diag = {
-            "Cardiac Tests": "#d0f0fd",
-            "Respiratory Tests": "#d0ffd0",
-            "Neurological Tests": "#fff6d0",
-            "General Lab Tests": "#ffe0d0"
+        # Two main categories
+        imaging_tests = {
+            "Chest X-Ray": "Reveals lung infections, fractures, or fluid accumulation.",
+            "CT Scan": "Provides detailed cross-sectional images; key for strokes or internal bleeding.",
+            "MRI": "Shows soft-tissue detail for brain, spine, or joint abnormalities.",
+            "Ultrasound": "Visualizes organs or detects fluid and internal bleeding."
         }
 
-        # Define test categories and their items
-        diagnostic_categories = {
-            "Cardiac Tests": {
-                "ECG": "Detects abnormal heart rhythms and signs of heart attack.",
-                "Blood Test": "Analyzes infection, glucose, and clotting levels."
-            },
-            "Respiratory Tests": {
-                "Chest X-Ray": "Reveals lung infections or fluid accumulation."
-            },
-            "Neurological Tests": {
-                "CT Scan": "Helps identify strokes or internal bleeding."
-            },
-            "General Lab Tests": {
-                "Urinalysis": "Detects infection or metabolic issues."
-            }
+        lab_tests = {
+            "CBC": "Complete blood count; detects infection or anemia.",
+            "Blood Test": "Analyzes infection markers, glucose, and clotting levels.",
+            "Urinalysis": "Detects infection or metabolic issues.",
+            "Biopsy": "Examines tissue samples for cancer or disease."
         }
 
-        # Correct tests for each diagnosis
+        # Correct tests by diagnosis
         correct_tests = {
-            "Heart attack": ["ECG", "Blood Test"],
-            "Pneumonia": ["Chest X-Ray", "Blood Test"],
-            "Stroke": ["CT Scan", "Blood Test"]
+            "Heart attack": ["CT Scan", "Blood Test", "MRI"],
+            "Pneumonia": ["Chest X-Ray", "CBC", "Blood Test"],
+            "Stroke": ["CT Scan", "MRI", "Blood Test"]
         }
 
-        # Define test results
+        # Results for each test
         results = {
-            "ECG": "Abnormal ST elevation — consistent with myocardial infarction.",
-            "Chest X-Ray": "Patchy infiltrates in lower lobes — suggests pneumonia.",
+            "Chest X-Ray": "Patchy infiltrates in lower lobes — consistent with pneumonia.",
             "CT Scan": "Left MCA ischemic region visible — indicates stroke.",
-            "Blood Test": "Elevated WBC count and CRP — likely infection.",
-            "Urinalysis": "Normal — no infection or glucose present."
+            "MRI": "Soft-tissue signal changes — possible cerebral ischemia.",
+            "Ultrasound": "No free fluid; normal abdominal structures.",
+            "CBC": "Elevated WBC count — suggests infection.",
+            "Blood Test": "Elevated cardiac enzymes — myocardial injury likely.",
+            "Urinalysis": "Normal — no infection or glucose present.",
+            "Biopsy": "Tissue sample pending pathology report."
         }
 
-        # Display each test category with matching style
-        for category, tests in diagnostic_categories.items():
+        # 2-column layout: Imaging (left) and Lab Tests (right)
+        col_imaging, col_lab = st.columns(2)
+
+        # ---- Imaging column ----
+        with col_imaging:
             st.markdown(
-                f"<h4 style='background-color:{color_map_diag[category]};padding:6px;border-radius:8px;'>{category}</h4>",
+                "<h4 style='background-color:#d0f0fd;padding:6px;border-radius:8px;'>Diagnostic Imaging</h4>",
                 unsafe_allow_html=True
             )
-            test_list = list(tests.items())
-            for i in range(0, len(test_list), 2):
-                colA, colB = st.columns(2)
-                for col, (test_name, desc) in zip((colA, colB), test_list[i:i+2]):
-                    with col:
-                        st.write(f"**{test_name}** — {desc}")
-                        if st.button(f"Run {test_name}", key=f"diag_{test_name.replace(' ', '_')}"):
-                            p = st.session_state.patient
-                            diagnosis = p["diagnosis"] if p else None
-                            result_text = results.get(test_name, "Results pending.")
-                            feedback = f"🧾 {test_name} completed.\n\n**Result:** {result_text}"
+            for test_name, desc in imaging_tests.items():
+                st.write(f"**{test_name}** — {desc}")
+                if st.button(f"Run {test_name}", key=f"imaging_{test_name.replace(' ', '_')}"):
+                    p = st.session_state.patient
+                    diagnosis = p["diagnosis"] if p else None
+                    result_text = results.get(test_name, "Results pending.")
+                    feedback = f"🧾 {test_name} completed.\n\n**Result:** {result_text}"
 
-                            if diagnosis and test_name in correct_tests.get(diagnosis, []):
-                                st.session_state.score += 7
-                                feedback += " ✅ Correct test ordered! (+7 points)"
-                            else:
-                                feedback += " ⚠️ Test provided limited diagnostic value."
+                    if diagnosis and test_name in correct_tests.get(diagnosis, []):
+                        st.session_state.score += 7
+                        feedback += " ✅ Correct test ordered! (+7 points)"
+                    else:
+                        feedback += " ⚠️ Test provided limited diagnostic value."
 
-                            st.session_state.treatment_history.append(f"Ran {test_name}. {feedback}")
-                            st.success(feedback)
-                            st.toast(f"✅ {test_name} completed!", icon="🧪")
-                            st.rerun()
+                    st.session_state.treatment_history.append(f"Ran {test_name}. {feedback}")
+                    st.success(feedback)
+                    st.toast(f"✅ {test_name} completed!", icon="🧪")
+                    st.rerun()
+
+        # ---- Lab Tests column ----
+        with col_lab:
+            st.markdown(
+                "<h4 style='background-color:#ffe0d0;padding:6px;border-radius:8px;'>Laboratory Tests</h4>",
+                unsafe_allow_html=True
+            )
+            for test_name, desc in lab_tests.items():
+                st.write(f"**{test_name}** — {desc}")
+                if st.button(f"Run {test_name}", key=f"lab_{test_name.replace(' ', '_')}"):
+                    p = st.session_state.patient
+                    diagnosis = p["diagnosis"] if p else None
+                    result_text = results.get(test_name, "Results pending.")
+                    feedback = f"🧾 {test_name} completed.\n\n**Result:** {result_text}"
+
+                    if diagnosis and test_name in correct_tests.get(diagnosis, []):
+                        st.session_state.score += 7
+                        feedback += " ✅ Correct test ordered! (+7 points)"
+                    else:
+                        feedback += " ⚠️ Test provided limited diagnostic value."
+
+                    st.session_state.treatment_history.append(f"Ran {test_name}. {feedback}")
+                    st.success(feedback)
+                    st.toast(f"✅ {test
 
 # ---- RIGHT COLUMN ----
 with col3:
