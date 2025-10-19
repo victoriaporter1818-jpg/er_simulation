@@ -108,6 +108,12 @@ index 234b1dadc952b1561777414fc197a4090993735f..73e9491c3c8c449bc891f04eecca27cc
 --- a/er_simulation.py
 +++ b/er_simulation.py
 @@ -105,85 +105,86 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
+(cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/er_simulation.py b/er_simulation.py
+index 234b1dadc952b1561777414fc197a4090993735f..c0a07dcdd0385c186f70e3c6e36665de7ec2b465 100644
+--- a/er_simulation.py
++++ b/er_simulation.py
+@@ -105,85 +105,128 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) {
  }
  
  /* Color tags for room sections */
@@ -147,18 +153,72 @@ index 234b1dadc952b1561777414fc197a4090993735f..73e9491c3c8c449bc891f04eecca27cc
  # PATIENT DATA
  # --------------------------------------
  patients = [
-     {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath",
-      "vitals": {"BP": "90/60", "HR": 120, "O2": "85%", "Temp": "37.0°C"},
-      "diagnosis": "Heart attack",
-      "medical_history": {"Allergies": "None", "Past Surgeries": "None", "Current Medications": "None", "Chronic Conditions": "None"}},
-     {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen",
-      "vitals": {"BP": "110/70", "HR": 95, "O2": "88%", "Temp": "39.2°C"},
-      "diagnosis": "Pneumonia",
-      "medical_history": {"Allergies": "Penicillin", "Past Surgeries": "Appendectomy", "Current Medications": "Ibuprofen", "Chronic Conditions": "Asthma"}},
-     {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech",
-      "vitals": {"BP": "150/90", "HR": 82, "O2": "97%", "Temp": "36.8°C"},
-      "diagnosis": "Stroke",
-      "medical_history": {"Allergies": "None", "Past Surgeries": "Knee Replacement", "Current Medications": "Aspirin", "Chronic Conditions": "Hypertension"}},
+-    {"name": "John Doe", "age": 45, "symptoms": "severe chest pain and shortness of breath",
+-     "vitals": {"BP": "90/60", "HR": 120, "O2": "85%", "Temp": "37.0°C"},
+-     "diagnosis": "Heart attack",
+-     "medical_history": {"Allergies": "None", "Past Surgeries": "None", "Current Medications": "None", "Chronic Conditions": "None"}},
+-    {"name": "Sarah Li", "age": 29, "symptoms": "high fever, cough, and low oxygen",
+-     "vitals": {"BP": "110/70", "HR": 95, "O2": "88%", "Temp": "39.2°C"},
+-     "diagnosis": "Pneumonia",
+-     "medical_history": {"Allergies": "Penicillin", "Past Surgeries": "Appendectomy", "Current Medications": "Ibuprofen", "Chronic Conditions": "Asthma"}},
+-    {"name": "Carlos Vega", "age": 60, "symptoms": "sudden weakness on one side and slurred speech",
+-     "vitals": {"BP": "150/90", "HR": 82, "O2": "97%", "Temp": "36.8°C"},
+-     "diagnosis": "Stroke",
+-     "medical_history": {"Allergies": "None", "Past Surgeries": "Knee Replacement", "Current Medications": "Aspirin", "Chronic Conditions": "Hypertension"}},
++    {
++        "name": "John Doe",
++        "age": 45,
++        "symptoms": "severe chest pain and shortness of breath",
++        "vitals": {
++            "BP": "90/60",
++            "HR": 120,
++            "O2": "85%",
++            "Temp": "37.0°C",
++        },
++        "diagnosis": "Heart attack",
++        "medical_history": {
++            "Allergies": "None",
++            "Past Surgeries": "None",
++            "Current Medications": "None",
++            "Chronic Conditions": "None",
++        },
++    },
++    {
++        "name": "Sarah Li",
++        "age": 29,
++        "symptoms": "high fever, cough, and low oxygen",
++        "vitals": {
++            "BP": "110/70",
++            "HR": 95,
++            "O2": "88%",
++            "Temp": "39.2°C",
++        },
++        "diagnosis": "Pneumonia",
++        "medical_history": {
++            "Allergies": "Penicillin",
++            "Past Surgeries": "Appendectomy",
++            "Current Medications": "Ibuprofen",
++            "Chronic Conditions": "Asthma",
++        },
++    },
++    {
++        "name": "Carlos Vega",
++        "age": 60,
++        "symptoms": "sudden weakness on one side and slurred speech",
++        "vitals": {
++            "BP": "150/90",
++            "HR": 82,
++            "O2": "97%",
++            "Temp": "36.8°C",
++        },
++        "diagnosis": "Stroke",
++        "medical_history": {
++            "Allergies": "None",
++            "Past Surgeries": "Knee Replacement",
++            "Current Medications": "Aspirin",
++            "Chronic Conditions": "Hypertension",
++        },
++    },
  ]
  
  # --------------------------------------
@@ -195,7 +255,7 @@ index 234b1dadc952b1561777414fc197a4090993735f..73e9491c3c8c449bc891f04eecca27cc
  # --------------------------------------
  # SUPPLY ROOM ITEMS (GROUPED & COLORED)
  # --------------------------------------
-@@ -234,63 +235,123 @@ med_categories = {
+@@ -234,63 +277,123 @@ med_categories = {
          "Ondansetron": "Used to prevent nausea and vomiting."
      },
      "Neurological": {
@@ -320,7 +380,7 @@ index 234b1dadc952b1561777414fc197a4090993735f..73e9491c3c8c449bc891f04eecca27cc
  
      # --------------------------- ER ROOM ---------------------------
      if st.session_state.room == "ER":
-@@ -419,73 +480,114 @@ with col2:
+@@ -419,73 +522,114 @@ with col2:
  
      # --------------------------- MEDSTATION ---------------------------
      elif st.session_state.room == "Medstation":
