@@ -168,26 +168,42 @@ with col2:
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
 
-            # ==== REAL-TIME MONITOR PANEL (moved to center) ====
+                # ==== REAL-TIME MONITOR PANEL (dark ICU style) ====
     if st.session_state.get("patient"):
+        import pandas as pd, math, time
         p = st.session_state["patient"]
 
-        st.markdown("<h4>📺 Real-Time Monitor</h4>", unsafe_allow_html=True)
+        # --- ECG waveform ---
+        st.markdown(
+            """
+            <div style="
+                background-color:#000000;
+                padding:12px 16px;
+                border-radius:10px;
+                box-shadow:0 0 12px rgba(0,255,0,0.3);
+                color:#39FF14;
+                font-family:monospace;">
+                <h4 style='color:#39FF14;margin-top:0;'>📺 Real-Time Monitor</h4>
+            """,
+            unsafe_allow_html=True,
+        )
 
-        import pandas as pd, math, time
-        # --- ECG waveform (streamlit native chart) ---
-        x = list(range(60))
+        x = list(range(80))
         phase = int(time.time() * 2) % 60
         y = [
             0.1 * math.sin((i + phase) * 0.3)
             + 0.02 * math.sin((i + phase) * 3)
-            + (0.4 if i == 30 else 0)
+            + (0.4 if i == 40 else 0)
             for i in x
         ]
         df = pd.DataFrame({"ECG": y})
-        st.line_chart(df, height=100, use_container_width=True)
+        st.line_chart(
+            df,
+            height=120,
+            use_container_width=True,
+        )
 
-        # --- Extract vitals ---
+        # --- Vitals ---
         vitals = p.get("vitals", {})
         try:
             hr = int(vitals.get("HR", 0))
@@ -196,39 +212,46 @@ with col2:
         except Exception:
             hr, o2, temp = 0, 0, 0
 
-        # --- Color-coded readouts ---
-        def colorize(value, low, high):
+        def glow_color(value, low, high):
             if value < low:
-                return "🟠"
+                return "#ffcc00"  # yellow
             elif value > high:
-                return "🔴"
-            return "🟢"
+                return "#ff0033"  # red
+            return "#39FF14"    # neon green
 
-        hr_icon = colorize(hr, 60, 110)
-        o2_icon = colorize(o2, 92, 100)
-        temp_icon = colorize(temp, 36, 38.5)
+        hr_color = glow_color(hr, 60, 110)
+        o2_color = glow_color(o2, 92, 100)
+        temp_color = glow_color(temp, 36, 38.5)
 
         st.markdown(
             f"""
-            **{hr_icon} Heart Rate:** {hr} bpm  
-            **{o2_icon} O₂ Sat:** {o2}%  
-            **{temp_icon} Temp:** {temp:.1f} °C
+            <div style="color:{hr_color};font-weight:bold;">❤️ HR: {hr} bpm</div>
+            <div style="color:{o2_color};font-weight:bold;">💨 O₂ Sat: {o2}%</div>
+            <div style="color:{temp_color};font-weight:bold;">🌡 Temp: {temp:.1f} °C</div>
             """,
             unsafe_allow_html=True,
         )
 
-        # --- Warning banner ---
-        warn = []
-        if hr < 50: warn.append("Bradycardia – HR < 50 bpm")
-        elif hr > 120: warn.append("Tachycardia – HR > 120 bpm")
-        if o2 < 90: warn.append("Hypoxia – O₂ < 90%")
-        if temp > 39: warn.append("High Fever")
-        if temp < 35: warn.append("Hypothermia")
-        if warn:
+        # --- Alerts ---
+        warnings = []
+        if hr < 50: warnings.append("Bradycardia – HR < 50 bpm")
+        elif hr > 120: warnings.append("Tachycardia – HR > 120 bpm")
+        if o2 < 90: warnings.append("Hypoxia – O₂ < 90%")
+        if temp > 39: warnings.append("High Fever")
+        if temp < 35: warnings.append("Hypothermia")
+
+        if warnings:
             st.markdown(
-                f"<div style='background:#e74c3c;color:white;padding:6px;border-radius:6px;'>⚠️ {' | '.join(warn)}</div>",
+                f"<div style='background-color:#ff0033;color:#fff;padding:6px;border-radius:6px;text-align:center;font-weight:bold;'>⚠️ {' | '.join(warnings)}</div>",
                 unsafe_allow_html=True,
             )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # --- Optional auto-refresh fallback ---
+        if st.session_state.get("patient"):
+            time.sleep(3)
+            st.experimental_rerun()
 
         if st.button("Next Patient"):
             st.session_state.next_patient_button_clicked = True
