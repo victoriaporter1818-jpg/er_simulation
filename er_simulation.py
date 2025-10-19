@@ -1,5 +1,5 @@
 diff --git a/er_simulation.py b/er_simulation.py
-index 234b1dadc952b1561777414fc197a4090993735f..8c0b8c19c12ab7854c06252e2c7d3e80f35c6815 100644
+index 234b1dadc952b1561777414fc197a4090993735f.8c0b8c19c12ab7854c06252e2c7d3e80f35c6815 100644
 --- a/er_simulation.py
 +++ b/er_simulation.py
 @@ -1,28 +1,30 @@
