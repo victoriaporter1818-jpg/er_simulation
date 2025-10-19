@@ -1,9 +1,6 @@
 import streamlit as st
 import random
 import time
-import numpy as np
-import matplotlib.pyplot as plt
-
 
 # --------------------------------------
 # PAGE CONFIGURATION
@@ -569,19 +566,27 @@ with col3:
 if p and "vitals" in p:
     st.markdown("<h4>📺 Real-Time Monitor</h4>", unsafe_allow_html=True)
 
-    # Generate a simple animated ECG waveform
-    
-    fig, ax = plt.subplots(figsize=(4, 1))
-    x = np.linspace(0, 2*np.pi, 200)
-    # heartbeat-like wave
-    phase = (time.time() % 2) * np.pi
-    y = 0.1*np.sin(8*x + phase) + 0.02*np.sin(60*x + phase*2)
-    ax.plot(x, y, color="#2ecc71", lw=2)
-    ax.set_ylim(-0.3, 0.3)
-    ax.axis("off")
-    st.pyplot(fig, use_container_width=True)
+    # ==== REAL-TIME MONITOR PANEL ====
+if p and "vitals" in p:
+    st.markdown("<h4>📺 Real-Time Monitor</h4>", unsafe_allow_html=True)
 
-    # Extract vitals safely
+    # --- ECG waveform (using Streamlit's native chart) ---
+    import pandas as pd
+    import math
+
+    # create a smooth sine wave that "moves" with time
+    x = list(range(60))
+    phase = int(time.time() * 2) % 60  # scrolls horizontally
+    y = [
+        0.1 * math.sin((i + phase) * 0.3) +
+        0.02 * math.sin((i + phase) * 3) +
+        (0.4 if i == 30 else 0)  # small heartbeat spike
+        for i in x
+    ]
+    df = pd.DataFrame({"ECG": y})
+    st.line_chart(df, height=100, use_container_width=True)
+
+    # --- Extract vitals safely ---
     vitals = p["vitals"]
     try:
         hr = int(vitals.get("HR", 0))
@@ -591,35 +596,28 @@ if p and "vitals" in p:
     except Exception:
         hr, o2, temp = 0, 0, 0
 
-    # Color-coded readouts
-    hr_color = "🟢"
-    if hr < 50 or hr > 120:
-        hr_color = "🔴"
-    elif hr < 60 or hr > 100:
-        hr_color = "🟠"
+    # --- Color-coded readouts ---
+    def colorize(value, normal_low, normal_high):
+        if value < normal_low:
+            return "🟠"
+        elif value > normal_high:
+            return "🔴"
+        return "🟢"
 
-    o2_color = "🟢"
-    if o2 < 85:
-        o2_color = "🔴"
-    elif o2 < 92:
-        o2_color = "🟠"
-
-    temp_color = "🟢"
-    if temp < 36 or temp > 38.5:
-        temp_color = "🟠"
-    if temp < 35 or temp > 39.5:
-        temp_color = "🔴"
+    hr_icon = colorize(hr, 60, 110)
+    o2_icon = colorize(o2, 92, 100)
+    temp_icon = colorize(temp, 36, 38.5)
 
     st.markdown(
         f"""
-        **{hr_color} Heart Rate:** {hr} bpm  
-        **{o2_color} O₂ Sat:** {o2}%  
-        **{temp_color} Temp:** {temp:.1f} °C
+        **{hr_icon} Heart Rate:** {hr} bpm  
+        **{o2_icon} O₂ Sat:** {o2}%  
+        **{temp_icon} Temp:** {temp:.1f} °C
         """,
         unsafe_allow_html=True,
     )
 
-    # Warning banner
+    # --- Warning banner ---
     warn_msgs = []
     if hr < 50:
         warn_msgs.append("Bradycardia – HR < 50 bpm")
