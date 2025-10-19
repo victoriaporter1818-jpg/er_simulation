@@ -72,7 +72,6 @@ def assign_patient():
     st.session_state.score = 0
     st.session_state.last_update = time.time()
 
-
 # --------------------------------------
 # DYNAMIC VITALS UPDATE
 # --------------------------------------
@@ -88,7 +87,7 @@ def update_vitals(effect):
         try:
             systolic, diastolic = bp_str.split("/")
             return int(systolic), int(diastolic)
-        except:
+        except Exception:
             return (100, 70)
 
     sys, dia = parse_bp(vitals.get("BP", "100/70"))
@@ -111,7 +110,6 @@ def update_vitals(effect):
     vitals["O2"] = f"{o2}%"
     st.session_state.patient["vitals"] = vitals
 
-
 # --------------------------------------
 # PASSIVE PATIENT DETERIORATION OVER TIME
 # --------------------------------------
@@ -130,7 +128,6 @@ def gradual_deterioration():
         st.session_state.last_update = now
         st.toast("⏳ Patient condition is deteriorating due to delay!", icon="⚠️")
 
-
 # --------------------------------------
 # SIDEBAR
 # --------------------------------------
@@ -139,7 +136,11 @@ with st.sidebar:
     difficulty = st.selectbox("Choose Difficulty", ["Easy", "Medium", "Hard"])
     role = st.radio("Select Your Role", ["Doctor", "Nurse", "Radiologist"])
     rooms = ["ER", "Supply Room", "Medstation", "Diagnostic Lab"]
-    st.session_state.room = st.radio("Select a Room", rooms, index=rooms.index(st.session_state.room) if st.session_state.room in rooms else 0)
+    st.session_state.room = st.radio(
+        "Select a Room",
+        rooms,
+        index=rooms.index(st.session_state.room) if st.session_state.room in rooms else 0
+    )
 
     st.write("---")
     st.subheader("📦 Current Inventory")
@@ -171,7 +172,9 @@ with col2:
             st.session_state.next_patient_button_clicked = False
 
         if st.session_state.patient:
+            # Passive deterioration on each rerun
             gradual_deterioration()
+
             p = st.session_state.patient
             st.subheader("Patient Information")
             st.write(f"**Name:** {p['name']}")
@@ -200,7 +203,9 @@ with col2:
                         feedback = f"⚠️ {selected_item} had limited effect."
                         update_vitals("worsen")
 
-                    st.session_state.treatment_history.append(f"Used {selected_item} on {p['name']}. {feedback}")
+                    st.session_state.treatment_history.append(
+                        f"Used {selected_item} on {p['name']}. {feedback}"
+                    )
                     st.session_state.inventory.remove(selected_item)
                     st.success(feedback)
                     st.toast(feedback, icon="💉")
@@ -232,7 +237,9 @@ with col2:
                         feedback = f"⚠️ {selected_med} was not very effective for this condition."
                         update_vitals("worsen")
 
-                    st.session_state.treatment_history.append(f"Gave {selected_med} to {p['name']}. {feedback}")
+                    st.session_state.treatment_history.append(
+                        f"Gave {selected_med} to {p['name']}. {feedback}"
+                    )
                     st.session_state.inventory.remove(selected_med)
                     st.success(feedback)
                     st.toast(feedback, icon="💊")
@@ -254,9 +261,12 @@ with col2:
                     total_score = max(0, min(100, int(st.session_state.score)))
                     effectiveness = total_score
                     history = st.session_state.get("treatment_history", [])
+
                     correct_diagnostics = sum(("✅" in e and "test" in e.lower()) for e in history)
                     incorrect_diagnostics = sum(("⚠️" in e and "test" in e.lower()) for e in history)
-                    diagnostic_accuracy = max(0, min(60 + (10 * correct_diagnostics) - (5 * incorrect_diagnostics), 100))
+
+                    diagnostic_accuracy = 60 + (10 * correct_diagnostics) - (5 * incorrect_diagnostics)
+                    diagnostic_accuracy = max(0, min(diagnostic_accuracy, 100))
                     resource_efficiency = random.randint(50, 95)
 
                     if total_score >= 85:
@@ -276,7 +286,38 @@ with col2:
                     )
                     st.caption(f"Transfer decision: **{transfer_option}**")
 
-    
+                    st.write("**Treatment Effectiveness**")
+                    st.progress(effectiveness / 100)
+                    st.write("**Diagnostic Accuracy**")
+                    st.progress(diagnostic_accuracy / 100)
+                    st.write("**Resource Management**")
+                    st.progress(resource_efficiency / 100)
+
+                    st.write("---")
+                    correct_acts = sum("✅" in line for line in st.session_state.treatment_history)
+                    limited_acts = sum("limited" in line.lower() for line in st.session_state.treatment_history)
+                    st.markdown("**Action Summary**")
+                    st.write(f"- ✅ Effective actions: **{correct_acts}**")
+                    st.write(f"- ⚠️ Limited/ineffective actions: **{limited_acts}**")
+
+                    feedback_pool = [
+                        "Great clinical judgment and timely interventions!",
+                        "Diagnostics were appropriate; consider earlier imaging next time.",
+                        "Supplies were used efficiently; watch for redundant meds.",
+                        "Good stabilization—optimize sequence of care for better outcomes.",
+                        "Consider reassessing vitals before transfer to ensure stability."
+                    ]
+                    st.write("---")
+                    st.markdown(f"**Feedback:** {random.choice(feedback_pool)}")
+
+                    if st.button("🆕 Start New Case", key="start_new_case"):
+                        st.session_state.patient = None
+                        st.session_state.treatment_history = []
+                        st.session_state.score = 0
+                        st.rerun()
+        else:
+            st.info("No active patient.")
+
     # ---------------- SUPPLY ROOM ----------------
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
@@ -314,7 +355,10 @@ with col2:
             }
         }
         for category, supplies in categorized_supplies.items():
-            st.markdown(f"<h4 style='background-color:{color_map[category]};padding:6px;border-radius:8px;'>{category}</h4>", unsafe_allow_html=True)
+            st.markdown(
+                f"<h4 style='background-color:{color_map[category]};padding:6px;border-radius:8px;'>{category}</h4>",
+                unsafe_allow_html=True
+            )
             items = list(supplies.items())
             for i in range(0, len(items), 2):
                 colA, colB = st.columns(2)
@@ -365,7 +409,10 @@ with col2:
             "Metabolic": "#f3e5f5"
         }
         for category, meds in med_categories.items():
-            st.markdown(f"<h4 style='background-color:{color_map_meds[category]};padding:6px;border-radius:8px;'>{category}</h4>", unsafe_allow_html=True)
+            st.markdown(
+                f"<h4 style='background-color:{color_map_meds[category]};padding:6px;border-radius:8px;'>{category}</h4>",
+                unsafe_allow_html=True
+            )
             meds_list = list(meds.items())
             for i in range(0, len(meds_list), 2):
                 colA, colB = st.columns(2)
@@ -380,8 +427,8 @@ with col2:
                                 st.rerun()
                             else:
                                 st.warning(f"{med} already in inventory.")
-                                
-                        # ---------------- DIAGNOSTIC LAB ----------------
+
+    # ---------------- DIAGNOSTIC LAB ----------------
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
 
@@ -390,10 +437,8 @@ with col2:
         Choose the most relevant tests — accurate selections improve your diagnostic accuracy!
         """)
 
-        # Define body part options for imaging
         body_part_options = ["Chest", "Head", "Abdomen", "Pelvis", "Extremities"]
 
-        # Two main categories
         imaging_tests = {
             "X-Ray": "Uses radiation to view bone and lung structures.",
             "CT Scan": "Cross-sectional imaging for strokes, trauma, or internal bleeding.",
@@ -408,14 +453,12 @@ with col2:
             "Biopsy": "Examines tissue samples for cancer or disease."
         }
 
-        # Correct tests by diagnosis and appropriate body part
         correct_tests = {
             "Heart attack": {"CT Scan": ["Chest"], "MRI": ["Chest"], "Blood Test": None},
             "Pneumonia": {"X-Ray": ["Chest"], "CBC": None, "Blood Test": None},
             "Stroke": {"CT Scan": ["Head"], "MRI": ["Head"], "Blood Test": None}
         }
 
-        # Results
         results = {
             "X-Ray": "Imaging shows patchy infiltrates — possible pneumonia.",
             "CT Scan": "Cross-sectional scan reveals ischemic changes.",
@@ -427,7 +470,6 @@ with col2:
             "Biopsy": "Tissue sample pending pathology report."
         }
 
-        # Layout: 2 columns (Imaging + Lab)
         col_imaging, col_lab = st.columns(2)
 
         # ---- Imaging Column ----
@@ -472,6 +514,7 @@ with col2:
                     st.session_state.treatment_history.append(f"Ran {test_name} ({body_part}). {feedback}")
                     st.success(feedback)
                     st.toast(f"✅ {test_name} ({body_part}) completed!", icon="🧪")
+                    st.session_state.last_update = time.time()
                     st.experimental_rerun()
 
         # ---- Laboratory Tests Column ----
@@ -506,81 +549,82 @@ with col2:
                     st.session_state.treatment_history.append(f"Ran {test_name}. {feedback}")
                     st.success(feedback)
                     st.toast(f"✅ {test_name} completed!", icon="🧪")
+                    st.session_state.last_update = time.time()
                     st.experimental_rerun()
 
 # ---- RIGHT COLUMN ----
 with col3:
     st.subheader("👩‍⚕️ Patient Data")
 
-    # Safely check for patient object
     p = st.session_state.get("patient")
     if p:
         st.write(f"**Name:** {p.get('name', 'Unknown')}")
         st.write(f"**Age:** {p.get('age', 'N/A')}")
         st.write(f"**Symptoms:** {p.get('symptoms', 'N/A')}")
 
-    # Safely show vitals
-vitals = p.get("vitals", {})
-if vitals:
-    st.subheader("🩺 Patient Vitals")
+        # Safely show vitals (color-coded + pulse indicator)
+        vitals = p.get("vitals", {})
+        if vitals:
+            st.subheader("🩺 Patient Vitals")
 
-    def color_vital(label, value, normal_range=None, suffix=""):
-        """Render a vital with colored indicator depending on whether it's normal."""
-        try:
-            if isinstance(value, str) and "%" in value:
-                numeric = int(value.strip("%"))
-            elif isinstance(value, str) and "/" in value:
-                systolic, diastolic = map(int, value.split("/"))
-                numeric = (systolic + diastolic) // 2
+            def color_vital(label, value, normal_range=None, suffix=""):
+                """Render a vital with colored indicator depending on whether it's normal."""
+                try:
+                    if isinstance(value, str) and "%" in value:
+                        numeric = int(value.strip("%"))
+                    elif isinstance(value, str) and "/" in value:
+                        systolic, diastolic = map(int, value.split("/"))
+                        numeric = (systolic + diastolic) // 2
+                    else:
+                        numeric = int(value)
+                except Exception:
+                    numeric = 0
+
+                color = "🟢"
+                if normal_range:
+                    if numeric < normal_range[0]:
+                        color = "🟠"
+                    elif numeric > normal_range[1]:
+                        color = "🔴"
+
+                return f"{color} **{label}:** {value}{suffix}"
+
+            st.markdown(color_vital("BP", vitals.get("BP", "N/A"), (90, 140)))
+            st.markdown(color_vital("HR", vitals.get("HR", "N/A"), (60, 110)))
+            st.markdown(color_vital("O₂", vitals.get("O2", "N/A"), (92, 100), "%"))
+            st.markdown(f"**Temp:** {vitals.get('Temp', 'N/A')}")
+
+            # Pulse / Rhythm display
+            try:
+                hr = int(vitals.get("HR", 0))
+                o2 = int(vitals.get("O2", "0%").strip("%"))
+            except Exception:
+                hr, o2 = 0, 0
+
+            if hr == 0 or o2 == 0:
+                st.markdown("<div style='color:#7f8c8d;'>No pulse detected.</div>", unsafe_allow_html=True)
+            elif hr < 50 or o2 < 85:
+                st.markdown("<div style='font-size:20px;color:#e74c3c;'>💔 Weak Pulse — Patient Deteriorating!</div>", unsafe_allow_html=True)
+            elif hr > 120:
+                st.markdown("<div style='font-size:20px;color:#f39c12;'>💢 Tachycardia — Monitor Closely!</div>", unsafe_allow_html=True)
             else:
-                numeric = int(value)
-        except:
-            numeric = 0
+                # subtle 'heartbeat' swap every rerun second
+                beat = "❤️" if int(time.time()) % 2 == 0 else "💚"
+                st.markdown(f"<div style='font-size:20px;color:#2ecc71;'>{beat} Stable Pulse — Normal Rhythm</div>", unsafe_allow_html=True)
+        else:
+            st.warning("⚠️ No vitals available.")
 
-        color = "🟢"
-        if normal_range:
-            if numeric < normal_range[0]:
-                color = "🟠"
-            elif numeric > normal_range[1]:
-                color = "🔴"
-
-        return f"{color} **{label}:** {value}{suffix}"
-
-    st.markdown(color_vital("BP", vitals.get("BP", "N/A"), (90, 140)))
-    st.markdown(color_vital("HR", vitals.get("HR", "N/A"), (60, 110)))
-    st.markdown(color_vital("O₂", vitals.get("O2", "N/A"), (92, 100), "%"))
-    st.markdown(f"**Temp:** {vitals.get('Temp', 'N/A')}")
-
-    # --- Pulse / Rhythm Display ---
-    try:
-        hr = int(vitals.get("HR", 0))
-        o2 = int(vitals.get("O2", "0%").strip("%"))
-    except:
-        hr, o2 = 0, 0
-
-    if hr == 0 or o2 == 0:
-        st.markdown("<div style='color:#7f8c8d;'>No pulse detected.</div>", unsafe_allow_html=True)
-    elif hr < 50 or o2 < 85:
-        st.markdown("<div style='font-size:20px;color:#e74c3c;'>💔 Weak Pulse — Patient Deteriorating!</div>", unsafe_allow_html=True)
-    elif hr > 120:
-        st.markdown("<div style='font-size:20px;color:#f39c12;'>💢 Tachycardia — Monitor Closely!</div>", unsafe_allow_html=True)
+        # Treatment history
+        st.subheader("🧾 Treatment History")
+        history = st.session_state.get("treatment_history", [])
+        if history:
+            for t in history:
+                st.write(t)
+        else:
+            st.info("No treatments yet.")
     else:
-        st.markdown("<div style='font-size:20px;color:#2ecc71;'>❤️ Stable Pulse — Normal Rhythm</div>", unsafe_allow_html=True)
-else:
-    st.warning("⚠️ No vitals available.")
+        st.info("No active patient.")
 
-        # Treatment history section
-    st.subheader("🧾 Treatment History")
-    history = st.session_state.get("treatment_history", [])
-    if history:
-        for t in history:
-            st.write(t)
-    else:
-        st.info("No treatments yet.")
-
-else:
-    st.info("No active patient.")
-
-    # Always show score at bottom
+    # Score
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.get("score", 0))
