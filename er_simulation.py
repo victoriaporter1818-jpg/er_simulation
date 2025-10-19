@@ -337,7 +337,7 @@ with col2:
                             else:
                                 st.warning(f"{med} already in inventory.")
                                 
-                    # ---------------- DIAGNOSTIC LAB ----------------
+                        # ---------------- DIAGNOSTIC LAB ----------------
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
 
@@ -346,12 +346,15 @@ with col2:
         Choose the most relevant tests — accurate selections improve your diagnostic accuracy!
         """)
 
+        # Define body part options for imaging
+        body_part_options = ["Chest", "Head", "Abdomen", "Pelvis", "Extremities"]
+
         # Two main categories
         imaging_tests = {
-            "Chest X-Ray": "Reveals lung infections, fractures, or fluid accumulation.",
-            "CT Scan": "Provides detailed cross-sectional images; key for strokes or internal bleeding.",
-            "MRI": "Shows soft-tissue detail for brain, spine, or joint abnormalities.",
-            "Ultrasound": "Visualizes organs or detects fluid and internal bleeding."
+            "X-Ray": "Uses radiation to view bone and lung structures.",
+            "CT Scan": "Cross-sectional imaging for strokes, trauma, or internal bleeding.",
+            "MRI": "Detailed soft-tissue imaging — excellent for brain, spine, and joint evaluation.",
+            "Ultrasound": "Real-time imaging to visualize organs or fluid buildup."
         }
 
         lab_tests = {
@@ -361,18 +364,18 @@ with col2:
             "Biopsy": "Examines tissue samples for cancer or disease."
         }
 
-        # Correct tests by diagnosis
+        # Correct tests by diagnosis and appropriate body part
         correct_tests = {
-            "Heart attack": ["CT Scan", "Blood Test", "MRI"],
-            "Pneumonia": ["Chest X-Ray", "CBC", "Blood Test"],
-            "Stroke": ["CT Scan", "MRI", "Blood Test"]
+            "Heart attack": {"CT Scan": ["Chest"], "MRI": ["Chest"], "Blood Test": None},
+            "Pneumonia": {"X-Ray": ["Chest"], "CBC": None, "Blood Test": None},
+            "Stroke": {"CT Scan": ["Head"], "MRI": ["Head"], "Blood Test": None}
         }
 
-        # Results for each test
+        # Results
         results = {
-            "Chest X-Ray": "Patchy infiltrates in lower lobes — consistent with pneumonia.",
-            "CT Scan": "Left MCA ischemic region visible — indicates stroke.",
-            "MRI": "Soft-tissue signal changes — possible cerebral ischemia.",
+            "X-Ray": "Imaging shows patchy infiltrates — possible pneumonia.",
+            "CT Scan": "Cross-sectional scan reveals ischemic changes.",
+            "MRI": "High-resolution scan confirms soft-tissue abnormalities.",
             "Ultrasound": "No free fluid; normal abdominal structures.",
             "CBC": "Elevated WBC count — suggests infection.",
             "Blood Test": "Elevated cardiac enzymes — myocardial injury likely.",
@@ -380,10 +383,10 @@ with col2:
             "Biopsy": "Tissue sample pending pathology report."
         }
 
-        # 2-column layout: Imaging (left) and Lab Tests (right)
+        # Layout: 2 columns (Imaging + Lab)
         col_imaging, col_lab = st.columns(2)
 
-        # ---- Imaging column ----
+        # ---- Imaging Column ----
         with col_imaging:
             st.markdown(
                 "<h4 style='background-color:#fff176;padding:6px;border-radius:8px;'>Diagnostic Imaging</h4>",
@@ -391,28 +394,43 @@ with col2:
             )
             for test_name, desc in imaging_tests.items():
                 st.write(f"**{test_name}** — {desc}")
-                if st.button(f"Run {test_name}", key="imaging_" + test_name.replace(" ", "_")):
+                selected_part = st.selectbox(
+                    f"Select body part for {test_name}",
+                    options=["-- Select --"] + body_part_options,
+                    key=f"body_part_{test_name.replace(' ', '_')}"
+                )
+                if st.button(f"Run {test_name}", key=f"imaging_{test_name.replace(' ', '_')}"):
                     p = st.session_state.get("patient")
                     if not p:
                         st.warning("No active patient.")
                         st.stop()
 
                     diagnosis = p.get("diagnosis")
+                    body_part = selected_part if selected_part != "-- Select --" else "unspecified area"
                     result_text = results.get(test_name, "Results pending.")
-                    feedback = f"🧾 {test_name} completed.\n\n**Result:** {result_text}"
+                    feedback = f"🧾 {test_name} ({body_part}) completed.\n\n**Result:** {result_text}"
 
-                    if diagnosis and test_name in correct_tests.get(diagnosis, []):
+                    # Scoring logic: test type + body part relevance
+                    test_correct = False
+                    if diagnosis in correct_tests:
+                        match_data = correct_tests[diagnosis]
+                        if test_name in match_data:
+                            correct_parts = match_data[test_name]
+                            if correct_parts is None or body_part in correct_parts:
+                                test_correct = True
+
+                    if test_correct:
                         st.session_state.score += 7
-                        feedback += " ✅ Correct test ordered! (+7 points)"
+                        feedback += " ✅ Correct test and target area! (+7 points)"
                     else:
-                        feedback += " ⚠️ Test provided limited diagnostic value."
+                        feedback += " ⚠️ Test or body part provided limited diagnostic value."
 
-                    st.session_state.treatment_history.append(f"Ran {test_name}. {feedback}")
+                    st.session_state.treatment_history.append(f"Ran {test_name} ({body_part}). {feedback}")
                     st.success(feedback)
-                    st.toast(f"✅ {test_name} completed!", icon="🧪")
+                    st.toast(f"✅ {test_name} ({body_part}) completed!", icon="🧪")
                     st.experimental_rerun()
 
-        # ---- Lab Tests column ----
+        # ---- Laboratory Tests Column ----
         with col_lab:
             st.markdown(
                 "<h4 style='background-color:#a5d6a7;padding:6px;border-radius:8px;'>Laboratory Tests</h4>",
@@ -420,7 +438,7 @@ with col2:
             )
             for test_name, desc in lab_tests.items():
                 st.write(f"**{test_name}** — {desc}")
-                if st.button(f"Run {test_name}", key="lab_" + test_name.replace(" ", "_")):
+                if st.button(f"Run {test_name}", key=f"lab_{test_name.replace(' ', '_')}"):
                     p = st.session_state.get("patient")
                     if not p:
                         st.warning("No active patient.")
@@ -430,7 +448,12 @@ with col2:
                     result_text = results.get(test_name, "Results pending.")
                     feedback = f"🧾 {test_name} completed.\n\n**Result:** {result_text}"
 
-                    if diagnosis and test_name in correct_tests.get(diagnosis, []):
+                    test_correct = (
+                        diagnosis in correct_tests
+                        and test_name in correct_tests[diagnosis]
+                    )
+
+                    if test_correct:
                         st.session_state.score += 7
                         feedback += " ✅ Correct test ordered! (+7 points)"
                     else:
