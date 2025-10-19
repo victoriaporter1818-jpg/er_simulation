@@ -1,6 +1,9 @@
 import streamlit as st
 import random
 import time
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 # --------------------------------------
 # PAGE CONFIGURATION
@@ -567,9 +570,7 @@ if p and "vitals" in p:
     st.markdown("<h4>📺 Real-Time Monitor</h4>", unsafe_allow_html=True)
 
     # Generate a simple animated ECG waveform
-    import numpy as np
-    import matplotlib.pyplot as plt
-
+    
     fig, ax = plt.subplots(figsize=(4, 1))
     x = np.linspace(0, 2*np.pi, 200)
     # heartbeat-like wave
