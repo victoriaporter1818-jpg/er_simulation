@@ -287,7 +287,7 @@ with st.sidebar:
 # --------------------------------------
 # MAIN LAYOUT
 # --------------------------------------
-col1, col2, col3 = st.columns([0.3, 3.4, 1.3])  # center wide
+col1, col2, col3 = st.columns([0.3, 3, 1.3])  # center wide
 
 # ---- CENTER COLUMN ----
 with col2:
