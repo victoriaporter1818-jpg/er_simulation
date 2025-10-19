@@ -614,14 +614,14 @@ else:
         # Treatment history section
     st.subheader("🧾 Treatment History")
     history = st.session_state.get("treatment_history", [])
-        if history:
-            for t in history:
-                st.write(t)
-        else:
-            st.info("No treatments yet.")
-
+    if history:
+        for t in history:
+            st.write(t)
     else:
-        st.info("No active patient.")
+        st.info("No treatments yet.")
+
+else:
+    st.info("No active patient.")
 
     # Always show score at bottom
     st.subheader("🏆 Score")
