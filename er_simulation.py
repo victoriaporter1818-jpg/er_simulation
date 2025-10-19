@@ -168,6 +168,68 @@ with col2:
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
 
+            # ==== REAL-TIME MONITOR PANEL (moved to center) ====
+    if st.session_state.get("patient"):
+        p = st.session_state["patient"]
+
+        st.markdown("<h4>📺 Real-Time Monitor</h4>", unsafe_allow_html=True)
+
+        import pandas as pd, math, time
+        # --- ECG waveform (streamlit native chart) ---
+        x = list(range(60))
+        phase = int(time.time() * 2) % 60
+        y = [
+            0.1 * math.sin((i + phase) * 0.3)
+            + 0.02 * math.sin((i + phase) * 3)
+            + (0.4 if i == 30 else 0)
+            for i in x
+        ]
+        df = pd.DataFrame({"ECG": y})
+        st.line_chart(df, height=100, use_container_width=True)
+
+        # --- Extract vitals ---
+        vitals = p.get("vitals", {})
+        try:
+            hr = int(vitals.get("HR", 0))
+            o2 = int(vitals.get("O2", "0%").strip("%"))
+            temp = float(str(vitals.get("Temp", "0")).replace("°C", ""))
+        except Exception:
+            hr, o2, temp = 0, 0, 0
+
+        # --- Color-coded readouts ---
+        def colorize(value, low, high):
+            if value < low:
+                return "🟠"
+            elif value > high:
+                return "🔴"
+            return "🟢"
+
+        hr_icon = colorize(hr, 60, 110)
+        o2_icon = colorize(o2, 92, 100)
+        temp_icon = colorize(temp, 36, 38.5)
+
+        st.markdown(
+            f"""
+            **{hr_icon} Heart Rate:** {hr} bpm  
+            **{o2_icon} O₂ Sat:** {o2}%  
+            **{temp_icon} Temp:** {temp:.1f} °C
+            """,
+            unsafe_allow_html=True,
+        )
+
+        # --- Warning banner ---
+        warn = []
+        if hr < 50: warn.append("Bradycardia – HR < 50 bpm")
+        elif hr > 120: warn.append("Tachycardia – HR > 120 bpm")
+        if o2 < 90: warn.append("Hypoxia – O₂ < 90%")
+        if temp > 39: warn.append("High Fever")
+        if temp < 35: warn.append("Hypothermia")
+        if warn:
+            st.markdown(
+                f"<div style='background:#e74c3c;color:white;padding:6px;border-radius:6px;'>⚠️ {' | '.join(warn)}</div>",
+                unsafe_allow_html=True,
+            )
+
         if st.button("Next Patient"):
             st.session_state.next_patient_button_clicked = True
 
@@ -565,137 +627,6 @@ with col3:
         st.write(f"**Name:** {p.get('name', 'Unknown')}")
         st.write(f"**Age:** {p.get('age', 'N/A')}")
         st.write(f"**Symptoms:** {p.get('symptoms', 'N/A')}")
-
-        # ==== REAL-TIME MONITOR PANEL ====
-if p and "vitals" in p:
-    st.markdown("<h4>📺 Real-Time Monitor</h4>", unsafe_allow_html=True)
-
-    # ==== REAL-TIME MONITOR PANEL ====
-if p and "vitals" in p:
-    st.markdown("<h4>📺 Real-Time Monitor</h4>", unsafe_allow_html=True)
-
-    # --- ECG waveform (using Streamlit's native chart) ---
-    import pandas as pd
-    import math
-
-    # create a smooth sine wave that "moves" with time
-    x = list(range(60))
-    phase = int(time.time() * 2) % 60  # scrolls horizontally
-    y = [
-        0.1 * math.sin((i + phase) * 0.3) +
-        0.02 * math.sin((i + phase) * 3) +
-        (0.4 if i == 30 else 0)  # small heartbeat spike
-        for i in x
-    ]
-    df = pd.DataFrame({"ECG": y})
-    st.line_chart(df, height=100, use_container_width=True)
-
-    # --- Extract vitals safely ---
-    vitals = p["vitals"]
-    try:
-        hr = int(vitals.get("HR", 0))
-        o2 = int(vitals.get("O2", "0%").strip("%"))
-        temp_str = str(vitals.get("Temp", "0")).replace("°C", "")
-        temp = float(temp_str)
-    except Exception:
-        hr, o2, temp = 0, 0, 0
-
-    # --- Color-coded readouts ---
-    def colorize(value, normal_low, normal_high):
-        if value < normal_low:
-            return "🟠"
-        elif value > normal_high:
-            return "🔴"
-        return "🟢"
-
-    hr_icon = colorize(hr, 60, 110)
-    o2_icon = colorize(o2, 92, 100)
-    temp_icon = colorize(temp, 36, 38.5)
-
-    st.markdown(
-        f"""
-        **{hr_icon} Heart Rate:** {hr} bpm  
-        **{o2_icon} O₂ Sat:** {o2}%  
-        **{temp_icon} Temp:** {temp:.1f} °C
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # --- Warning banner ---
-    warn_msgs = []
-    if hr < 50:
-        warn_msgs.append("Bradycardia – HR < 50 bpm")
-    elif hr > 120:
-        warn_msgs.append("Tachycardia – HR > 120 bpm")
-    if o2 < 90:
-        warn_msgs.append("Hypoxia – O₂ < 90%")
-    if temp > 39:
-        warn_msgs.append("High Fever")
-    if temp < 35:
-        warn_msgs.append("Hypothermia")
-
-    if warn_msgs:
-        st.markdown(
-            f"<div style='background:#e74c3c;color:white;padding:6px;border-radius:6px;'>⚠️ {' | '.join(warn_msgs)}</div>",
-            unsafe_allow_html=True,
-        )
-
-        # Safely show vitals (color-coded + pulse indicator)
-        vitals = p.get("vitals", {})
-        if vitals:
-            st.subheader("🩺 Patient Vitals")
-
-            def color_vital(label, value, normal_range=None, suffix=""):
-                """Render a vital with colored indicator depending on whether it's normal."""
-                try:
-                    if isinstance(value, str) and "%" in value:
-                        numeric = int(value.strip("%"))
-                    elif isinstance(value, str) and "/" in value:
-                        systolic, diastolic = map(int, value.split("/"))
-                        numeric = (systolic + diastolic) // 2
-                    else:
-                        numeric = int(value)
-                except Exception:
-                    numeric = 0
-
-                color = "🟢"
-                if normal_range:
-                    if numeric < normal_range[0]:
-                        color = "🟠"
-                    elif numeric > normal_range[1]:
-                        color = "🔴"
-
-                return f"{color} **{label}:** {value}{suffix}"
-
-            st.markdown(color_vital("BP", vitals.get("BP", "N/A"), (90, 140)))
-            st.markdown(color_vital("HR", vitals.get("HR", "N/A"), (60, 110)))
-            st.markdown(color_vital("O₂", vitals.get("O2", "N/A"), (92, 100), "%"))
-            st.markdown(f"**Temp:** {vitals.get('Temp', 'N/A')}")
-
-            # Pulse / Rhythm display
-            try:
-                hr = int(vitals.get("HR", 0))
-                o2 = int(vitals.get("O2", "0%").strip("%"))
-            except Exception:
-                hr, o2 = 0, 0
-
-            if hr == 0 or o2 == 0:
-                st.markdown("<div style='color:#7f8c8d;'>No pulse detected.</div>", unsafe_allow_html=True)
-            elif hr < 50 or o2 < 85:
-                st.markdown("<div style='font-size:20px;color:#e74c3c;'>💔 Weak Pulse — Patient Deteriorating!</div>", unsafe_allow_html=True)
-            elif hr > 120:
-                st.markdown("<div style='font-size:20px;color:#f39c12;'>💢 Tachycardia — Monitor Closely!</div>", unsafe_allow_html=True)
-            else:
-                # subtle 'heartbeat' swap every rerun second
-                beat = "❤️" if int(time.time()) % 2 == 0 else "💚"
-                st.markdown(f"<div style='font-size:20px;color:#2ecc71;'>{beat} Stable Pulse — Normal Rhythm</div>", unsafe_allow_html=True)
-        else:
-            st.warning("⚠️ No vitals available.")
-
-        # Soft auto-refresh fallback (no extra deps)
-        if st.session_state.get("patient"):
-            time.sleep(3)
-            st.experimental_rerun()
 
         # Treatment history
         st.subheader("🧾 Treatment History")
