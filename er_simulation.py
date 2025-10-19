@@ -69,6 +69,44 @@ def assign_patient():
     st.session_state.score = 0
 
 # --------------------------------------
+# DYNAMIC VITALS UPDATE
+# --------------------------------------
+def update_vitals(effect):
+    """Adjust patient vitals dynamically depending on treatment effectiveness."""
+    p = st.session_state.get("patient")
+    if not p or "vitals" not in p:
+        return
+
+    vitals = p["vitals"]
+
+    def parse_bp(bp_str):
+        try:
+            systolic, diastolic = bp_str.split("/")
+            return int(systolic), int(diastolic)
+        except:
+            return (100, 70)
+
+    sys, dia = parse_bp(vitals.get("BP", "100/70"))
+    hr = int(vitals.get("HR", 80))
+    o2 = int(vitals.get("O2", "95%").strip("%"))
+
+    if effect == "improve":
+        o2 = min(100, o2 + random.randint(2, 5))
+        hr = max(55, hr - random.randint(2, 6))
+        sys = min(140, sys + random.randint(1, 3))
+        dia = min(90, dia + random.randint(1, 2))
+    elif effect == "worsen":
+        o2 = max(70, o2 - random.randint(3, 7))
+        hr = min(160, hr + random.randint(5, 10))
+        sys = max(80, sys - random.randint(3, 6))
+        dia = max(50, dia - random.randint(2, 5))
+
+    vitals["BP"] = f"{sys}/{dia}"
+    vitals["HR"] = hr
+    vitals["O2"] = f"{o2}%"
+    st.session_state.patient["vitals"] = vitals
+
+# --------------------------------------
 # SIDEBAR
 # --------------------------------------
 with st.sidebar:
@@ -142,6 +180,14 @@ with col2:
             else:
                 st.info("No available supplies in your inventory to use.")
 
+            if selected_item in correct_uses.get(diagnosis, []):
+    st.session_state.score += 5
+    feedback = f"✅ Correct use! {selected_item} was appropriate. (+5 points)"
+    update_vitals("improve")
+else:
+    feedback = f"⚠️ {selected_item} had limited effect."
+    update_vitals("worsen")
+
             # ---------------- GIVE MEDICATION ----------------
             meds_in_inventory = [m for m in st.session_state.inventory if m.lower() in [
                 "acetaminophen", "morphine", "motrin", "ondansetron", "phenytoin",
@@ -169,6 +215,14 @@ with col2:
                     st.rerun()
             else:
                 st.info("No medications available in your inventory.")
+
+            if selected_med in correct_meds.get(diagnosis, []):
+    st.session_state.score += 10
+    feedback = f"💊 Correct treatment! {selected_med} helped improve the patient's condition. (+10 points)"
+    update_vitals("improve")
+else:
+    feedback = f"⚠️ {selected_med} was not very effective for this condition."
+    update_vitals("worsen")
 
             # ---------------- TRANSFER PATIENT ----------------
             st.subheader("🏥 Transfer Patient")
