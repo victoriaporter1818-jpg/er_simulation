@@ -612,8 +612,8 @@ else:
     st.warning("⚠️ No vitals available.")
 
         # Treatment history section
-        st.subheader("🧾 Treatment History")
-        history = st.session_state.get("treatment_history", [])
+    st.subheader("🧾 Treatment History")
+    history = st.session_state.get("treatment_history", [])
         if history:
             for t in history:
                 st.write(t)
