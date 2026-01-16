@@ -394,8 +394,8 @@ with col2:
                         st.session_state.treatment_history = []
                         st.session_state.score = 0
                         st.rerun()
-        else:
-            st.info("No active patient.")
+                    else:
+                    st.info("No active patient.")
 
     # ---------------- SUPPLY ROOM ----------------
     elif st.session_state.room == "Supply Room":
