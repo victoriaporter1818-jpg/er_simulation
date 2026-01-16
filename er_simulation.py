@@ -174,9 +174,11 @@ with col2:
             st.session_state.score = 0
             st.rerun()
 
-                # ==== REAL-TIME MONITOR PANEL (dark ICU style) ====
+    # ==== REAL-TIME MONITOR PANEL (dark ICU style) ====
     if st.session_state.get("patient"):
-        import pandas as pd, math, time
+        import pandas as pd
+        import math
+
         p = st.session_state["patient"]
 
         # --- ECG waveform ---
@@ -202,12 +204,9 @@ with col2:
             + (0.4 if i == 40 else 0)
             for i in x
         ]
+
         df = pd.DataFrame({"ECG": y})
-        st.line_chart(
-            df,
-            height=120,
-            use_container_width=True,
-        )
+        st.line_chart(df, height=120, use_container_width=True)
 
         # --- Vitals ---
         vitals = p.get("vitals", {})
@@ -220,10 +219,10 @@ with col2:
 
         def glow_color(value, low, high):
             if value < low:
-                return "#ffcc00"  # yellow
+                return "#ffcc00"
             elif value > high:
-                return "#ff0033"  # red
-            return "#39FF14"    # neon green
+                return "#ff0033"
+            return "#39FF14"
 
         hr_color = glow_color(hr, 60, 110)
         o2_color = glow_color(o2, 92, 100)
@@ -240,11 +239,16 @@ with col2:
 
         # --- Alerts ---
         warnings = []
-        if hr < 50: warnings.append("Bradycardia – HR < 50 bpm")
-        elif hr > 120: warnings.append("Tachycardia – HR > 120 bpm")
-        if o2 < 90: warnings.append("Hypoxia – O₂ < 90%")
-        if temp > 39: warnings.append("High Fever")
-        if temp < 35: warnings.append("Hypothermia")
+        if hr < 50:
+            warnings.append("Bradycardia – HR < 50 bpm")
+        elif hr > 120:
+            warnings.append("Tachycardia – HR > 120 bpm")
+        if o2 < 90:
+            warnings.append("Hypoxia – O₂ < 90%")
+        if temp > 39:
+            warnings.append("High Fever")
+        if temp < 35:
+            warnings.append("Hypothermia")
 
         if warnings:
             st.markdown(
@@ -254,36 +258,40 @@ with col2:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        
-            # ---------------- USE SUPPLIES ----------------
-                if st.session_state.inventory:
-                st.subheader("🧰 Use Supplies")
-                selected_item = st.selectbox("Select an item to use:", st.session_state.inventory)
-                if st.button("Use Selected Item"):
-                    diagnosis = p["diagnosis"]
-                    correct_uses = {
-                        "Heart attack": ["Defibrillator and Pads", "Oxygen Mask", "IV Kit", "Aspirin"],
-                        "Pneumonia": ["Oxygen Mask", "Thermometer", "IV Kit"],
-                        "Stroke": ["Oxygen Mask", "IV Kit", "Glucometer", "Blood Pressure Cuff"]
-                    }
-                    if selected_item in correct_uses.get(diagnosis, []):
-                        st.session_state.score += 5
-                        feedback = f"✅ Correct use! {selected_item} was appropriate. (+5 points)"
-                        update_vitals("improve")
-                    else:
-                        feedback = f"⚠️ {selected_item} had limited effect."
-                        update_vitals("worsen")
+        # ---------------- USE SUPPLIES ----------------
+        if st.session_state.inventory:
+            st.subheader("🧰 Use Supplies")
+            selected_item = st.selectbox(
+                "Select an item to use:", st.session_state.inventory
+            )
 
-                    st.session_state.treatment_history.append(
-                        f"Used {selected_item} on {p['name']}. {feedback}"
-                    )
-                    st.session_state.inventory.remove(selected_item)
-                    st.success(feedback)
-                    st.toast(feedback, icon="💉")
-                    st.session_state.last_update = time.time()
-                    st.rerun()
-            else:
-                st.info("No available supplies in your inventory to use.")
+            if st.button("Use Selected Item"):
+                diagnosis = p["diagnosis"]
+                correct_uses = {
+                    "Heart attack": ["Defibrillator and Pads", "Oxygen Mask", "IV Kit", "Aspirin"],
+                    "Pneumonia": ["Oxygen Mask", "Thermometer", "IV Kit"],
+                    "Stroke": ["Oxygen Mask", "IV Kit", "Glucometer", "Blood Pressure Cuff"],
+                }
+
+                if selected_item in correct_uses.get(diagnosis, []):
+                    st.session_state.score += 5
+                    feedback = f"✅ Correct use! {selected_item} was appropriate. (+5 points)"
+                    update_vitals("improve")
+                else:
+                    feedback = f"⚠️ {selected_item} had limited effect."
+                    update_vitals("worsen")
+
+                st.session_state.treatment_history.append(
+                    f"Used {selected_item} on {p['name']}. {feedback}"
+                )
+                st.session_state.inventory.remove(selected_item)
+                st.success(feedback)
+                st.toast(feedback, icon="💉")
+                st.session_state.last_update = time.time()
+                st.rerun()
+        else:
+            st.info("No available supplies in your inventory to use.")
+
 
             # ---------------- GIVE MEDICATION ----------------
             meds_in_inventory = [m for m in st.session_state.inventory if m.lower() in [
