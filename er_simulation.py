@@ -165,14 +165,18 @@ col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 
 # ---- CENTER COLUMN ----
 with col2:
-    if not st.session_state.patient:
-        st.header("🏥 Emergency Room Simulation")
-        st.info("No active patient. Generate a new patient to begin.")
 
-        if st.button("🆕 Generate New Patient"):
-            assign_patient()
-            st.session_state.score = 0
-            st.rerun()
+    # ================= ER =================
+    if st.session_state.room == "ER":
+
+        if not st.session_state.patient:
+            st.header("🏥 Emergency Room Simulation")
+            st.info("No active patient. Generate a new patient to begin.")
+
+            if st.button("🆕 Generate New Patient"):
+                assign_patient()
+                st.session_state.score = 0
+                st.rerun()
 
     # ==== REAL-TIME MONITOR PANEL (dark ICU style) ====
     if st.session_state.get("patient"):
