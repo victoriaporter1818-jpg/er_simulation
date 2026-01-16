@@ -165,8 +165,14 @@ col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 
 # ---- CENTER COLUMN ----
 with col2:
-    if st.session_state.room == "ER":
-        st.header("🏥 Emergency Room")
+    if not st.session_state.patient:
+        st.header("🏥 Emergency Room Simulation")
+        st.info("No active patient. Generate a new patient to begin.")
+
+        if st.button("🆕 Generate New Patient"):
+            assign_patient()
+            st.session_state.score = 0
+            st.rerun()
 
                 # ==== REAL-TIME MONITOR PANEL (dark ICU style) ====
     if st.session_state.get("patient"):
@@ -248,31 +254,7 @@ with col2:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # --- Optional auto-refresh fallback ---
-        if st.session_state.get("patient"):
-            time.sleep(3)
-            st.experimental_rerun()
-
-        if st.button("Next Patient"):
-            st.session_state.next_patient_button_clicked = True
-
-        if st.session_state.get("next_patient_button_clicked", False):
-            assign_patient()
-            st.session_state.next_patient_button_clicked = False
-
-        if st.session_state.patient:
-            # Passive deterioration on each rerun
-            gradual_deterioration()
-
-            p = st.session_state.patient
-            st.subheader("Patient Information")
-            st.write(f"**Name:** {p['name']}")
-            st.write(f"**Age:** {p['age']}")
-            st.write(f"**Symptoms:** {p['symptoms']}")
-            st.subheader("📜 Medical History Form")
-            for k, v in p["medical_history"].items():
-                st.write(f"**{k}:** {v}")
-
+        
             # ---------------- USE SUPPLIES ----------------
             if st.session_state.inventory:
                 st.subheader("🧰 Use Supplies")
