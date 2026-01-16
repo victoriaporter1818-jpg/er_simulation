@@ -166,7 +166,7 @@ col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 # ---- CENTER COLUMN ----
 with col2:
 
-    # ================= ER =================
+# ================= ER =================
     if st.session_state.room == "ER":
 
         if not st.session_state.patient:
