@@ -256,7 +256,7 @@ with col2:
 
         
             # ---------------- USE SUPPLIES ----------------
-            if st.session_state.inventory:
+                if st.session_state.inventory:
                 st.subheader("🧰 Use Supplies")
                 selected_item = st.selectbox("Select an item to use:", st.session_state.inventory)
                 if st.button("Use Selected Item"):
