@@ -166,7 +166,9 @@ col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
 # ---- CENTER COLUMN ----
 with col2:
 
-# ================= ER =================
+    # =========================
+    # 🏥 EMERGENCY ROOM
+    # =========================
     if st.session_state.room == "ER":
 
         if not st.session_state.patient:
@@ -178,123 +180,78 @@ with col2:
                 st.session_state.score = 0
                 st.rerun()
 
-    # ==== REAL-TIME MONITOR PANEL (dark ICU style) ====
-    if st.session_state.get("patient"):
-        import pandas as pd
-        import math
+        else:
+            import pandas as pd
+            import math
 
-        p = st.session_state["patient"]
+            p = st.session_state.patient
 
-        # --- ECG waveform ---
-        st.markdown(
-            """
-            <div style="
-                background-color:#000000;
-                padding:12px 16px;
-                border-radius:10px;
-                box-shadow:0 0 12px rgba(0,255,0,0.3);
-                color:#39FF14;
-                font-family:monospace;">
-                <h4 style='color:#39FF14;margin-top:0;'>📺 Real-Time Monitor</h4>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        x = list(range(80))
-        phase = int(time.time() * 2) % 60
-        y = [
-            0.1 * math.sin((i + phase) * 0.3)
-            + 0.02 * math.sin((i + phase) * 3)
-            + (0.4 if i == 40 else 0)
-            for i in x
-        ]
-
-        df = pd.DataFrame({"ECG": y})
-        st.line_chart(df, height=120, use_container_width=True)
-
-        # --- Vitals ---
-        vitals = p.get("vitals", {})
-        try:
-            hr = int(vitals.get("HR", 0))
-            o2 = int(vitals.get("O2", "0%").strip("%"))
-            temp = float(str(vitals.get("Temp", "0")).replace("°C", ""))
-        except Exception:
-            hr, o2, temp = 0, 0, 0
-
-        def glow_color(value, low, high):
-            if value < low:
-                return "#ffcc00"
-            elif value > high:
-                return "#ff0033"
-            return "#39FF14"
-
-        hr_color = glow_color(hr, 60, 110)
-        o2_color = glow_color(o2, 92, 100)
-        temp_color = glow_color(temp, 36, 38.5)
-
-        st.markdown(
-            f"""
-            <div style="color:{hr_color};font-weight:bold;">❤️ HR: {hr} bpm</div>
-            <div style="color:{o2_color};font-weight:bold;">💨 O₂ Sat: {o2}%</div>
-            <div style="color:{temp_color};font-weight:bold;">🌡 Temp: {temp:.1f} °C</div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        # --- Alerts ---
-        warnings = []
-        if hr < 50:
-            warnings.append("Bradycardia – HR < 50 bpm")
-        elif hr > 120:
-            warnings.append("Tachycardia – HR > 120 bpm")
-        if o2 < 90:
-            warnings.append("Hypoxia – O₂ < 90%")
-        if temp > 39:
-            warnings.append("High Fever")
-        if temp < 35:
-            warnings.append("Hypothermia")
-
-        if warnings:
+            # ---- MONITOR ----
             st.markdown(
-                f"<div style='background-color:#ff0033;color:#fff;padding:6px;border-radius:6px;text-align:center;font-weight:bold;'>⚠️ {' | '.join(warnings)}</div>",
+                """
+                <div style="background-color:#000;padding:12px 16px;
+                border-radius:10px;box-shadow:0 0 12px rgba(0,255,0,0.3);
+                color:#39FF14;font-family:monospace;">
+                <h4 style='margin-top:0;color:#39FF14;'>📺 Real-Time Monitor</h4>
+                """,
                 unsafe_allow_html=True,
             )
 
-        st.markdown("</div>", unsafe_allow_html=True)
+            x = list(range(80))
+            phase = int(time.time() * 2) % 60
+            y = [
+                0.1 * math.sin((i + phase) * 0.3)
+                + 0.02 * math.sin((i + phase) * 3)
+                + (0.4 if i == 40 else 0)
+                for i in x
+            ]
 
-        # ---------------- USE SUPPLIES ----------------
-        if st.session_state.inventory:
-            st.subheader("🧰 Use Supplies")
-            selected_item = st.selectbox(
-                "Select an item to use:", st.session_state.inventory
+            df = pd.DataFrame({"ECG": y})
+            st.line_chart(df, height=120, use_container_width=True)
+
+            vitals = p.get("vitals", {})
+            hr = int(vitals.get("HR", 0))
+            o2 = int(vitals.get("O2", "0%").strip("%"))
+            temp = float(str(vitals.get("Temp", "0")).replace("°C", ""))
+
+            def glow(v, lo, hi):
+                return "#ff0033" if v > hi else "#ffcc00" if v < lo else "#39FF14"
+
+            st.markdown(
+                f"""
+                <div style="color:{glow(hr,60,110)};">❤️ HR: {hr} bpm</div>
+                <div style="color:{glow(o2,92,100)};">💨 O₂ Sat: {o2}%</div>
+                <div style="color:{glow(temp,36,38.5)};">🌡 Temp: {temp:.1f} °C</div>
+                """,
+                unsafe_allow_html=True,
             )
+            st.markdown("</div>", unsafe_allow_html=True)
 
-            if st.button("Use Selected Item"):
-                diagnosis = p["diagnosis"]
-                correct_uses = {
-                    "Heart attack": ["Defibrillator and Pads", "Oxygen Mask", "IV Kit", "Aspirin"],
-                    "Pneumonia": ["Oxygen Mask", "Thermometer", "IV Kit"],
-                    "Stroke": ["Oxygen Mask", "IV Kit", "Glucometer", "Blood Pressure Cuff"],
-                }
+            # ---- USE SUPPLIES ----
+            if st.session_state.inventory:
+                st.subheader("🧰 Use Supplies")
+                item = st.selectbox("Select item:", st.session_state.inventory)
+                if st.button("Use Selected Item"):
+                    correct = {
+                        "Heart attack": ["Defibrillator and Pads", "Oxygen Mask", "IV Kit", "Aspirin"],
+                        "Pneumonia": ["Oxygen Mask", "Thermometer", "IV Kit"],
+                        "Stroke": ["Oxygen Mask", "IV Kit", "Glucometer"]
+                    }
+                    if item in correct.get(p["diagnosis"], []):
+                        st.session_state.score += 5
+                        update_vitals("improve")
+                        msg = "✅ Correct use (+5)"
+                    else:
+                        update_vitals("worsen")
+                        msg = "⚠️ Limited effect"
 
-                if selected_item in correct_uses.get(diagnosis, []):
-                    st.session_state.score += 5
-                    feedback = f"✅ Correct use! {selected_item} was appropriate. (+5 points)"
-                    update_vitals("improve")
-                else:
-                    feedback = f"⚠️ {selected_item} had limited effect."
-                    update_vitals("worsen")
-
-                st.session_state.treatment_history.append(
-                    f"Used {selected_item} on {p['name']}. {feedback}"
-                )
-                st.session_state.inventory.remove(selected_item)
-                st.success(feedback)
-                st.toast(feedback, icon="💉")
-                st.session_state.last_update = time.time()
-                st.rerun()
-        else:
-            st.info("No available supplies in your inventory to use.")
+                    st.session_state.inventory.remove(item)
+                    st.session_state.treatment_history.append(msg)
+                    st.success(msg)
+                    st.session_state.last_update = time.time()
+                    st.rerun()
+            else:
+                st.info("No supplies available.")
 
 
             # ---------------- GIVE MEDICATION ----------------
