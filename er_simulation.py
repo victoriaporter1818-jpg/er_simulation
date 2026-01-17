@@ -230,25 +230,181 @@ with col2:
 
     # ========= SUPPLY ROOM =========
     elif st.session_state.room == "Supply Room":
-        st.header("🛒 Supply Room")
-        for item in ["Oxygen Mask", "IV Kit", "Defibrillator"]:
-            if st.button(f"Add {item}"):
-                st.session_state.inventory.append(item)
-                st.rerun()
+    st.header("🛒 Supply Room")
+
+    color_map = {
+        "Airway & Breathing": "#d0f0fd",
+        "Circulation & IV": "#d0ffd0",
+        "Diagnostics": "#fff6d0",
+        "Immobilization": "#ffe0d0",
+        "General Care": "#e0d0ff"
+    }
+
+    categorized_supplies = {
+        "Airway & Breathing": {
+            "Oxygen Mask": "Used to deliver oxygen to patients with breathing difficulties.",
+            "Intubation Kit": "Contains tools for airway management.",
+            "Defibrillator and Pads": "Delivers shocks for cardiac arrest."
+        },
+        "Circulation & IV": {
+            "IV Kit": "For IV fluids or medication administration.",
+            "Saline and Other IV Fluids": "Hydrates patients or delivers IV meds.",
+            "Tourniquet": "Stops bleeding on limbs."
+        },
+        "Diagnostics": {
+            "Test Swabs": "Collect samples for testing.",
+            "Glucometer": "Measures blood glucose levels.",
+            "Thermometer": "Measures body temperature."
+        },
+        "Immobilization": {
+            "Cervical Collar": "Neck immobilization for trauma.",
+            "Arm Splint": "Immobilizes broken or injured limbs."
+        },
+        "General Care": {
+            "Catheter Kit": "For urinary drainage.",
+            "Bed Pan": "For bedridden patients.",
+            "Sutures": "Used to close wounds."
+        }
+    }
+
+    for category, supplies in categorized_supplies.items():
+        st.markdown(
+            f"<h4 style='background-color:{color_map[category]};padding:6px;border-radius:8px;'>{category}</h4>",
+            unsafe_allow_html=True
+        )
+
+        items = list(supplies.items())
+        for i in range(0, len(items), 2):
+            colA, colB = st.columns(2)
+            for col, (item, desc) in zip((colA, colB), items[i:i+2]):
+                with col.expander(item):
+                    st.write(desc)
+                    if st.button(f"Add {item}", key=f"supply_{item}"):
+                        if item not in st.session_state.inventory:
+                            st.session_state.inventory.append(item)
+                            st.success(f"{item} added.")
+                            st.toast(f"📦 {item} added!", icon="📦")
+                            st.rerun()
+                        else:
+                            st.warning("Already in inventory.")
 
     # ========= MEDSTATION =========
     elif st.session_state.room == "Medstation":
-        st.header("💊 Medstation")
-        for med in ["Morphine", "Heparin"]:
-            if st.button(f"Add {med}"):
-                st.session_state.inventory.append(med)
-                st.rerun()
+    st.header("💊 Medstation")
+
+    med_categories = {
+        "Pain Relief": {
+            "Acetaminophen": "Used for fever or mild pain.",
+            "Morphine": "For severe pain.",
+            "Motrin": "Anti-inflammatory pain relief."
+        },
+        "Antiemetics": {
+            "Ondansetron": "Prevents nausea and vomiting."
+        },
+        "Neurological": {
+            "Phenytoin": "Used for seizure control.",
+            "Midodrine": "Used for low blood pressure."
+        },
+        "Cardiac & Emergency": {
+            "Epinephrine": "Used for anaphylaxis or cardiac arrest.",
+            "Hydralazine": "Lowers blood pressure.",
+            "Heparin": "Prevents blood clots.",
+            "Lasix": "Removes excess fluid.",
+            "Naloxone": "Reverses opioid overdose."
+        },
+        "Metabolic": {
+            "Glucose": "Used to treat low blood sugar."
+        }
+    }
+
+    color_map_meds = {
+        "Pain Relief": "#fde0dc",
+        "Antiemetics": "#fff5d7",
+        "Neurological": "#e3f2fd",
+        "Cardiac & Emergency": "#e8f5e9",
+        "Metabolic": "#f3e5f5"
+    }
+
+    for category, meds in med_categories.items():
+        st.markdown(
+            f"<h4 style='background-color:{color_map_meds[category]};padding:6px;border-radius:8px;'>{category}</h4>",
+            unsafe_allow_html=True
+        )
+
+        meds_list = list(meds.items())
+        for i in range(0, len(meds_list), 2):
+            colA, colB = st.columns(2)
+            for col, (med, desc) in zip((colA, colB), meds_list[i:i+2]):
+                with col.expander(med):
+                    st.write(desc)
+                    if st.button(f"Add {med}", key=f"med_{med}"):
+                        if med not in st.session_state.inventory:
+                            st.session_state.inventory.append(med)
+                            st.success(f"{med} added.")
+                            st.toast(f"💊 {med} added!", icon="💊")
+                            st.rerun()
+                        else:
+                            st.warning("Already in inventory.")
 
     # ========= DIAGNOSTIC LAB =========
     elif st.session_state.room == "Diagnostic Lab":
-        st.header("🧪 Diagnostic Lab")
-        st.info("Diagnostics affect future versions")
+    st.header("🧪 Diagnostic Lab")
 
+    st.markdown("""
+    Perform diagnostic imaging and laboratory tests to confirm or refine your diagnosis.  
+    Choose wisely — accurate tests improve outcomes.
+    """)
+
+    body_part_options = ["Chest", "Head", "Abdomen", "Pelvis", "Extremities"]
+
+    imaging_tests = {
+        "X-Ray": "Uses radiation to view bone and lung structures.",
+        "CT Scan": "Cross-sectional imaging for strokes, trauma, or internal bleeding.",
+        "MRI": "Detailed soft-tissue imaging — excellent for brain, spine, and joints.",
+        "Ultrasound": "Real-time imaging to visualize organs or fluid buildup."
+    }
+
+    lab_tests = {
+        "CBC": "Complete blood count; detects infection or anemia.",
+        "Blood Test": "Analyzes infection markers, glucose, and clotting levels.",
+        "Urinalysis": "Detects infection or metabolic issues.",
+        "Biopsy": "Examines tissue samples for cancer or disease."
+    }
+
+    col_imaging, col_lab = st.columns(2)
+
+    with col_imaging:
+        st.markdown(
+            "<h4 style='background-color:#fff176;padding:6px;border-radius:8px;'>Diagnostic Imaging</h4>",
+            unsafe_allow_html=True
+        )
+        for test, desc in imaging_tests.items():
+            st.write(f"**{test}** — {desc}")
+            part = st.selectbox(
+                f"Body part for {test}",
+                ["-- Select --"] + body_part_options,
+                key=f"img_{test}"
+            )
+            if st.button(f"Run {test}", key=f"run_{test}"):
+                st.session_state.score += 5
+                st.success(f"{test} completed for {part}")
+                st.toast(f"🧪 {test} completed!", icon="🧪")
+                st.session_state.last_update = time.time()
+                st.rerun()
+
+    with col_lab:
+        st.markdown(
+            "<h4 style='background-color:#a5d6a7;padding:6px;border-radius:8px;'>Laboratory Tests</h4>",
+            unsafe_allow_html=True
+        )
+        for test, desc in lab_tests.items():
+            st.write(f"**{test}** — {desc}")
+            if st.button(f"Run {test}", key=f"lab_{test}"):
+                st.session_state.score += 5
+                st.success(f"{test} completed.")
+                st.toast(f"🧪 {test} completed!", icon="🧪")
+                st.session_state.last_update = time.time()
+                st.rerun()
 # --------------------------------------
 # RIGHT COLUMN
 # --------------------------------------
