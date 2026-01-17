@@ -346,24 +346,25 @@ with col2:
                 )
 
                 if st.button("Give Medication"):
-    diagnosis = p["diagnosis"]
+                diagnosis = p["diagnosis"]
 
-    effect, feedback, score_delta = apply_medication_effect(
-        selected_med, diagnosis
-    )
+                effect, feedback, score_delta = apply_medication_effect(
+                    selected_med, diagnosis
+                )
 
-    update_vitals(effect)
-    st.session_state.score += score_delta
+                update_vitals(effect)
+                st.session_state.score += score_delta
 
-    st.session_state.treatment_history.append(
-        f"Gave {selected_med}. {feedback}"
-    )
+                st.session_state.treatment_history.append(
+                    f"Gave {selected_med}. {feedback}"
+                )
 
-    st.session_state.inventory.remove(selected_med)
-    st.success(feedback)
-    st.toast(feedback, icon="💊")
-    st.session_state.last_update = time.time()
-    st.rerun()
+                st.session_state.inventory.remove(selected_med)
+                st.success(feedback)
+                st.toast(feedback, icon="💊")
+                st.session_state.last_update = time.time()
+                st.rerun()
+
             else:
                 st.info("No supplies available in inventory.")
 
