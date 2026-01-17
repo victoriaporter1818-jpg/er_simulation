@@ -3,6 +3,7 @@ import random
 import time
 import math
 import pandas as pd
+import altair as alt
 
 # --------------------------------------
 # PAGE CONFIGURATION
@@ -322,8 +323,32 @@ with col2:
                 unsafe_allow_html=True,
             )
 
-            df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
-            st.line_chart(df, height=160, y_min=-1, y_max=5)
+            ecg_data = generate_ecg(
+    diagnosis=p["diagnosis"],
+    hr=hr,
+    length=120
+)
+
+ecg_df = pd.DataFrame({
+    "Time": range(len(ecg_data)),
+    "ECG": ecg_data
+})
+
+ecg_chart = (
+    alt.Chart(ecg_df)
+    .mark_line(color="#39FF14")
+    .encode(
+        x=alt.X("Time", title=None),
+        y=alt.Y(
+            "ECG",
+            scale=alt.Scale(domain=[-1, 5]),
+            title=None
+        )
+    )
+    .properties(height=160)
+)
+
+st.altair_chart(ecg_chart, use_container_width=True)
 
             st.divider()
             st.subheader("🧰 Use Supplies")
