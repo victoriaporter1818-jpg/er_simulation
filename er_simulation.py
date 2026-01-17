@@ -149,19 +149,36 @@ def restart_simulation():
 def update_vitals(effect):
     if st.session_state.paused:
         return
+
     v = st.session_state.patient["vitals"]
+
     hr = int(v["HR"])
     o2 = int(v["O2"].replace("%", ""))
+    rr = int(v["RR"])
+    temp = float(v["Temp"])
+    sys, dia = map(int, v["BP"].split("/"))
 
     if effect == "improve":
         hr = max(55, hr - random.randint(2, 6))
-        o2 = min(100, o2 + random.randint(3, 6))
+        o2 = min(100, o2 + random.randint(2, 5))
+        rr = max(12, rr - random.randint(1, 3))
+        sys = min(140, sys + random.randint(2, 5))
+        dia = min(90, dia + random.randint(1, 3))
+        temp = max(36.5, temp - random.uniform(0.1, 0.3))
+
     else:
-        hr = min(170, hr + random.randint(5, 10))
-        o2 = max(65, o2 - random.randint(4, 8))
+        hr = min(170, hr + random.randint(4, 8))
+        o2 = max(65, o2 - random.randint(3, 6))
+        rr = min(40, rr + random.randint(2, 4))
+        sys = max(70, sys - random.randint(4, 8))
+        dia = max(40, dia - random.randint(2, 4))
+        temp = min(41.0, temp + random.uniform(0.2, 0.4))
 
     v["HR"] = hr
     v["O2"] = f"{o2}%"
+    v["RR"] = rr
+    v["BP"] = f"{sys}/{dia}"
+    v["Temp"] = round(temp, 1)
 
 
 def gradual_deterioration():
@@ -245,8 +262,44 @@ with col2:
 
             p = st.session_state.patient
             st.subheader(f"Status: {st.session_state.patient_status}")
-            st.write(f"❤️ HR: {p['vitals']['HR']} bpm")
-            st.write(f"💨 O₂: {p['vitals']['O2']}")
+            v = p["vitals"]
+
+# ---------- Color helper ----------
+def vital_color(val, low, high):
+    if val < low:
+        return "#f1c40f"   # yellow
+    if val > high:
+        return "#e74c3c"   # red
+    return "#2ecc71"       # green
+
+# Parse values
+sys, dia = map(int, v["BP"].split("/"))
+hr = v["HR"]
+o2 = int(v["O2"].replace("%", ""))
+rr = v["RR"]
+temp = v["Temp"]
+
+st.markdown(
+    f"""
+    <div style="
+        background:#000;
+        padding:16px;
+        border-radius:12px;
+        box-shadow:0 0 14px rgba(0,255,0,0.35);
+        font-family:monospace;">
+        
+        <h4 style="color:#39FF14;margin-top:0;">📺 Patient Monitor</h4>
+
+        <div style="color:{vital_color(hr,60,110)};">❤️ HR: {hr} bpm</div>
+        <div style="color:{vital_color(o2,92,100)};">💨 SpO₂: {o2}%</div>
+        <div style="color:{vital_color(rr,12,20)};">🫁 RR: {rr} /min</div>
+        <div style="color:{vital_color(sys,90,140)};">🩺 BP: {sys}/{dia} mmHg</div>
+        <div style="color:{vital_color(temp,36.0,38.0)};">🌡 Temp: {temp:.1f} °C</div>
+
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
             df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
             st.line_chart(df, height=120)
