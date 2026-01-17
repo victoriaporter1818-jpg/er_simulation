@@ -36,6 +36,9 @@ for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
+if "diagnostic_history" not in st.session_state:
+    st.session_state.diagnostic_history = []
+
 # --------------------------------------
 # PATIENT DATA
 # --------------------------------------
@@ -108,6 +111,7 @@ def assign_patient():
     st.session_state.inventory.clear()
     st.session_state.score = 0
     st.session_state.treatment_history.clear()
+    st.session_state.diagnostic_history = []  # 👈 ADD THIS
     st.session_state.patient_status = "Stable"
     st.session_state.case_start_time = time.time()
     st.session_state.last_update = time.time()
@@ -323,26 +327,46 @@ with col2:
                             st.rerun()
 
     # ---------------- DIAGNOSTIC LAB ----------------
-    elif st.session_state.room == "Diagnostic Lab":
-        st.header("🧪 Diagnostic Lab")
+elif st.session_state.room == "Diagnostic Lab":
+    st.header("🧪 Diagnostic Lab")
 
-        p = st.session_state.patient
-        if not p:
-            st.info("No active patient.")
+    p = st.session_state.patient
+    if not p:
+        st.info("No active patient.")
+    else:
+        colA, colB = st.columns(2)
+
+        # ---------- IMAGING ----------
+        with colA:
+            st.subheader("📸 Imaging")
+            for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
+                if st.button(f"Run {test}", key=f"img_{test}"):
+                    result = diagnostic_results[p["diagnosis"]][test]
+
+                    entry = f"📸 **{test}**: {result}"
+                    if entry not in st.session_state.diagnostic_history:
+                        st.session_state.diagnostic_history.append(entry)
+
+        # ---------- LABS ----------
+        with colB:
+            st.subheader("🧫 Labs")
+            for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
+                if st.button(f"Run {test}", key=f"lab_{test}"):
+                    result = diagnostic_results[p["diagnosis"]][test]
+
+                    entry = f"🧫 **{test}**: {result}"
+                    if entry not in st.session_state.diagnostic_history:
+                        st.session_state.diagnostic_history.append(entry)
+
+        # ---------- RESULTS PANEL ----------
+        st.divider()
+        st.subheader("📋 Diagnostic Results")
+
+        if st.session_state.diagnostic_history:
+            for r in st.session_state.diagnostic_history:
+                st.markdown(r)
         else:
-            colA, colB = st.columns(2)
-
-            with colA:
-                st.subheader("📸 Imaging")
-                for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
-                    if st.button(f"Run {test}", key=f"img_{test}"):
-                        st.success(diagnostic_results[p["diagnosis"]][test])
-
-            with colB:
-                st.subheader("🧫 Labs")
-                for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
-                    if st.button(f"Run {test}", key=f"lab_{test}"):
-                        st.success(diagnostic_results[p["diagnosis"]][test])
+            st.info("No diagnostic results yet.")
 
 # --------------------------------------
 # RIGHT COLUMN
