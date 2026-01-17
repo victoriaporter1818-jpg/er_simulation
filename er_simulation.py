@@ -475,8 +475,8 @@ with col2:
         }
 
         categorized_supplies = {
-            "Airway & Breathing": ["Oxygen Mask", "Nebulizer" "Intubation Kit", "Defibrillator"],
-            "Circulation & IV": ["IV Kit", "Blood Warmer" "Saline", "Tourniquet"],
+            "Airway & Breathing": ["Oxygen Mask", "Nebulizer", "Intubation Kit", "Defibrillator"],
+            "Circulation & IV": ["IV Kit", "Blood Warmer", "Saline", "Tourniquet"],
             "Diagnostics": ["Test Swabs", "Glucometer", "Thermometer"],
             "Immobilization": ["Cervical Collar", "Arm Splint"],
             "General Care": ["Catheter Kit", "Bed Pan", "Sutures"],
