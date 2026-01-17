@@ -245,7 +245,7 @@ with col2:
                 if st.button("Use Selected Supply"):
                     if selected_item == "Oxygen Mask":
                         update_vitals("improve")
-                          st.session_state.score += 5
+                        st.session_state.score += 5
                         message = "🫁 Oxygen mask applied — breathing improved."
                     else:
                         update_vitals("worsen")
