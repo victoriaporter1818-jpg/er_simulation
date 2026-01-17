@@ -53,21 +53,39 @@ patients = [
         "age": 45,
         "symptoms": "severe chest pain and shortness of breath",
         "diagnosis": "Heart attack",
-        "vitals": {"BP": "90/60", "HR": 120, "O2": "85%", "Temp": "37.0°C"},
+        "vitals": {
+    "BP": "90/60",
+    "HR": 120,
+    "O2": "85%",
+    "RR": 28,
+    "Temp": 37.0
+}
     },
     {
         "name": "Sarah Li",
         "age": 29,
         "symptoms": "high fever, cough, and low oxygen",
         "diagnosis": "Pneumonia",
-        "vitals": {"BP": "110/70", "HR": 95, "O2": "88%", "Temp": "39.2°C"},
+        "vitals": {
+    "BP": "110/70",
+    "HR": 95,
+    "O2": "88%",
+    "RR": 26,
+    "Temp": 39.2
+}
     },
     {
         "name": "Carlos Vega",
         "age": 60,
         "symptoms": "sudden weakness on one side and slurred speech",
         "diagnosis": "Stroke",
-        "vitals": {"BP": "150/90", "HR": 82, "O2": "97%", "Temp": "36.8°C"},
+        "vitals": {
+    "BP": "150/90",
+    "HR": 82,
+    "O2": "97%",
+    "RR": 18,
+    "Temp": 36.8
+}
     },
 ]
 
