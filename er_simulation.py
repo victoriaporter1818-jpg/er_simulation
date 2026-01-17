@@ -88,6 +88,59 @@ patients = [
             "Temp": 36.8,
         },
     },
+
+        {
+        "name": "Emily Carter",
+        "age": 34,
+        "symptoms": "severe wheezing, chest tightness, difficulty speaking in full sentences",
+        "diagnosis": "Asthma exacerbation",
+        "vitals": {
+            "BP": "125/80",
+            "HR": 118,
+            "O2": "89%",
+            "RR": 32,
+            "Temp": 37.1,
+        },
+    },
+    {
+        "name": "Robert Kim",
+        "age": 72,
+        "symptoms": "confusion, low body temperature, slow speech, shivering",
+        "diagnosis": "Hypothermia",
+        "vitals": {
+            "BP": "95/60",
+            "HR": 54,
+            "O2": "92%",
+            "RR": 10,
+            "Temp": 33.4,
+        },
+    },
+    {
+        "name": "Aisha Hassan",
+        "age": 26,
+        "symptoms": "abdominal pain, vomiting, dizziness, rapid heart rate",
+        "diagnosis": "Sepsis",
+        "vitals": {
+            "BP": "85/50",
+            "HR": 135,
+            "O2": "90%",
+            "RR": 30,
+            "Temp": 39.8,
+        },
+    },
+    {
+        "name": "Mark Reynolds",
+        "age": 58,
+        "symptoms": "sudden tearing chest pain radiating to the back",
+        "diagnosis": "Aortic dissection",
+        "vitals": {
+            "BP": "190/110",
+            "HR": 110,
+            "O2": "96%",
+            "RR": 24,
+            "Temp": 36.9,
+        },
+    },
 ]
 
 # --------------------------------------
@@ -123,6 +176,47 @@ diagnostic_results = {
         "Blood Test": "Glucose mildly elevated.",
         "Urinalysis": "Normal urinalysis.",
         "Biopsy": "Not indicated for acute stroke.",
+    },
+
+        "Asthma exacerbation": {
+        "X-Ray": "Chest X-ray shows hyperinflated lungs.",
+        "CT Scan": "No acute pulmonary embolism detected.",
+        "MRI": "MRI not indicated.",
+        "Ultrasound": "Normal lung sliding.",
+        "CBC": "Mild eosinophilia.",
+        "Blood Test": "Normal metabolic panel.",
+        "Urinalysis": "Normal.",
+        "Biopsy": "Not indicated.",
+    },
+    "Hypothermia": {
+        "X-Ray": "No acute cardiopulmonary abnormality.",
+        "CT Scan": "No intracranial hemorrhage.",
+        "MRI": "MRI deferred due to instability.",
+        "Ultrasound": "Cardiac activity slowed but present.",
+        "CBC": "Hemoconcentration noted.",
+        "Blood Test": "Electrolyte disturbances present.",
+        "Urinalysis": "Cold diuresis observed.",
+        "Biopsy": "Not indicated.",
+    },
+    "Sepsis": {
+        "X-Ray": "Possible bilateral infiltrates.",
+        "CT Scan": "Source unclear, possible intra-abdominal infection.",
+        "MRI": "MRI not indicated emergently.",
+        "Ultrasound": "IVC collapsibility suggests hypovolemia.",
+        "CBC": "Marked leukocytosis.",
+        "Blood Test": "Elevated lactate.",
+        "Urinalysis": "Possible infection.",
+        "Biopsy": "Not indicated.",
+    },
+    "Aortic dissection": {
+        "X-Ray": "Widened mediastinum.",
+        "CT Scan": "Intimal flap consistent with aortic dissection.",
+        "MRI": "MRI angiography confirms dissection.",
+        "Ultrasound": "Limited visualization.",
+        "CBC": "Normal.",
+        "Blood Test": "Elevated D-dimer.",
+        "Urinalysis": "Normal.",
+        "Biopsy": "Contraindicated.",
     },
 }
 
@@ -381,8 +475,8 @@ with col2:
         }
 
         categorized_supplies = {
-            "Airway & Breathing": ["Oxygen Mask", "Intubation Kit", "Defibrillator"],
-            "Circulation & IV": ["IV Kit", "Saline", "Tourniquet"],
+            "Airway & Breathing": ["Oxygen Mask", "Nebulizer" "Intubation Kit", "Defibrillator"],
+            "Circulation & IV": ["IV Kit", "Blood Warmer" "Saline", "Tourniquet"],
             "Diagnostics": ["Test Swabs", "Glucometer", "Thermometer"],
             "Immobilization": ["Cervical Collar", "Arm Splint"],
             "General Care": ["Catheter Kit", "Bed Pan", "Sutures"],
@@ -407,6 +501,10 @@ with col2:
             "Antiemetics": ["Ondansetron"],
             "Neurological": ["Phenytoin"],
             "Cardiac & Emergency": ["Epinephrine", "Heparin", "Lasix"],
+            "Respiratory": ["Albuterol"],
+            "Infectious Disease": ["Broad-Spectrum Antibiotics"],
+            "Temperature Control": ["Warming Blankets"],
+            "Blood Pressure": ["Beta Blocker"],
         }
 
         color_map = {
@@ -414,6 +512,10 @@ with col2:
             "Antiemetics": "#fff5d7",
             "Neurological": "#e3f2fd",
             "Cardiac & Emergency": "#e8f5e9",
+            "Respiratory": "#e0f7fa",
+            "Infectious Disease": "#fff3e0",
+            "Temperature Control": "#ede7f6",
+            "Blood Pressure": "#e8f5e9",
         }
 
         for cat, meds in med_categories.items():
