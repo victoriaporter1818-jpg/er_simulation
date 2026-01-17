@@ -432,6 +432,13 @@ with col2:
             st.divider()
             st.subheader("🧰 Use Supplies")
 
+            if st.button("🧰 Use Supplies"):
+                message = apply_item_effect(selected_item)
+                st.session_state.inventory.remove(selected_item)
+                st.toast(message)
+                st.rerun()
+
+
             if st.session_state.inventory:
                 selected_item = st.selectbox(
                     "Select supply",
@@ -461,6 +468,97 @@ with col2:
 
             else:
                 st.info("No supplies available in inventory.")
+
+    def apply_item_effect(item):
+    """
+    Applies diagnosis-specific effects for supplies and medications.
+    Returns a feedback string.
+    """
+    p = st.session_state.patient
+    dx = p["diagnosis"]
+    v = p["vitals"]
+
+    correct = False
+    message = ""
+
+    # ---------------- OXYGEN ----------------
+    if item == "Oxygen Mask":
+        if dx in ["Heart attack", "Pneumonia", "Asthma exacerbation", "Sepsis"]:
+            v["O2"] = f"{min(100, int(v['O2'].replace('%','')) + 6)}%"
+            v["RR"] = max(12, v["RR"] - 3)
+            correct = True
+            message = "🫁 Oxygen therapy improved oxygenation and breathing."
+        else:
+            message = "⚠️ Oxygen provided minimal benefit."
+
+    # ---------------- NEBULIZER ----------------
+    elif item == "Nebulizer" or item == "Albuterol":
+        if dx == "Asthma exacerbation":
+            v["RR"] = max(14, v["RR"] - 6)
+            v["O2"] = f"{min(100, int(v['O2'].replace('%','')) + 8)}%"
+            v["HR"] = max(70, v["HR"] - 10)
+            correct = True
+            message = "🌬️ Bronchodilator relieved airway obstruction."
+        else:
+            message = "⚠️ Nebulizer not indicated for this condition."
+
+    # ---------------- ANTIBIOTICS ----------------
+    elif item == "Broad-Spectrum Antibiotics":
+        if dx == "Sepsis":
+            v["HR"] = max(80, v["HR"] - 12)
+            v["Temp"] = max(36.5, v["Temp"] - 0.8)
+            correct = True
+            message = "🦠 Antibiotics started — infection control improving."
+        else:
+            message = "⚠️ Antibiotics unnecessary at this time."
+
+    # ---------------- IV FLUIDS ----------------
+    elif item == "IV Fluids":
+        if dx in ["Sepsis", "Hypotension"]:
+            sys, dia = map(int, v["BP"].split("/"))
+            v["BP"] = f"{min(130, sys + 15)}/{min(85, dia + 10)}"
+            v["HR"] = max(75, v["HR"] - 10)
+            correct = True
+            message = "💧 IV fluids improved blood pressure and perfusion."
+        else:
+            message = "⚠️ Fluids had limited effect."
+
+    # ---------------- WARMING ----------------
+    elif item == "Warming Blankets" or item == "Blood Warmer":
+        if dx == "Hypothermia":
+            v["Temp"] = min(37.0, v["Temp"] + 1.2)
+            v["HR"] = min(90, v["HR"] + 8)
+            correct = True
+            message = "🔥 Active warming raised core temperature."
+        else:
+            message = "⚠️ Warming not clinically indicated."
+
+    # ---------------- BETA BLOCKER ----------------
+    elif item == "Beta Blocker":
+        if dx == "Aortic dissection":
+            v["HR"] = max(60, v["HR"] - 20)
+            sys, dia = map(int, v["BP"].split("/"))
+            v["BP"] = f"{max(110, sys - 25)}/{max(70, dia - 15)}"
+            correct = True
+            message = "🩺 Heart rate and blood pressure safely reduced."
+        else:
+            message = "⚠️ Beta blocker inappropriate — risk increased."
+
+    # ---------------- DEFAULT ----------------
+    else:
+        message = f"⚠️ {item} used — no significant clinical effect."
+
+    # ---------------- SCORING ----------------
+    if correct:
+        st.session_state.score += 8
+    else:
+        st.session_state.mistakes += 1
+        update_vitals("worsen")
+
+    st.session_state.treatment_history.append(message)
+    st.session_state.last_update = time.time()
+
+    return message
 
             # ================= SUPPLY ROOM =================
     if st.session_state.room == "Supply Room":
