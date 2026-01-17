@@ -343,19 +343,19 @@ with col2:
 
     # ================= DIAGNOSTIC LAB =================
     elif st.session_state.room == "Diagnostic Lab":
-    st.header("🧪 Diagnostic Lab")
+        st.header("🧪 Diagnostic Lab")
 
-    st.markdown(
-        "Run diagnostic imaging or lab tests. Results will vary based on the patient's condition."
-    )
+        st.markdown(
+            "Run diagnostic imaging or lab tests. Results will vary based on the patient's condition."
+        )
 
-    imaging_tests = ["X-Ray", "CT Scan", "MRI", "Ultrasound"]
-    lab_tests = ["CBC", "Blood Test", "Urinalysis", "Biopsy"]
+        imaging_tests = ["X-Ray", "CT Scan", "MRI", "Ultrasound"]
+        lab_tests = ["CBC", "Blood Test", "Urinalysis", "Biopsy"]
 
-    p = st.session_state.get("patient")
-    diagnosis = p["diagnosis"] if p else None
-
-    colA, colB = st.columns(2)
+        p = st.session_state.get("patient")
+        diagnosis = p["diagnosis"] if p else None
+    
+        colA, colB = st.columns(2)
 
     # ---------- IMAGING ----------
     with colA:
