@@ -121,6 +121,17 @@ def check_patient_outcome():
 
     if o2 <= 70 or hr >= 160 or hr <= 35 or st.session_state.mistakes >= 5:
         st.session_state.patient_status = "Deceased"
+        
+def restart_simulation():
+    st.session_state.patient = None
+    st.session_state.inventory = []
+    st.session_state.score = 0
+    st.session_state.mistakes = 0
+    st.session_state.patient_status = "Stable"
+    st.session_state.case_start_time = None
+    st.session_state.last_update = time.time()
+    st.session_state.treatment_history = []
+    st.session_state.room = "ER"
 
 # --------------------------------------
 # SIDEBAR
@@ -181,10 +192,10 @@ with col2:
                 st.write(f"❌ Mistakes: {st.session_state.mistakes}")
                 st.write(f"🏆 Score: {st.session_state.score}")
 
-                if st.button("🆕 New Case"):
-                    st.session_state.patient = None
+                if st.button("🔄 Restart Simulation"):
+                    restart_simulation()
                     st.rerun()
-                st.stop()
+        
 
             p = st.session_state.patient
             vitals = p["vitals"]
