@@ -25,6 +25,7 @@ defaults = {
     "score": 0,
     "patient": None,
     "treatment_history": [],
+    "diagnostic_history": [],
     "last_update": time.time(),
     "patient_status": "Stable",
     "case_start_time": None,
@@ -35,9 +36,6 @@ defaults = {
 for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
-
-if "diagnostic_history" not in st.session_state:
-    st.session_state.diagnostic_history = []
 
 # --------------------------------------
 # PATIENT DATA
@@ -111,7 +109,7 @@ def assign_patient():
     st.session_state.inventory.clear()
     st.session_state.score = 0
     st.session_state.treatment_history.clear()
-    st.session_state.diagnostic_history = []  # 👈 ADD THIS
+    st.session_state.diagnostic_history.clear()
     st.session_state.patient_status = "Stable"
     st.session_state.case_start_time = time.time()
     st.session_state.last_update = time.time()
@@ -240,10 +238,33 @@ with col2:
             df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
             st.line_chart(df, height=120)
 
+            if st.session_state.inventory:
+                item = st.selectbox("Use supply", st.session_state.inventory)
+                if st.button("Use Item"):
+                    correct = {
+                        "Heart attack": ["Oxygen Mask"],
+                        "Pneumonia": ["Oxygen Mask"],
+                        "Stroke": ["Oxygen Mask"],
+                    }
+                    if item in correct.get(p["diagnosis"], []):
+                        update_vitals("improve")
+                        st.session_state.score += 5
+                        st.session_state.treatment_history.append(
+                            f"🫁 {item} applied — patient breathing has improved."
+                        )
+                    else:
+                        update_vitals("worsen")
+                        st.session_state.mistakes += 1
+                        st.session_state.treatment_history.append(
+                            f"⚠️ {item} used — limited effect on patient condition."
+                        )
+                    st.session_state.inventory.remove(item)
+                    st.session_state.last_update = time.time()
+                    st.rerun()
+
     # ---------------- SUPPLY ROOM ----------------
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
-
         color_map = {
             "Airway & Breathing": "#d0f0fd",
             "Circulation & IV": "#d0ffd0",
@@ -251,7 +272,6 @@ with col2:
             "Immobilization": "#ffe0d0",
             "General Care": "#e0d0ff",
         }
-
         categorized_supplies = {
             "Airway & Breathing": {
                 "Oxygen Mask": "Delivers oxygen.",
@@ -278,7 +298,6 @@ with col2:
                 "Sutures": "Wound closure.",
             },
         }
-
         for cat, items in categorized_supplies.items():
             st.markdown(
                 f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
@@ -290,13 +309,14 @@ with col2:
                     if st.button(f"Add {item}", key=f"supply_{item}"):
                         if item not in st.session_state.inventory:
                             st.session_state.inventory.append(item)
-                            st.toast(f"📦 {item} added")
+                            st.session_state.treatment_history.append(
+                                f"📦 {item} collected from Supply Room."
+                            )
                             st.rerun()
 
     # ---------------- MEDSTATION ----------------
     elif st.session_state.room == "Medstation":
         st.header("💊 Medstation")
-
         med_categories = {
             "Pain Relief": ["Acetaminophen", "Morphine", "Motrin"],
             "Antiemetics": ["Ondansetron"],
@@ -304,7 +324,6 @@ with col2:
             "Cardiac & Emergency": ["Epinephrine", "Hydralazine", "Heparin", "Lasix", "Naloxone"],
             "Metabolic": ["Glucose"],
         }
-
         color_map = {
             "Pain Relief": "#fde0dc",
             "Antiemetics": "#fff5d7",
@@ -312,7 +331,6 @@ with col2:
             "Cardiac & Emergency": "#e8f5e9",
             "Metabolic": "#f3e5f5",
         }
-
         for cat, meds in med_categories.items():
             st.markdown(
                 f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
@@ -323,50 +341,51 @@ with col2:
                     if st.button(f"Add {med}", key=f"med_{med}"):
                         if med not in st.session_state.inventory:
                             st.session_state.inventory.append(med)
-                            st.toast(f"💊 {med} added")
+                            st.session_state.treatment_history.append(
+                                f"💊 {med} obtained from Medstation."
+                            )
                             st.rerun()
 
     # ---------------- DIAGNOSTIC LAB ----------------
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
-
         p = st.session_state.patient
         if not p:
             st.info("No active patient.")
         else:
             colA, colB = st.columns(2)
 
-        # ---------- IMAGING ----------
-        with colA:
-            st.subheader("📸 Imaging")
-            for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
-                if st.button(f"Run {test}", key=f"img_{test}"):
-                    result = diagnostic_results[p["diagnosis"]][test]
+            with colA:
+                st.subheader("📸 Imaging")
+                for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
+                    if st.button(f"Run {test}", key=f"img_{test}"):
+                        result = diagnostic_results[p["diagnosis"]][test]
+                        entry = f"📸 {test}: {result}"
+                        if entry not in st.session_state.diagnostic_history:
+                            st.session_state.diagnostic_history.append(entry)
+                            st.session_state.treatment_history.append(
+                                f"🧪 {test} performed — {result}"
+                            )
 
-                    entry = f"📸 **{test}**: {result}"
-                    if entry not in st.session_state.diagnostic_history:
-                        st.session_state.diagnostic_history.append(entry)
+            with colB:
+                st.subheader("🧫 Labs")
+                for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
+                    if st.button(f"Run {test}", key=f"lab_{test}"):
+                        result = diagnostic_results[p["diagnosis"]][test]
+                        entry = f"🧫 {test}: {result}"
+                        if entry not in st.session_state.diagnostic_history:
+                            st.session_state.diagnostic_history.append(entry)
+                            st.session_state.treatment_history.append(
+                                f"🧪 {test} performed — {result}"
+                            )
 
-        # ---------- LABS ----------
-        with colB:
-            st.subheader("🧫 Labs")
-            for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
-                if st.button(f"Run {test}", key=f"lab_{test}"):
-                    result = diagnostic_results[p["diagnosis"]][test]
-
-                    entry = f"🧫 **{test}**: {result}"
-                    if entry not in st.session_state.diagnostic_history:
-                        st.session_state.diagnostic_history.append(entry)
-
-        # ---------- RESULTS PANEL ----------
-        st.divider()
-        st.subheader("📋 Diagnostic Results")
-
-        if st.session_state.diagnostic_history:
-            for r in st.session_state.diagnostic_history:
-                st.markdown(r)
-        else:
-            st.info("No diagnostic results yet.")
+            st.divider()
+            st.subheader("📋 Diagnostic Results")
+            if st.session_state.diagnostic_history:
+                for r in st.session_state.diagnostic_history:
+                    st.markdown(f"- {r}")
+            else:
+                st.info("No diagnostic results yet.")
 
 # --------------------------------------
 # RIGHT COLUMN
@@ -379,3 +398,12 @@ with col3:
 
     st.subheader("🏆 Score")
     st.metric("Total Score", st.session_state.score)
+
+    st.divider()
+    st.subheader("📋 Action Log")
+
+    if st.session_state.treatment_history:
+        for entry in reversed(st.session_state.treatment_history):
+            st.markdown(f"- {entry}")
+    else:
+        st.info("No actions taken yet.")
