@@ -126,6 +126,35 @@ diagnostic_results = {
 }
 
 # --------------------------------------
+# ECG GENERATOR (NEW – ONLY ADDITION)
+# --------------------------------------
+def generate_ecg(diagnosis, hr, length=120):
+    ecg = []
+    base_rate = max(50, min(hr, 140)) / 60
+
+    for i in range(length):
+        t = i / 10
+        wave = math.sin(2 * math.pi * base_rate * t)
+
+        if diagnosis == "Heart attack":
+            spike = 2.5 if i % int(60 / base_rate) == 0 else 0
+            noise = random.uniform(-0.5, 0.5)
+            ecg.append(wave + spike + noise)
+
+        elif diagnosis == "Pneumonia":
+            spike = 1.5 if i % int(45 / base_rate) == 0 else 0
+            ecg.append(math.sin(t * 1.6) + spike)
+
+        elif diagnosis == "Stroke":
+            spike = 1.8 if i % int(70 / base_rate) == 0 else 0
+            ecg.append(wave + spike)
+
+        else:
+            ecg.append(wave)
+
+    return ecg
+
+# --------------------------------------
 # CORE FUNCTIONS
 # --------------------------------------
 def assign_patient():
