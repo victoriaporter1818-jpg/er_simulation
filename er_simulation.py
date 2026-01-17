@@ -163,6 +163,23 @@ def check_patient_outcome():
 # SIDEBAR
 # --------------------------------------
 with st.sidebar:
+    st.header("⏸️ Game Control")
+
+    if st.session_state.paused:
+        if st.button("▶️ Resume", key="resume_btn"):
+            st.session_state.paused = False
+            st.session_state.last_update = time.time()
+            st.rerun()
+    else:
+        if st.button("⏸️ Pause", key="pause_btn"):
+            st.session_state.paused = True
+            st.rerun()
+
+    if st.session_state.paused:
+        st.warning("Simulation Paused")
+
+    st.divider()
+
     st.header("🏥 ER Simulation")
     st.session_state.room = st.radio(
         "Select Room",
