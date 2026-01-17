@@ -301,37 +301,37 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-            df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
-            st.line_chart(df, height=120)
+df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
+st.line_chart(df, height=120)
 
-            st.divider()
-            st.subheader("🧰 Use Supplies")
+st.divider()
+st.subheader("🧰 Use Supplies")
 
-            if st.session_state.inventory:
-                selected_item = st.selectbox(
-                    "Select supply",
-                    st.session_state.inventory,
-                    key="use_supply_dropdown"
-                )
+if st.session_state.inventory:
+    selected_item = st.selectbox(
+        "Select supply",
+        st.session_state.inventory,
+        key="use_supply_dropdown"
+    )
 
-                if st.button("Use Selected Supply"):
-                    if selected_item == "Oxygen Mask":
-                        update_vitals("improve")
-                        st.session_state.score += 5
-                        message = "🫁 Oxygen mask applied — breathing improved."
-                    else:
-                        update_vitals("worsen")
-                        st.session_state.mistakes += 1
-                        message = f"⚠️ {selected_item} used — limited clinical effect."
+    if st.button("Use Selected Supply"):
+        if selected_item == "Oxygen Mask":
+            update_vitals("improve")
+            st.session_state.score += 5
+            message = "🫁 Oxygen mask applied — breathing improved."
+        else:
+            update_vitals("worsen")
+            st.session_state.mistakes += 1
+            message = f"⚠️ {selected_item} used — limited clinical effect."
 
-                    st.session_state.inventory.remove(selected_item)
-                    st.session_state.treatment_history.append(message)
-                    st.session_state.last_update = time.time()
+        st.session_state.inventory.remove(selected_item)
+        st.session_state.treatment_history.append(message)
+        st.session_state.last_update = time.time()
 
-                    st.toast(message)
-                    st.rerun()
-            else:
-                st.info("No supplies available in inventory.")
+        st.toast(message)
+        st.rerun()
+else:
+    st.info("No supplies available in inventory.")
 
             # -------- Clinical Reasoning --------
             st.divider()
