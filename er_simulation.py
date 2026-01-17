@@ -341,7 +341,7 @@ with col2:
                             st.toast(f"💊 {med} added")
                             st.rerun()
 
-    # ================= DIAGNOSTIC LAB =================
+        # ================= DIAGNOSTIC LAB =================
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
 
@@ -354,52 +354,52 @@ with col2:
 
         p = st.session_state.get("patient")
         diagnosis = p["diagnosis"] if p else None
-    
+
         colA, colB = st.columns(2)
 
-    # ---------- IMAGING ----------
-    with colA:
-        st.subheader("📸 Imaging")
-        for test in imaging_tests:
-            if st.button(f"Run {test}", key=f"diag_img_{test}"):
-                if not p:
-                    st.warning("No active patient.")
-                    st.stop()
+        # ---------- IMAGING ----------
+        with colA:
+            st.subheader("📸 Imaging")
+            for test in imaging_tests:
+                if st.button(f"Run {test}", key=f"diag_img_{test}"):
+                    if not p:
+                        st.warning("No active patient.")
+                        st.stop()
 
-                result = diagnostic_results[diagnosis].get(
-                    test, "No significant findings."
-                )
+                    result = diagnostic_results.get(diagnosis, {}).get(
+                        test, "No significant findings."
+                    )
 
-                st.session_state.treatment_history.append(
-                    f"🧪 {test}: {result}"
-                )
+                    st.session_state.treatment_history.append(
+                        f"🧪 {test}: {result}"
+                    )
 
-                st.success(f"{test} completed")
-                st.info(f"**Result:** {result}")
-                st.session_state.score += 5
-                st.session_state.last_update = time.time()
+                    st.success(f"{test} completed")
+                    st.info(f"**Result:** {result}")
+                    st.session_state.score += 5
+                    st.session_state.last_update = time.time()
 
-    # ---------- LABS ----------
-    with colB:
-        st.subheader("🧫 Laboratory Tests")
-        for test in lab_tests:
-            if st.button(f"Run {test}", key=f"diag_lab_{test}"):
-                if not p:
-                    st.warning("No active patient.")
-                    st.stop()
+        # ---------- LABS ----------
+        with colB:
+            st.subheader("🧫 Laboratory Tests")
+            for test in lab_tests:
+                if st.button(f"Run {test}", key=f"diag_lab_{test}"):
+                    if not p:
+                        st.warning("No active patient.")
+                        st.stop()
 
-                result = diagnostic_results[diagnosis].get(
-                    test, "Results pending or normal."
-                )
+                    result = diagnostic_results.get(diagnosis, {}).get(
+                        test, "Results pending or normal."
+                    )
 
-                st.session_state.treatment_history.append(
-                    f"🧪 {test}: {result}"
-                )
+                    st.session_state.treatment_history.append(
+                        f"🧪 {test}: {result}"
+                    )
 
-                st.success(f"{test} completed")
-                st.info(f"**Result:** {result}")
-                st.session_state.score += 5
-                st.session_state.last_update = time.time()
+                    st.success(f"{test} completed")
+                    st.info(f"**Result:** {result}")
+                    st.session_state.score += 5
+                    st.session_state.last_update = time.time()
 
 # --------------------------------------
 # RIGHT COLUMN
