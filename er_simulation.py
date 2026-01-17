@@ -127,7 +127,7 @@ diagnostic_results = {
 }
 
 # --------------------------------------
-# ECG GENERATOR (NEW – ONLY ADDITION)
+# ECG GENERATOR
 # --------------------------------------
 def generate_ecg(diagnosis, hr, length=120):
     ecg = []
@@ -137,18 +137,15 @@ def generate_ecg(diagnosis, hr, length=120):
         baseline = random.uniform(-0.05, 0.05)
 
         if i % beat_interval == 0:
-            # QRS spike
             spike = random.uniform(2.5, 4.0)
 
             if diagnosis == "Heart attack":
-                spike *= random.uniform(0.6, 1.6)  # irregular height
+                spike *= random.uniform(0.6, 1.6)
                 baseline += random.uniform(-0.6, 0.6)
-
             elif diagnosis == "Pneumonia":
-                spike *= 0.9  # weaker beats
-
+                spike *= 0.9
             elif diagnosis == "Stroke":
-                spike *= 1.1  # stable beats
+                spike *= 1.1
 
             ecg.append(spike + baseline)
         else:
@@ -323,32 +320,20 @@ with col2:
                 unsafe_allow_html=True,
             )
 
-            ecg_data = generate_ecg(
-    diagnosis=p["diagnosis"],
-    hr=hr,
-    length=120
-)
+            ecg_values = generate_ecg(p["diagnosis"], hr)
+            ecg_df = pd.DataFrame({"Time": range(len(ecg_values)), "ECG": ecg_values})
 
-ecg_df = pd.DataFrame({
-    "Time": range(len(ecg_data)),
-    "ECG": ecg_data
-})
+            ecg_chart = (
+                alt.Chart(ecg_df)
+                .mark_line(color="#39FF14")
+                .encode(
+                    x=alt.X("Time", title=None),
+                    y=alt.Y("ECG", scale=alt.Scale(domain=[-1, 5]), title=None),
+                )
+                .properties(height=160)
+            )
 
-ecg_chart = (
-    alt.Chart(ecg_df)
-    .mark_line(color="#39FF14")
-    .encode(
-        x=alt.X("Time", title=None),
-        y=alt.Y(
-            "ECG",
-            scale=alt.Scale(domain=[-1, 5]),
-            title=None
-        )
-    )
-    .properties(height=160)
-)
-
-st.altair_chart(ecg_chart, use_container_width=True)
+            st.altair_chart(ecg_chart, use_container_width=True)
 
             st.divider()
             st.subheader("🧰 Use Supplies")
