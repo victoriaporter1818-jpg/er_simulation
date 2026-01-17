@@ -188,12 +188,12 @@ with col1:
     st.markdown("### ⏸️ Game Control")
 
     if st.session_state.paused:
-        if st.button("▶️ Resume"):
+        if st.button("▶️ Resume", key="resume_btn"):
             st.session_state.paused = False
             st.session_state.last_update = time.time()
             st.rerun()
     else:
-        if st.button("⏸️ Pause"):
+        if st.button("⏸️ Pause", key="pause_btn"):
             st.session_state.paused = True
             st.rerun()
 
