@@ -54,12 +54,12 @@ patients = [
         "symptoms": "severe chest pain and shortness of breath",
         "diagnosis": "Heart attack",
         "vitals": {
-    "BP": "90/60",
-    "HR": 120,
-    "O2": "85%",
-    "RR": 28,
-    "Temp": 37.0
-}
+            "BP": "90/60",
+            "HR": 120,
+            "O2": "85%",
+            "RR": 28,
+            "Temp": 37.0,
+        },
     },
     {
         "name": "Sarah Li",
@@ -67,12 +67,12 @@ patients = [
         "symptoms": "high fever, cough, and low oxygen",
         "diagnosis": "Pneumonia",
         "vitals": {
-    "BP": "110/70",
-    "HR": 95,
-    "O2": "88%",
-    "RR": 26,
-    "Temp": 39.2
-}
+            "BP": "110/70",
+            "HR": 95,
+            "O2": "88%",
+            "RR": 26,
+            "Temp": 39.2,
+        },
     },
     {
         "name": "Carlos Vega",
@@ -80,12 +80,12 @@ patients = [
         "symptoms": "sudden weakness on one side and slurred speech",
         "diagnosis": "Stroke",
         "vitals": {
-    "BP": "150/90",
-    "HR": 82,
-    "O2": "97%",
-    "RR": 18,
-    "Temp": 36.8
-}
+            "BP": "150/90",
+            "HR": 82,
+            "O2": "97%",
+            "RR": 18,
+            "Temp": 36.8,
+        },
     },
 ]
 
@@ -165,7 +165,6 @@ def update_vitals(effect):
         sys = min(140, sys + random.randint(2, 5))
         dia = min(90, dia + random.randint(1, 3))
         temp = max(36.5, temp - random.uniform(0.1, 0.3))
-
     else:
         hr = min(170, hr + random.randint(4, 8))
         o2 = max(65, o2 - random.randint(3, 6))
@@ -261,77 +260,67 @@ with col2:
             check_patient_outcome()
 
             p = st.session_state.patient
-            st.subheader(f"Status: {st.session_state.patient_status}")
             v = p["vitals"]
+            st.subheader(f"Status: {st.session_state.patient_status}")
 
-# ---------- Color helper ----------
-def vital_color(val, low, high):
-    if val < low:
-        return "#f1c40f"   # yellow
-    if val > high:
-        return "#e74c3c"   # red
-    return "#2ecc71"       # green
+            def vital_color(val, low, high):
+                if val < low:
+                    return "#f1c40f"
+                if val > high:
+                    return "#e74c3c"
+                return "#2ecc71"
 
-# Parse values
-sys, dia = map(int, v["BP"].split("/"))
-hr = v["HR"]
-o2 = int(v["O2"].replace("%", ""))
-rr = v["RR"]
-temp = v["Temp"]
+            sys, dia = map(int, v["BP"].split("/"))
+            hr = v["HR"]
+            o2 = int(v["O2"].replace("%", ""))
+            rr = v["RR"]
+            temp = v["Temp"]
 
-st.markdown(
-    f"""
-    <div style="
-        background:#000;
-        padding:16px;
-        border-radius:12px;
-        box-shadow:0 0 14px rgba(0,255,0,0.35);
-        font-family:monospace;">
-        
-        <h4 style="color:#39FF14;margin-top:0;">📺 Patient Monitor</h4>
+            st.markdown(
+                f"""
+                <div style="background:#000;padding:16px;border-radius:12px;
+                            box-shadow:0 0 14px rgba(0,255,0,0.35);font-family:monospace;">
+                    <h4 style="color:#39FF14;">📺 Patient Monitor</h4>
+                    <div style="color:{vital_color(hr,60,110)};">❤️ HR: {hr} bpm</div>
+                    <div style="color:{vital_color(o2,92,100)};">💨 SpO₂: {o2}%</div>
+                    <div style="color:{vital_color(rr,12,20)};">🫁 RR: {rr} /min</div>
+                    <div style="color:{vital_color(sys,90,140)};">🩺 BP: {sys}/{dia}</div>
+                    <div style="color:{vital_color(temp,36.0,38.0)};">🌡 Temp: {temp:.1f} °C</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-        <div style="color:{vital_color(hr,60,110)};">❤️ HR: {hr} bpm</div>
-        <div style="color:{vital_color(o2,92,100)};">💨 SpO₂: {o2}%</div>
-        <div style="color:{vital_color(rr,12,20)};">🫁 RR: {rr} /min</div>
-        <div style="color:{vital_color(sys,90,140)};">🩺 BP: {sys}/{dia} mmHg</div>
-        <div style="color:{vital_color(temp,36.0,38.0)};">🌡 Temp: {temp:.1f} °C</div>
+            df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
+            st.line_chart(df, height=120)
 
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+            st.divider()
+            st.subheader("🧰 Use Supplies")
 
-df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
-st.line_chart(df, height=120)
+            if st.session_state.inventory:
+                selected_item = st.selectbox(
+                    "Select supply",
+                    st.session_state.inventory,
+                    key="use_supply_dropdown"
+                )
 
-st.divider()
-st.subheader("🧰 Use Supplies")
+                if st.button("Use Selected Supply"):
+                    if selected_item == "Oxygen Mask":
+                        update_vitals("improve")
+                        st.session_state.score += 5
+                        message = "🫁 Oxygen mask applied — breathing improved."
+                    else:
+                        update_vitals("worsen")
+                        st.session_state.mistakes += 1
+                        message = f"⚠️ {selected_item} used — limited clinical effect."
 
-if st.session_state.inventory:
-    selected_item = st.selectbox(
-        "Select supply",
-        st.session_state.inventory,
-        key="use_supply_dropdown"
-    )
-
-    if st.button("Use Selected Supply"):
-        if selected_item == "Oxygen Mask":
-            update_vitals("improve")
-            st.session_state.score += 5
-            message = "🫁 Oxygen mask applied — breathing improved."
-        else:
-            update_vitals("worsen")
-            st.session_state.mistakes += 1
-            message = f"⚠️ {selected_item} used — limited clinical effect."
-
-        st.session_state.inventory.remove(selected_item)
-        st.session_state.treatment_history.append(message)
-        st.session_state.last_update = time.time()
-
-        st.toast(message)
-        st.rerun()
-else:
-    st.info("No supplies available in inventory.")
+                    st.session_state.inventory.remove(selected_item)
+                    st.session_state.treatment_history.append(message)
+                    st.session_state.last_update = time.time()
+                    st.toast(message)
+                    st.rerun()
+            else:
+                st.info("No supplies available in inventory.")
 
             # -------- Clinical Reasoning --------
             st.divider()
@@ -396,7 +385,6 @@ else:
                 st.session_state.case_complete = True
                 st.rerun()
 
-            # -------- End of Case Summary --------
             if st.session_state.case_complete:
                 elapsed = int(time.time() - st.session_state.case_start_time)
                 score = st.session_state.score
@@ -429,134 +417,14 @@ else:
 
                 st.stop()
 
-    # ================= SUPPLY ROOM =================
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
 
-        color_map = {
-            "Airway & Breathing": "#d0f0fd",
-            "Circulation & IV": "#d0ffd0",
-            "Diagnostics": "#fff6d0",
-            "Immobilization": "#ffe0d0",
-            "General Care": "#e0d0ff",
-        }
-
-        categorized_supplies = {
-            "Airway & Breathing": {
-                "Oxygen Mask": "Delivers oxygen.",
-                "Intubation Kit": "Airway management.",
-                "Defibrillator and Pads": "Cardiac shocks.",
-            },
-            "Circulation & IV": {
-                "IV Kit": "IV access.",
-                "Saline and Other IV Fluids": "Hydration.",
-                "Tourniquet": "Bleeding control.",
-            },
-            "Diagnostics": {
-                "Test Swabs": "Sample collection.",
-                "Glucometer": "Blood glucose.",
-                "Thermometer": "Body temperature.",
-            },
-            "Immobilization": {
-                "Cervical Collar": "Neck support.",
-                "Arm Splint": "Limb immobilization.",
-            },
-            "General Care": {
-                "Catheter Kit": "Urinary drainage.",
-                "Bed Pan": "Bedside toileting.",
-                "Sutures": "Wound closure.",
-            },
-        }
-
-        for cat, items in categorized_supplies.items():
-            st.markdown(
-                f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
-                unsafe_allow_html=True,
-            )
-            for item, desc in items.items():
-                with st.expander(item):
-                    st.write(desc)
-                    if st.button(f"Add {item}", key=f"supply_{item}"):
-                        if item not in st.session_state.inventory:
-                            st.session_state.inventory.append(item)
-                            st.session_state.treatment_history.append(
-                                f"📦 {item} collected from Supply Room."
-                            )
-                            st.rerun()
-
-    # ================= MEDSTATION =================
     elif st.session_state.room == "Medstation":
         st.header("💊 Medstation")
 
-        med_categories = {
-            "Pain Relief": ["Acetaminophen", "Morphine", "Motrin"],
-            "Antiemetics": ["Ondansetron"],
-            "Neurological": ["Phenytoin", "Midodrine"],
-            "Cardiac & Emergency": ["Epinephrine", "Hydralazine", "Heparin", "Lasix", "Naloxone"],
-            "Metabolic": ["Glucose"],
-        }
-
-        color_map = {
-            "Pain Relief": "#fde0dc",
-            "Antiemetics": "#fff5d7",
-            "Neurological": "#e3f2fd",
-            "Cardiac & Emergency": "#e8f5e9",
-            "Metabolic": "#f3e5f5",
-        }
-
-        for cat, meds in med_categories.items():
-            st.markdown(
-                f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
-                unsafe_allow_html=True,
-            )
-            for med in meds:
-                with st.expander(med):
-                    if st.button(f"Add {med}", key=f"med_{med}"):
-                        if med not in st.session_state.inventory:
-                            st.session_state.inventory.append(med)
-                            st.session_state.treatment_history.append(
-                                f"💊 {med} obtained from Medstation."
-                            )
-                            st.rerun()
-
-    # ================= DIAGNOSTIC LAB =================
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
-
-        p = st.session_state.patient
-        if not p:
-            st.info("No active patient.")
-        else:
-            colA, colB = st.columns(2)
-
-            with colA:
-                st.subheader("📸 Imaging")
-                for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
-                    if st.button(f"Run {test}", key=f"img_{test}"):
-                        result = diagnostic_results[p["diagnosis"]][test]
-                        entry = f"📸 {test}: {result}"
-                        if entry not in st.session_state.diagnostic_history:
-                            st.session_state.diagnostic_history.append(entry)
-                            st.session_state.treatment_history.append(
-                                f"🧪 {test} performed — {result}"
-                            )
-
-            with colB:
-                st.subheader("🧫 Labs")
-                for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
-                    if st.button(f"Run {test}", key=f"lab_{test}"):
-                        result = diagnostic_results[p["diagnosis"]][test]
-                        entry = f"🧫 {test}: {result}"
-                        if entry not in st.session_state.diagnostic_history:
-                            st.session_state.diagnostic_history.append(entry)
-                            st.session_state.treatment_history.append(
-                                f"🧪 {test} performed — {result}"
-                            )
-
-            st.divider()
-            st.subheader("📋 Diagnostic Results")
-            for r in st.session_state.diagnostic_history:
-                st.markdown(f"- {r}")
 
 # --------------------------------------
 # RIGHT COLUMN
