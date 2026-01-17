@@ -62,6 +62,39 @@ patients = [
     },
 ]
 
+diagnostic_results = {
+    "Heart attack": {
+        "X-Ray": "Chest X-ray shows mild pulmonary congestion.",
+        "CT Scan": "CT chest shows coronary artery calcifications.",
+        "MRI": "MRI reveals myocardial ischemia.",
+        "Ultrasound": "Echocardiogram shows reduced left ventricular function.",
+        "CBC": "CBC within normal limits.",
+        "Blood Test": "Troponin markedly elevated — myocardial infarction confirmed.",
+        "Urinalysis": "Normal urinalysis.",
+        "Biopsy": "Not indicated for acute coronary syndrome."
+    },
+    "Pneumonia": {
+        "X-Ray": "Chest X-ray shows right lower lobe infiltrates.",
+        "CT Scan": "CT chest shows consolidation consistent with pneumonia.",
+        "MRI": "MRI not typically indicated for pneumonia.",
+        "Ultrasound": "Lung ultrasound shows B-lines and consolidation.",
+        "CBC": "Elevated white blood cell count — infection likely.",
+        "Blood Test": "Inflammatory markers elevated.",
+        "Urinalysis": "Normal urinalysis.",
+        "Biopsy": "Not indicated — infection suspected."
+    },
+    "Stroke": {
+        "X-Ray": "Chest X-ray unremarkable.",
+        "CT Scan": "CT head shows acute ischemic changes.",
+        "MRI": "MRI brain confirms ischemic stroke.",
+        "Ultrasound": "Carotid ultrasound shows reduced flow.",
+        "CBC": "CBC within normal limits.",
+        "Blood Test": "Glucose mildly elevated.",
+        "Urinalysis": "Normal urinalysis.",
+        "Biopsy": "Not indicated for acute stroke."
+    }
+}
+
 # --------------------------------------
 # CORE FUNCTIONS
 # --------------------------------------
@@ -310,36 +343,63 @@ with col2:
 
     # ================= DIAGNOSTIC LAB =================
     elif st.session_state.room == "Diagnostic Lab":
-        st.header("🧪 Diagnostic Lab")
+    st.header("🧪 Diagnostic Lab")
 
-        imaging = ["X-Ray", "CT Scan", "MRI", "Ultrasound"]
-        labs = ["CBC", "Blood Test", "Urinalysis", "Biopsy"]
+    st.markdown(
+        "Run diagnostic imaging or lab tests. Results will vary based on the patient's condition."
+    )
 
-        colA, colB = st.columns(2)
+    imaging_tests = ["X-Ray", "CT Scan", "MRI", "Ultrasound"]
+    lab_tests = ["CBC", "Blood Test", "Urinalysis", "Biopsy"]
 
-        with colA:
-            st.subheader("Imaging")
-            for img in imaging:
-                if st.button(
-                    f"Run {img}",
-                    key=f"img_{img}",
-                ):
-                    st.session_state.score += 5
-                    st.toast(f"🧪 {img} completed")
-                    st.session_state.last_update = time.time()
-                    st.rerun()
+    p = st.session_state.get("patient")
+    diagnosis = p["diagnosis"] if p else None
 
-        with colB:
-            st.subheader("Labs")
-            for lab in labs:
-                if st.button(
-                    f"Run {lab}",
-                    key=f"lab_{lab}",
-                ):
-                    st.session_state.score += 5
-                    st.toast(f"🧪 {lab} completed")
-                    st.session_state.last_update = time.time()
-                    st.rerun()
+    colA, colB = st.columns(2)
+
+    # ---------- IMAGING ----------
+    with colA:
+        st.subheader("📸 Imaging")
+        for test in imaging_tests:
+            if st.button(f"Run {test}", key=f"diag_img_{test}"):
+                if not p:
+                    st.warning("No active patient.")
+                    st.stop()
+
+                result = diagnostic_results[diagnosis].get(
+                    test, "No significant findings."
+                )
+
+                st.session_state.treatment_history.append(
+                    f"🧪 {test}: {result}"
+                )
+
+                st.success(f"{test} completed")
+                st.info(f"**Result:** {result}")
+                st.session_state.score += 5
+                st.session_state.last_update = time.time()
+
+    # ---------- LABS ----------
+    with colB:
+        st.subheader("🧫 Laboratory Tests")
+        for test in lab_tests:
+            if st.button(f"Run {test}", key=f"diag_lab_{test}"):
+                if not p:
+                    st.warning("No active patient.")
+                    st.stop()
+
+                result = diagnostic_results[diagnosis].get(
+                    test, "Results pending or normal."
+                )
+
+                st.session_state.treatment_history.append(
+                    f"🧪 {test}: {result}"
+                )
+
+                st.success(f"{test} completed")
+                st.info(f"**Result:** {result}")
+                st.session_state.score += 5
+                st.session_state.last_update = time.time()
 
 # --------------------------------------
 # RIGHT COLUMN
