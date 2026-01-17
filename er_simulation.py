@@ -31,6 +31,7 @@ defaults = {
     "case_start_time": None,
     "mistakes": 0,
     "paused": False,
+    "case_complete": False,
 }
 
 for k, v in defaults.items():
@@ -114,6 +115,7 @@ def assign_patient():
     st.session_state.case_start_time = time.time()
     st.session_state.last_update = time.time()
     st.session_state.mistakes = 0
+    st.session_state.case_complete = False
 
 
 def restart_simulation():
@@ -125,9 +127,7 @@ def update_vitals(effect):
     if st.session_state.paused:
         return
 
-    p = st.session_state.patient
-    v = p["vitals"]
-
+    v = st.session_state.patient["vitals"]
     hr = int(v["HR"])
     o2 = int(v["O2"].replace("%", ""))
 
@@ -140,7 +140,6 @@ def update_vitals(effect):
 
     v["HR"] = hr
     v["O2"] = f"{o2}%"
-    p["vitals"] = v
 
 
 def gradual_deterioration():
@@ -154,10 +153,8 @@ def gradual_deterioration():
 def check_patient_outcome():
     if st.session_state.paused:
         return
-    p = st.session_state.patient
-    if not p:
-        return
 
+    p = st.session_state.patient
     hr = int(p["vitals"]["HR"])
     o2 = int(p["vitals"]["O2"].replace("%", ""))
 
@@ -168,9 +165,10 @@ def check_patient_outcome():
 
     if o2 <= 70 or hr >= 160 or hr <= 35 or st.session_state.mistakes >= 5:
         st.session_state.patient_status = "Deceased"
+        st.session_state.case_complete = True
 
 # --------------------------------------
-# SIDEBAR (PAUSE + NAV)
+# SIDEBAR
 # --------------------------------------
 with st.sidebar:
     st.header("⏸️ Game Control")
@@ -213,6 +211,7 @@ col2, col3 = st.columns([3.4, 1.3])
 # --------------------------------------
 with col2:
     if st.session_state.room == "ER":
+
         if not st.session_state.patient:
             st.header("🏥 Emergency Room")
             if st.button("🆕 Generate Patient"):
@@ -222,16 +221,36 @@ with col2:
             gradual_deterioration()
             check_patient_outcome()
 
-            st.subheader(f"Status: {st.session_state.patient_status}")
+            if st.session_state.case_complete:
+                elapsed = int(time.time() - st.session_state.case_start_time)
+                score = st.session_state.score
 
-            if st.session_state.patient_status == "Deceased":
-                st.error("💀 Patient has died")
-                if st.button("🔄 Restart Simulation"):
-                    restart_simulation()
-                    st.rerun()
+                grade = (
+                    "A" if score >= 85 else
+                    "B" if score >= 70 else
+                    "C" if score >= 55 else
+                    "D" if score >= 40 else "F"
+                )
+
+                with st.expander("🏁 End-of-Case Summary", expanded=True):
+                    st.markdown("## 💀 Patient Deceased")
+                    st.metric("Final Score", score)
+                    st.metric("Time in Care (sec)", elapsed)
+                    st.metric("Mistakes", st.session_state.mistakes)
+                    st.metric("Grade", grade)
+
+                    st.divider()
+                    st.subheader("📋 Action Log")
+                    for entry in st.session_state.treatment_history:
+                        st.markdown(f"- {entry}")
+
+                    if st.button("🔄 Start New Case"):
+                        restart_simulation()
+                        st.rerun()
                 st.stop()
 
             p = st.session_state.patient
+            st.subheader(f"Status: {st.session_state.patient_status}")
             st.write(f"❤️ HR: {p['vitals']['HR']} bpm")
             st.write(f"💨 O₂: {p['vitals']['O2']}")
 
@@ -241,151 +260,21 @@ with col2:
             if st.session_state.inventory:
                 item = st.selectbox("Use supply", st.session_state.inventory)
                 if st.button("Use Item"):
-                    correct = {
-                        "Heart attack": ["Oxygen Mask"],
-                        "Pneumonia": ["Oxygen Mask"],
-                        "Stroke": ["Oxygen Mask"],
-                    }
-                    if item in correct.get(p["diagnosis"], []):
+                    if item == "Oxygen Mask":
                         update_vitals("improve")
                         st.session_state.score += 5
                         st.session_state.treatment_history.append(
-                            f"🫁 {item} applied — patient breathing has improved."
+                            "🫁 Oxygen mask applied — breathing improved."
                         )
                     else:
                         update_vitals("worsen")
                         st.session_state.mistakes += 1
                         st.session_state.treatment_history.append(
-                            f"⚠️ {item} used — limited effect on patient condition."
+                            f"⚠️ {item} used — limited effect."
                         )
                     st.session_state.inventory.remove(item)
                     st.session_state.last_update = time.time()
                     st.rerun()
-
-    # ---------------- SUPPLY ROOM ----------------
-    elif st.session_state.room == "Supply Room":
-        st.header("🛒 Supply Room")
-        color_map = {
-            "Airway & Breathing": "#d0f0fd",
-            "Circulation & IV": "#d0ffd0",
-            "Diagnostics": "#fff6d0",
-            "Immobilization": "#ffe0d0",
-            "General Care": "#e0d0ff",
-        }
-        categorized_supplies = {
-            "Airway & Breathing": {
-                "Oxygen Mask": "Delivers oxygen.",
-                "Intubation Kit": "Airway management.",
-                "Defibrillator and Pads": "Cardiac shocks.",
-            },
-            "Circulation & IV": {
-                "IV Kit": "IV access.",
-                "Saline and Other IV Fluids": "Hydration.",
-                "Tourniquet": "Bleeding control.",
-            },
-            "Diagnostics": {
-                "Test Swabs": "Sample collection.",
-                "Glucometer": "Blood glucose.",
-                "Thermometer": "Body temperature.",
-            },
-            "Immobilization": {
-                "Cervical Collar": "Neck support.",
-                "Arm Splint": "Limb immobilization.",
-            },
-            "General Care": {
-                "Catheter Kit": "Urinary drainage.",
-                "Bed Pan": "Bedside toileting.",
-                "Sutures": "Wound closure.",
-            },
-        }
-        for cat, items in categorized_supplies.items():
-            st.markdown(
-                f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
-                unsafe_allow_html=True,
-            )
-            for item, desc in items.items():
-                with st.expander(item):
-                    st.write(desc)
-                    if st.button(f"Add {item}", key=f"supply_{item}"):
-                        if item not in st.session_state.inventory:
-                            st.session_state.inventory.append(item)
-                            st.session_state.treatment_history.append(
-                                f"📦 {item} collected from Supply Room."
-                            )
-                            st.rerun()
-
-    # ---------------- MEDSTATION ----------------
-    elif st.session_state.room == "Medstation":
-        st.header("💊 Medstation")
-        med_categories = {
-            "Pain Relief": ["Acetaminophen", "Morphine", "Motrin"],
-            "Antiemetics": ["Ondansetron"],
-            "Neurological": ["Phenytoin", "Midodrine"],
-            "Cardiac & Emergency": ["Epinephrine", "Hydralazine", "Heparin", "Lasix", "Naloxone"],
-            "Metabolic": ["Glucose"],
-        }
-        color_map = {
-            "Pain Relief": "#fde0dc",
-            "Antiemetics": "#fff5d7",
-            "Neurological": "#e3f2fd",
-            "Cardiac & Emergency": "#e8f5e9",
-            "Metabolic": "#f3e5f5",
-        }
-        for cat, meds in med_categories.items():
-            st.markdown(
-                f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
-                unsafe_allow_html=True,
-            )
-            for med in meds:
-                with st.expander(med):
-                    if st.button(f"Add {med}", key=f"med_{med}"):
-                        if med not in st.session_state.inventory:
-                            st.session_state.inventory.append(med)
-                            st.session_state.treatment_history.append(
-                                f"💊 {med} obtained from Medstation."
-                            )
-                            st.rerun()
-
-    # ---------------- DIAGNOSTIC LAB ----------------
-    elif st.session_state.room == "Diagnostic Lab":
-        st.header("🧪 Diagnostic Lab")
-        p = st.session_state.patient
-        if not p:
-            st.info("No active patient.")
-        else:
-            colA, colB = st.columns(2)
-
-            with colA:
-                st.subheader("📸 Imaging")
-                for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
-                    if st.button(f"Run {test}", key=f"img_{test}"):
-                        result = diagnostic_results[p["diagnosis"]][test]
-                        entry = f"📸 {test}: {result}"
-                        if entry not in st.session_state.diagnostic_history:
-                            st.session_state.diagnostic_history.append(entry)
-                            st.session_state.treatment_history.append(
-                                f"🧪 {test} performed — {result}"
-                            )
-
-            with colB:
-                st.subheader("🧫 Labs")
-                for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
-                    if st.button(f"Run {test}", key=f"lab_{test}"):
-                        result = diagnostic_results[p["diagnosis"]][test]
-                        entry = f"🧫 {test}: {result}"
-                        if entry not in st.session_state.diagnostic_history:
-                            st.session_state.diagnostic_history.append(entry)
-                            st.session_state.treatment_history.append(
-                                f"🧪 {test} performed — {result}"
-                            )
-
-            st.divider()
-            st.subheader("📋 Diagnostic Results")
-            if st.session_state.diagnostic_history:
-                for r in st.session_state.diagnostic_history:
-                    st.markdown(f"- {r}")
-            else:
-                st.info("No diagnostic results yet.")
 
 # --------------------------------------
 # RIGHT COLUMN
