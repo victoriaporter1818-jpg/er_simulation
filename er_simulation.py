@@ -130,27 +130,29 @@ diagnostic_results = {
 # --------------------------------------
 def generate_ecg(diagnosis, hr, length=120):
     ecg = []
-    base_rate = max(50, min(hr, 140)) / 60
+    beat_interval = max(6, int(60 / max(hr, 40)))
 
     for i in range(length):
-        t = i / 10
-        wave = math.sin(2 * math.pi * base_rate * t)
+        baseline = random.uniform(-0.05, 0.05)
 
-        if diagnosis == "Heart attack":
-            spike = 2.5 if i % int(60 / base_rate) == 0 else 0
-            noise = random.uniform(-0.5, 0.5)
-            ecg.append(wave + spike + noise)
+        if i % beat_interval == 0:
+            # QRS spike
+            spike = random.uniform(2.5, 4.0)
 
-        elif diagnosis == "Pneumonia":
-            spike = 1.5 if i % int(45 / base_rate) == 0 else 0
-            ecg.append(math.sin(t * 1.6) + spike)
+            if diagnosis == "Heart attack":
+                spike *= random.uniform(0.6, 1.6)  # irregular height
+                baseline += random.uniform(-0.6, 0.6)
 
-        elif diagnosis == "Stroke":
-            spike = 1.8 if i % int(70 / base_rate) == 0 else 0
-            ecg.append(wave + spike)
+            elif diagnosis == "Pneumonia":
+                spike *= 0.9  # weaker beats
 
+            elif diagnosis == "Stroke":
+                spike *= 1.1  # stable beats
+
+            ecg.append(spike + baseline)
         else:
-            ecg.append(wave)
+            decay = math.exp(-(i % beat_interval) / 2)
+            ecg.append(decay * random.uniform(0.1, 0.4) + baseline)
 
     return ecg
 
@@ -321,7 +323,7 @@ with col2:
             )
 
             df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
-            st.line_chart(df, height=120)
+            st.line_chart(df, height=160, y_min=-1, y_max=5)
 
             st.divider()
             st.subheader("🧰 Use Supplies")
