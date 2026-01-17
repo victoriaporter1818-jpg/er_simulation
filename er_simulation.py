@@ -238,6 +238,7 @@ with col2:
 
             if st.session_state.inventory:
                 selected_item = st.selectbox(
+                    "Select supply",
                     st.session_state.inventory,
                     key="use_supply_dropdown"
                 )
