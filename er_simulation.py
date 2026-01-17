@@ -35,6 +35,9 @@ for key, value in defaults.items():
     if key not in st.session_state:
         st.session_state[key] = value
 
+if "paused" not in st.session_state:
+    st.session_state.paused = False
+
 # --------------------------------------
 # PATIENT DATA
 # --------------------------------------
@@ -176,7 +179,26 @@ with st.sidebar:
 # --------------------------------------
 # LAYOUT
 # --------------------------------------
-_, col2, col3 = st.columns([0.3, 3.4, 1.3])
+col1, col2, col3 = st.columns([0.3, 3.4, 1.3])
+
+# --------------------------------------
+# PAUSE CONTROL (LEFT COLUMN)
+# --------------------------------------
+with col1:
+    st.markdown("### ⏸️ Game Control")
+
+    if st.session_state.paused:
+        if st.button("▶️ Resume"):
+            st.session_state.paused = False
+            st.session_state.last_update = time.time()
+            st.rerun()
+    else:
+        if st.button("⏸️ Pause"):
+            st.session_state.paused = True
+            st.rerun()
+
+    if st.session_state.paused:
+        st.warning("Simulation Paused")
 
 # --------------------------------------
 # CENTER COLUMN
