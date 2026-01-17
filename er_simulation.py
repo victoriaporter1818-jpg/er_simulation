@@ -327,14 +327,14 @@ with col2:
                             st.rerun()
 
     # ---------------- DIAGNOSTIC LAB ----------------
-elif st.session_state.room == "Diagnostic Lab":
-    st.header("🧪 Diagnostic Lab")
+    elif st.session_state.room == "Diagnostic Lab":
+        st.header("🧪 Diagnostic Lab")
 
-    p = st.session_state.patient
-    if not p:
-        st.info("No active patient.")
-    else:
-        colA, colB = st.columns(2)
+        p = st.session_state.patient
+        if not p:
+            st.info("No active patient.")
+        else:
+            colA, colB = st.columns(2)
 
         # ---------- IMAGING ----------
         with colA:
