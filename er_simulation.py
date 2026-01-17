@@ -345,21 +345,25 @@ with col2:
                     key="use_supply_dropdown"
                 )
 
-                if st.button("Use Selected Supply"):
-                    if selected_item == "Oxygen Mask":
-                        update_vitals("improve")
-                        st.session_state.score += 5
-                        message = "🫁 Oxygen mask applied — breathing improved."
-                    else:
-                        update_vitals("worsen")
-                        st.session_state.mistakes += 1
-                        message = f"⚠️ {selected_item} used — limited clinical effect."
+                if st.button("Give Medication"):
+    diagnosis = p["diagnosis"]
 
-                    st.session_state.inventory.remove(selected_item)
-                    st.session_state.treatment_history.append(message)
-                    st.session_state.last_update = time.time()
-                    st.toast(message)
-                    st.rerun()
+    effect, feedback, score_delta = apply_medication_effect(
+        selected_med, diagnosis
+    )
+
+    update_vitals(effect)
+    st.session_state.score += score_delta
+
+    st.session_state.treatment_history.append(
+        f"Gave {selected_med}. {feedback}"
+    )
+
+    st.session_state.inventory.remove(selected_med)
+    st.success(feedback)
+    st.toast(feedback, icon="💊")
+    st.session_state.last_update = time.time()
+    st.rerun()
             else:
                 st.info("No supplies available in inventory.")
 
