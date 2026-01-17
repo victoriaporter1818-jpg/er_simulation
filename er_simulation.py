@@ -38,6 +38,12 @@ for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
+if "entered_diagnosis" not in st.session_state:
+    st.session_state.entered_diagnosis = ""
+
+if "handoff_decision" not in st.session_state:
+    st.session_state.handoff_decision = None
+
 # --------------------------------------
 # PATIENT DATA
 # --------------------------------------
@@ -229,8 +235,77 @@ with col2:
                     "D" if score >= 40 else "F"
                 )
 
+                st.divider()
+st.subheader("🧠 Clinical Reasoning")
+
+# ---------- DIAGNOSIS INPUT ----------
+st.text_input(
+    "Enter Working Diagnosis",
+    key="entered_diagnosis",
+    placeholder="e.g. Pneumonia, Stroke, Heart attack"
+)
+
+if st.button("Confirm Diagnosis"):
+    correct_dx = st.session_state.patient["diagnosis"].lower()
+    entered_dx = st.session_state.entered_diagnosis.lower().strip()
+
+    if correct_dx in entered_dx or entered_dx in correct_dx:
+        st.success("✅ Correct diagnosis identified.")
+        st.session_state.score += 15
+        st.session_state.treatment_history.append(
+            f"🧠 Correct diagnosis identified: {st.session_state.patient['diagnosis']}."
+        )
+    else:
+        st.error("❌ Incorrect diagnosis.")
+        st.session_state.mistakes += 1
+        st.session_state.treatment_history.append(
+            f"❌ Incorrect diagnosis entered: '{st.session_state.entered_diagnosis}'."
+        )
+
+# ---------- HANDOFF DECISION ----------
+st.divider()
+st.subheader("📞 Patient Handoff")
+
+handoff = st.radio(
+    "Choose Handoff Destination",
+    ["Discharge", "Prep for Surgery", "Send to ICU"],
+    key="handoff_decision"
+)
+
+if st.button("Complete Handoff"):
+    correct_handoff = {
+        "Heart attack": "Send to ICU",
+        "Pneumonia": "Discharge",
+        "Stroke": "Prep for Surgery",
+    }
+
+    diagnosis = st.session_state.patient["diagnosis"]
+    expected = correct_handoff.get(diagnosis)
+
+    if handoff == expected:
+        st.success(f"✅ Appropriate handoff: {handoff}")
+        st.session_state.score += 20
+        st.session_state.treatment_history.append(
+            f"📞 Appropriate handoff — patient sent to {handoff}."
+        )
+    else:
+        st.warning(f"⚠️ Suboptimal handoff. Expected: {expected}")
+        st.session_state.mistakes += 1
+        st.session_state.treatment_history.append(
+            f"⚠️ Suboptimal handoff — sent to {handoff}, expected {expected}."
+        )
+
+    # Mark case complete (successful end)
+    st.session_state.case_complete = True
+    st.session_state.patient_status = "Stabilized"
+    st.rerun()
+        
+
                 with st.expander("🏁 End-of-Case Summary", expanded=True):
-                    st.markdown("## 💀 Patient Deceased")
+                    if st.session_state.patient_status == "Deceased":
+    st.markdown("## 💀 Patient Deceased")
+else:
+    st.markdown("## ✅ Patient Stabilized & Handed Off")
                     st.metric("Final Score", score)
                     st.metric("Time in Care (sec)", elapsed)
                     st.metric("Mistakes", st.session_state.mistakes)
