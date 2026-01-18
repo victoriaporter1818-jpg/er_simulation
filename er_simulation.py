@@ -178,8 +178,10 @@ with col2:
             st.write(f"❤️ HR: {p['vitals']['HR']} bpm")
             st.write(f"💨 O₂: {p['vitals']['O2']}")
 
+            ecg_placeholder = st.empty()
+
             df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
-            st.line_chart(df, height=120)
+            ecg_placeholder.line_chart(df, height=120)
 
             st.divider()
             st.subheader("🧰 Use Supplies")
