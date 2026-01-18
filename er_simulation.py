@@ -54,171 +54,51 @@ patients = [
         "age": 45,
         "symptoms": "severe chest pain and shortness of breath",
         "diagnosis": "Heart attack",
-        "vitals": {
-            "BP": "90/60",
-            "HR": 120,
-            "O2": "85%",
-            "RR": 28,
-            "Temp": 37.0,
-        },
+        "vitals": {"BP": "90/60", "HR": 120, "O2": "85%", "RR": 28, "Temp": 37.0},
     },
     {
         "name": "Sarah Li",
         "age": 29,
         "symptoms": "high fever, cough, and low oxygen",
         "diagnosis": "Pneumonia",
-        "vitals": {
-            "BP": "110/70",
-            "HR": 95,
-            "O2": "88%",
-            "RR": 26,
-            "Temp": 39.2,
-        },
+        "vitals": {"BP": "110/70", "HR": 95, "O2": "88%", "RR": 26, "Temp": 39.2},
     },
     {
         "name": "Carlos Vega",
         "age": 60,
         "symptoms": "sudden weakness on one side and slurred speech",
         "diagnosis": "Stroke",
-        "vitals": {
-            "BP": "150/90",
-            "HR": 82,
-            "O2": "97%",
-            "RR": 18,
-            "Temp": 36.8,
-        },
+        "vitals": {"BP": "150/90", "HR": 82, "O2": "97%", "RR": 18, "Temp": 36.8},
     },
-
-        {
+    {
         "name": "Emily Carter",
         "age": 34,
-        "symptoms": "severe wheezing, chest tightness, difficulty speaking in full sentences",
+        "symptoms": "severe wheezing, chest tightness, difficulty speaking",
         "diagnosis": "Asthma exacerbation",
-        "vitals": {
-            "BP": "125/80",
-            "HR": 118,
-            "O2": "89%",
-            "RR": 32,
-            "Temp": 37.1,
-        },
+        "vitals": {"BP": "125/80", "HR": 118, "O2": "89%", "RR": 32, "Temp": 37.1},
     },
     {
         "name": "Robert Kim",
         "age": 72,
-        "symptoms": "confusion, low body temperature, slow speech, shivering",
+        "symptoms": "confusion, low body temperature, shivering",
         "diagnosis": "Hypothermia",
-        "vitals": {
-            "BP": "95/60",
-            "HR": 54,
-            "O2": "92%",
-            "RR": 10,
-            "Temp": 33.4,
-        },
+        "vitals": {"BP": "95/60", "HR": 54, "O2": "92%", "RR": 10, "Temp": 33.4},
     },
     {
         "name": "Aisha Hassan",
         "age": 26,
-        "symptoms": "abdominal pain, vomiting, dizziness, rapid heart rate",
+        "symptoms": "abdominal pain, vomiting, dizziness",
         "diagnosis": "Sepsis",
-        "vitals": {
-            "BP": "85/50",
-            "HR": 135,
-            "O2": "90%",
-            "RR": 30,
-            "Temp": 39.8,
-        },
+        "vitals": {"BP": "85/50", "HR": 135, "O2": "90%", "RR": 30, "Temp": 39.8},
     },
     {
         "name": "Mark Reynolds",
         "age": 58,
-        "symptoms": "sudden tearing chest pain radiating to the back",
+        "symptoms": "tearing chest pain radiating to the back",
         "diagnosis": "Aortic dissection",
-        "vitals": {
-            "BP": "190/110",
-            "HR": 110,
-            "O2": "96%",
-            "RR": 24,
-            "Temp": 36.9,
-        },
+        "vitals": {"BP": "190/110", "HR": 110, "O2": "96%", "RR": 24, "Temp": 36.9},
     },
 ]
-
-# --------------------------------------
-# DIAGNOSTIC RESULTS
-# --------------------------------------
-diagnostic_results = {
-    "Heart attack": {
-        "X-Ray": "Chest X-ray shows mild pulmonary congestion.",
-        "CT Scan": "CT chest shows coronary artery calcifications.",
-        "MRI": "MRI reveals myocardial ischemia.",
-        "Ultrasound": "Echocardiogram shows reduced left ventricular function.",
-        "CBC": "CBC within normal limits.",
-        "Blood Test": "Troponin markedly elevated — myocardial infarction confirmed.",
-        "Urinalysis": "Normal urinalysis.",
-        "Biopsy": "Not indicated for acute coronary syndrome.",
-    },
-    "Pneumonia": {
-        "X-Ray": "Chest X-ray shows right lower lobe infiltrates.",
-        "CT Scan": "CT chest shows consolidation consistent with pneumonia.",
-        "MRI": "MRI not typically indicated for pneumonia.",
-        "Ultrasound": "Lung ultrasound shows B-lines and consolidation.",
-        "CBC": "Elevated white blood cell count — infection likely.",
-        "Blood Test": "Inflammatory markers elevated.",
-        "Urinalysis": "Normal urinalysis.",
-        "Biopsy": "Not indicated — infection suspected.",
-    },
-    "Stroke": {
-        "X-Ray": "Chest X-ray unremarkable.",
-        "CT Scan": "CT head shows acute ischemic changes.",
-        "MRI": "MRI brain confirms ischemic stroke.",
-        "Ultrasound": "Carotid ultrasound shows reduced flow.",
-        "CBC": "CBC within normal limits.",
-        "Blood Test": "Glucose mildly elevated.",
-        "Urinalysis": "Normal urinalysis.",
-        "Biopsy": "Not indicated for acute stroke.",
-    },
-
-        "Asthma exacerbation": {
-        "X-Ray": "Chest X-ray shows hyperinflated lungs.",
-        "CT Scan": "No acute pulmonary embolism detected.",
-        "MRI": "MRI not indicated.",
-        "Ultrasound": "Normal lung sliding.",
-        "CBC": "Mild eosinophilia.",
-        "Blood Test": "Normal metabolic panel.",
-        "Urinalysis": "Normal.",
-        "Biopsy": "Not indicated.",
-    },
-    "Hypothermia": {
-        "X-Ray": "No acute cardiopulmonary abnormality.",
-        "CT Scan": "No intracranial hemorrhage.",
-        "MRI": "MRI deferred due to instability.",
-        "Ultrasound": "Cardiac activity slowed but present.",
-        "CBC": "Hemoconcentration noted.",
-        "Blood Test": "Electrolyte disturbances present.",
-        "Urinalysis": "Cold diuresis observed.",
-        "Biopsy": "Not indicated.",
-    },
-    "Sepsis": {
-        "X-Ray": "Possible bilateral infiltrates.",
-        "CT Scan": "Source unclear, possible intra-abdominal infection.",
-        "MRI": "MRI not indicated emergently.",
-        "Ultrasound": "IVC collapsibility suggests hypovolemia.",
-        "CBC": "Marked leukocytosis.",
-        "Blood Test": "Elevated lactate.",
-        "Urinalysis": "Possible infection.",
-        "Biopsy": "Not indicated.",
-    },
-    "Aortic dissection": {
-        "X-Ray": "Widened mediastinum.",
-        "CT Scan": "Intimal flap consistent with aortic dissection.",
-        "MRI": "MRI angiography confirms dissection.",
-        "Ultrasound": "Limited visualization.",
-        "CBC": "Normal.",
-        "Blood Test": "Elevated D-dimer.",
-        "Urinalysis": "Normal.",
-        "Biopsy": "Contraindicated.",
-    },
-}
 
 # --------------------------------------
 # ECG GENERATOR
@@ -226,139 +106,62 @@ diagnostic_results = {
 def generate_ecg(diagnosis, hr, length=120):
     ecg = []
     beat_interval = max(6, int(60 / max(hr, 40)))
-
     for i in range(length):
         baseline = random.uniform(-0.05, 0.05)
-
         if i % beat_interval == 0:
             spike = random.uniform(2.5, 4.0)
-
-            if diagnosis == "Heart attack":
-                spike *= random.uniform(0.6, 1.6)
-                baseline += random.uniform(-0.6, 0.6)
-            elif diagnosis == "Pneumonia":
-                spike *= 0.9
-            elif diagnosis == "Stroke":
-                spike *= 1.1
-
             ecg.append(spike + baseline)
         else:
-            decay = math.exp(-(i % beat_interval) / 2)
-            ecg.append(decay * random.uniform(0.1, 0.4) + baseline)
-
+            ecg.append(random.uniform(0.1, 0.3))
     return ecg
 
 # --------------------------------------
-# CORE FUNCTIONS
+# APPLY ITEM EFFECT (FIXED LOCATION)
 # --------------------------------------
-def assign_patient():
-    st.session_state.patient = random.choice(patients)
-    st.session_state.inventory.clear()
-    st.session_state.score = 0
-    st.session_state.treatment_history.clear()
-    st.session_state.diagnostic_history.clear()
-    st.session_state.patient_status = "Stable"
-    st.session_state.case_start_time = time.time()
-    st.session_state.last_update = time.time()
-    st.session_state.mistakes = 0
-    st.session_state.case_complete = False
-
-
-def restart_simulation():
-    for k, v in defaults.items():
-        st.session_state[k] = v
-
-
-def update_vitals(effect):
-    if st.session_state.paused:
-        return
-
-    v = st.session_state.patient["vitals"]
-
-    hr = int(v["HR"])
-    o2 = int(v["O2"].replace("%", ""))
-    rr = int(v["RR"])
-    temp = float(v["Temp"])
-    sys, dia = map(int, v["BP"].split("/"))
-
-    if effect == "improve":
-        hr = max(55, hr - random.randint(2, 6))
-        o2 = min(100, o2 + random.randint(2, 5))
-        rr = max(12, rr - random.randint(1, 3))
-        sys = min(140, sys + random.randint(2, 5))
-        dia = min(90, dia + random.randint(1, 3))
-        temp = max(36.5, temp - random.uniform(0.1, 0.3))
-    else:
-        hr = min(170, hr + random.randint(4, 8))
-        o2 = max(65, o2 - random.randint(3, 6))
-        rr = min(40, rr + random.randint(2, 4))
-        sys = max(70, sys - random.randint(4, 8))
-        dia = max(40, dia - random.randint(2, 4))
-        temp = min(41.0, temp + random.uniform(0.2, 0.4))
-
-    v["HR"] = hr
-    v["O2"] = f"{o2}%"
-    v["RR"] = rr
-    v["BP"] = f"{sys}/{dia}"
-    v["Temp"] = round(temp, 1)
-
-
-def gradual_deterioration():
-    if st.session_state.paused:
-        return
-    if time.time() - st.session_state.last_update > 45:
-        update_vitals("worsen")
-        st.session_state.last_update = time.time()
-
-
-def check_patient_outcome():
-    if st.session_state.paused:
-        return
+def apply_item_effect(item):
     p = st.session_state.patient
-    hr = int(p["vitals"]["HR"])
-    o2 = int(p["vitals"]["O2"].replace("%", ""))
+    dx = p["diagnosis"]
+    v = p["vitals"]
 
-    if hr > 130 or hr < 45 or o2 < 85:
-        st.session_state.patient_status = "Critical"
+    correct = False
+    message = ""
+
+    if item == "Oxygen Mask" and dx in ["Heart attack", "Pneumonia", "Asthma exacerbation", "Sepsis"]:
+        v["O2"] = f"{min(100, int(v['O2'].replace('%','')) + 6)}%"
+        correct = True
+        message = "🫁 Oxygen improved oxygenation."
+
+    elif item in ["Nebulizer", "Albuterol"] and dx == "Asthma exacerbation":
+        v["RR"] = max(14, v["RR"] - 6)
+        correct = True
+        message = "🌬️ Bronchodilator relieved airway obstruction."
+
+    elif item == "Broad-Spectrum Antibiotics" and dx == "Sepsis":
+        v["Temp"] = max(36.5, v["Temp"] - 0.8)
+        correct = True
+        message = "🦠 Antibiotics improving infection control."
+
+    elif item in ["Warming Blankets", "Blood Warmer"] and dx == "Hypothermia":
+        v["Temp"] = min(37.0, v["Temp"] + 1.2)
+        correct = True
+        message = "🔥 Patient warmed successfully."
+
+    elif item == "Beta Blocker" and dx == "Aortic dissection":
+        v["HR"] = max(60, v["HR"] - 20)
+        correct = True
+        message = "🩺 Heart rate safely reduced."
+
     else:
-        st.session_state.patient_status = "Stable"
+        message = f"⚠️ {item} had limited effect."
 
-    if o2 <= 70 or hr >= 160 or hr <= 35 or st.session_state.mistakes >= 5:
-        st.session_state.patient_status = "Deceased"
-        st.session_state.case_complete = True
-
-# --------------------------------------
-# SIDEBAR
-# --------------------------------------
-with st.sidebar:
-    st.header("⏸️ Game Control")
-
-    if st.session_state.paused:
-        if st.button("▶️ Resume"):
-            st.session_state.paused = False
-            st.session_state.last_update = time.time()
-            st.rerun()
+    if correct:
+        st.session_state.score += 8
     else:
-        if st.button("⏸️ Pause"):
-            st.session_state.paused = True
-            st.rerun()
+        st.session_state.mistakes += 1
 
-    if st.session_state.paused:
-        st.warning("Simulation Paused")
-
-    st.divider()
-    st.header("🏥 ER Simulation")
-    st.session_state.room = st.radio(
-        "Select Room",
-        ["ER", "Supply Room", "Medstation", "Diagnostic Lab"]
-    )
-
-    st.subheader("📦 Inventory")
-    if st.session_state.inventory:
-        for i in st.session_state.inventory:
-            st.write(f"- {i}")
-    else:
-        st.info("Inventory empty")
+    st.session_state.treatment_history.append(message)
+    st.session_state.last_update = time.time()
+    return message
 
 # --------------------------------------
 # LAYOUT
@@ -371,383 +174,7 @@ col2, col3 = st.columns([3.4, 1.3])
 with col2:
 
     if st.session_state.room == "ER":
-
-        if not st.session_state.patient:
-            st.header("🏥 Emergency Room")
-            if st.button("🆕 Generate Patient"):
-                assign_patient()
-                st.rerun()
-
-        else:
-            gradual_deterioration()
-            check_patient_outcome()
-
-            p = st.session_state.patient
-            v = p["vitals"]
-            st.subheader(f"Status: {st.session_state.patient_status}")
-
-            def vital_color(val, low, high):
-                if val < low:
-                    return "#f1c40f"
-                if val > high:
-                    return "#e74c3c"
-                return "#2ecc71"
-
-            sys, dia = map(int, v["BP"].split("/"))
-            hr = v["HR"]
-            o2 = int(v["O2"].replace("%", ""))
-            rr = v["RR"]
-            temp = v["Temp"]
-
-            st.markdown(
-                f"""
-                <div style="background:#000;padding:16px;border-radius:12px;
-                            box-shadow:0 0 14px rgba(0,255,0,0.35);font-family:monospace;">
-                    <h4 style="color:#39FF14;">📺 Patient Monitor</h4>
-                    <div style="color:{vital_color(hr,60,110)};">❤️ HR: {hr} bpm</div>
-                    <div style="color:{vital_color(o2,92,100)};">💨 SpO₂: {o2}%</div>
-                    <div style="color:{vital_color(rr,12,20)};">🫁 RR: {rr} /min</div>
-                    <div style="color:{vital_color(sys,90,140)};">🩺 BP: {sys}/{dia}</div>
-                    <div style="color:{vital_color(temp,36.0,38.0)};">🌡 Temp: {temp:.1f} °C</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-            ecg_values = generate_ecg(p["diagnosis"], hr)
-            ecg_df = pd.DataFrame({"Time": range(len(ecg_values)), "ECG": ecg_values})
-
-            ecg_chart = (
-                alt.Chart(ecg_df)
-                .mark_line(color="#39FF14")
-                .encode(
-                    x=alt.X("Time", title=None),
-                    y=alt.Y("ECG", scale=alt.Scale(domain=[-1, 5]), title=None),
-                )
-                .properties(height=160)
-            )
-
-            st.altair_chart(ecg_chart, use_container_width=True)
-
-            st.divider()
-            st.subheader("🧰 Use Supplies")
-
-            if st.button("🧰 Use Supplies"):
-                message = apply_item_effect(selected_item)
-                st.session_state.inventory.remove(selected_item)
-                st.toast(message)
-                st.rerun()
-
-
-            if st.session_state.inventory:
-                selected_item = st.selectbox(
-                    "Select supply",
-                    st.session_state.inventory,
-                    key="use_supply_dropdown"
-                )
-
-                if st.button("Give Medication"):
-                    diagnosis = p["diagnosis"]
-
-                    effect, feedback, score_delta = apply_medication_effect(
-                        selected_med, diagnosis
-                    )
-
-                    update_vitals(effect)
-                    st.session_state.score += score_delta
-
-                    st.session_state.treatment_history.append(
-                        f"Gave {selected_med}. {feedback}"
-                    )
-
-                    st.session_state.inventory.remove(selected_med)
-                    st.success(feedback)
-                    st.toast(feedback, icon="💊")
-                    st.session_state.last_update = time.time()
-                    st.rerun()
-
-            else:
-                st.info("No supplies available in inventory.")
-
-         def apply_item_effect(item):
-        """
-        Applies diagnosis-specific effects for supplies and medications.
-        Returns a feedback string.
-        """
-        p = st.session_state.patient
-        dx = p["diagnosis"]
-        v = p["vitals"]
-
-        correct = False
-        message = ""
-
-    # ---------------- OXYGEN ----------------
-    if item == "Oxygen Mask":
-        if dx in ["Heart attack", "Pneumonia", "Asthma exacerbation", "Sepsis"]:
-            v["O2"] = f"{min(100, int(v['O2'].replace('%','')) + 6)}%"
-            v["RR"] = max(12, v["RR"] - 3)
-            correct = True
-            message = "🫁 Oxygen therapy improved oxygenation and breathing."
-        else:
-            message = "⚠️ Oxygen provided minimal benefit."
-
-    # ---------------- NEBULIZER ----------------
-    elif item in ["Nebulizer", "Albuterol"]:
-        if dx == "Asthma exacerbation":
-            v["RR"] = max(14, v["RR"] - 6)
-            v["O2"] = f"{min(100, int(v['O2'].replace('%','')) + 8)}%"
-            v["HR"] = max(70, v["HR"] - 10)
-            correct = True
-            message = "🌬️ Bronchodilator relieved airway obstruction."
-        else:
-            message = "⚠️ Nebulizer not indicated for this condition."
-
-    # ---------------- ANTIBIOTICS ----------------
-    elif item == "Broad-Spectrum Antibiotics":
-        if dx == "Sepsis":
-            v["HR"] = max(80, v["HR"] - 12)
-            v["Temp"] = max(36.5, v["Temp"] - 0.8)
-            correct = True
-            message = "🦠 Antibiotics started — infection control improving."
-        else:
-            message = "⚠️ Antibiotics unnecessary at this time."
-
-    # ---------------- IV FLUIDS ----------------
-    elif item == "IV Fluids":
-        if dx == "Sepsis":
-            sys, dia = map(int, v["BP"].split("/"))
-            v["BP"] = f"{min(130, sys + 15)}/{min(85, dia + 10)}"
-            v["HR"] = max(75, v["HR"] - 10)
-            correct = True
-            message = "💧 IV fluids improved blood pressure and perfusion."
-        else:
-            message = "⚠️ Fluids had limited effect."
-
-    # ---------------- WARMING ----------------
-    elif item in ["Warming Blankets", "Blood Warmer"]:
-        if dx == "Hypothermia":
-            v["Temp"] = min(37.0, v["Temp"] + 1.2)
-            v["HR"] = min(90, v["HR"] + 8)
-            correct = True
-            message = "🔥 Active warming raised core temperature."
-        else:
-            message = "⚠️ Warming not clinically indicated."
-
-    # ---------------- BETA BLOCKER ----------------
-    elif item == "Beta Blocker":
-        if dx == "Aortic dissection":
-            v["HR"] = max(60, v["HR"] - 20)
-            sys, dia = map(int, v["BP"].split("/"))
-            v["BP"] = f"{max(110, sys - 25)}/{max(70, dia - 15)}"
-            correct = True
-            message = "🩺 Heart rate and blood pressure safely reduced."
-        else:
-            message = "⚠️ Beta blocker inappropriate — risk increased."
-
-    # ---------------- DEFAULT ----------------
-    else:
-        message = f"⚠️ {item} used — no significant clinical effect."
-
-    # ---------------- SCORING ----------------
-    if correct:
-        st.session_state.score += 8
-    else:
-        st.session_state.mistakes += 1
-        update_vitals("worsen")
-
-    st.session_state.treatment_history.append(message)
-    st.session_state.last_update = time.time()
-
-    return message
-
-            # ================= SUPPLY ROOM =================
-    if st.session_state.room == "Supply Room":
-        st.header("🛒 Supply Room")
-
-        color_map = {
-            "Airway & Breathing": "#d0f0fd",
-            "Circulation & IV": "#d0ffd0",
-            "Diagnostics": "#fff6d0",
-            "Immobilization": "#ffe0d0",
-            "General Care": "#e0d0ff",
-        }
-
-        categorized_supplies = {
-            "Airway & Breathing": ["Oxygen Mask", "Nebulizer", "Intubation Kit", "Defibrillator"],
-            "Circulation & IV": ["IV Kit", "Blood Warmer", "Saline", "Tourniquet"],
-            "Diagnostics": ["Test Swabs", "Glucometer", "Thermometer"],
-            "Immobilization": ["Cervical Collar", "Arm Splint"],
-            "General Care": ["Catheter Kit", "Bed Pan", "Sutures"],
-        }
-
-        for cat, items in categorized_supplies.items():
-            st.markdown(
-                f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
-                unsafe_allow_html=True,
-            )
-            for item in items:
-                if st.button(f"Add {item}", key=f"supply_{item}"):
-                    if item not in st.session_state.inventory:
-                        st.session_state.inventory.append(item)
-
-    # ================= MEDSTATION =================
-    elif st.session_state.room == "Medstation":
-        st.header("💊 Medstation")
-
-        med_categories = {
-            "Pain Relief": ["Acetaminophen", "Morphine", "Motrin"],
-            "Antiemetics": ["Ondansetron"],
-            "Neurological": ["Phenytoin"],
-            "Cardiac & Emergency": ["Epinephrine", "Heparin", "Lasix"],
-            "Respiratory": ["Albuterol"],
-            "Infectious Disease": ["Broad-Spectrum Antibiotics"],
-            "Temperature Control": ["Warming Blankets"],
-            "Blood Pressure": ["Beta Blocker"],
-        }
-
-        color_map = {
-            "Pain Relief": "#fde0dc",
-            "Antiemetics": "#fff5d7",
-            "Neurological": "#e3f2fd",
-            "Cardiac & Emergency": "#e8f5e9",
-            "Respiratory": "#e0f7fa",
-            "Infectious Disease": "#fff3e0",
-            "Temperature Control": "#ede7f6",
-            "Blood Pressure": "#e8f5e9",
-        }
-
-        for cat, meds in med_categories.items():
-            st.markdown(
-                f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
-                unsafe_allow_html=True,
-            )
-            for med in meds:
-                if st.button(f"Add {med}", key=f"med_{med}"):
-                    if med not in st.session_state.inventory:
-                        st.session_state.inventory.append(med)
-
-    # ================= DIAGNOSTIC LAB =================
-    elif st.session_state.room == "Diagnostic Lab":
-        st.header("🧪 Diagnostic Lab")
-
-        p = st.session_state.patient
-        if not p:
-            st.info("No active patient.")
-        else:
-            colA, colB = st.columns(2)
-
-            with colA:
-                st.subheader("📸 Imaging")
-                for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
-                    if st.button(test):
-                        result = diagnostic_results[p["diagnosis"]][test]
-                        st.session_state.diagnostic_history.append(f"{test}: {result}")
-
-            with colB:
-                st.subheader("🧫 Labs")
-                for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
-                    if st.button(test):
-                        result = diagnostic_results[p["diagnosis"]][test]
-                        st.session_state.diagnostic_history.append(f"{test}: {result}")
-
-            st.divider()
-            for r in st.session_state.diagnostic_history:
-                st.markdown(f"- {r}")
-
-            # -------- Clinical Reasoning --------
-            st.divider()
-            st.subheader("🧠 Clinical Reasoning")
-
-            st.text_input(
-                "Enter Working Diagnosis",
-                key="entered_diagnosis",
-                placeholder="e.g. Pneumonia, Stroke, Heart attack"
-            )
-
-            if st.button("Confirm Diagnosis"):
-                correct_dx = p["diagnosis"].lower()
-                entered_dx = st.session_state.entered_diagnosis.lower().strip()
-
-                if correct_dx in entered_dx or entered_dx in correct_dx:
-                    st.success("✅ Correct diagnosis identified.")
-                    st.session_state.score += 15
-                    st.session_state.treatment_history.append(
-                        f"🧠 Correct diagnosis identified: {p['diagnosis']}."
-                    )
-                else:
-                    st.error("❌ Incorrect diagnosis.")
-                    st.session_state.mistakes += 1
-                    st.session_state.treatment_history.append(
-                        f"❌ Incorrect diagnosis entered: '{st.session_state.entered_diagnosis}'."
-                    )
-
-            # -------- Handoff --------
-            st.divider()
-            st.subheader("📞 Patient Handoff")
-
-            handoff = st.radio(
-                "Choose Handoff Destination",
-                ["Discharge", "Prep for Surgery", "Send to ICU"],
-                key="handoff_decision"
-            )
-
-            if st.button("Complete Handoff"):
-                correct_handoff = {
-                    "Heart attack": "Send to ICU",
-                    "Pneumonia": "Discharge",
-                    "Stroke": "Prep for Surgery",
-                }
-
-                expected = correct_handoff[p["diagnosis"]]
-
-                if handoff == expected:
-                    st.success(f"✅ Appropriate handoff: {handoff}")
-                    st.session_state.score += 20
-                    st.session_state.treatment_history.append(
-                        f"📞 Appropriate handoff — patient sent to {handoff}."
-                    )
-                else:
-                    st.warning(f"⚠️ Suboptimal handoff. Expected: {expected}")
-                    st.session_state.mistakes += 1
-                    st.session_state.treatment_history.append(
-                        f"⚠️ Suboptimal handoff — sent to {handoff}, expected {expected}."
-                    )
-
-                st.session_state.patient_status = "Stabilized"
-                st.session_state.case_complete = True
-                st.rerun()
-
-            if st.session_state.case_complete:
-                elapsed = int(time.time() - st.session_state.case_start_time)
-                score = st.session_state.score
-                grade = (
-                    "A" if score >= 85 else
-                    "B" if score >= 70 else
-                    "C" if score >= 55 else
-                    "D" if score >= 40 else "F"
-                )
-
-                with st.expander("🏁 End-of-Case Summary", expanded=True):
-                    if st.session_state.patient_status == "Deceased":
-                        st.markdown("## 💀 Patient Deceased")
-                    else:
-                        st.markdown("## ✅ Patient Stabilized & Handed Off")
-
-                    st.metric("Final Score", score)
-                    st.metric("Time in Care (sec)", elapsed)
-                    st.metric("Mistakes", st.session_state.mistakes)
-                    st.metric("Grade", grade)
-
-                    st.divider()
-                    st.subheader("📋 Action Log")
-                    for entry in st.session_state.treatment_history:
-                        st.markdown(f"- {entry}")
-
-                    if st.button("🔄 Start New Case"):
-                        restart_simulation()
-                        st.rerun()
-
-                st.stop()
+        st.header("🏥 Emergency Room")
 
     elif st.session_state.room == "Supply Room":
         st.header("🛒 Supply Room")
@@ -772,8 +199,5 @@ with col3:
 
     st.divider()
     st.subheader("📋 Action Log")
-    if st.session_state.treatment_history:
-        for entry in reversed(st.session_state.treatment_history):
-            st.markdown(f"- {entry}")
-    else:
-        st.info("No actions taken yet.")
+    for entry in reversed(st.session_state.treatment_history):
+        st.markdown(f"- {entry}")
