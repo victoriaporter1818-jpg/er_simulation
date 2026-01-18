@@ -469,17 +469,17 @@ with col2:
             else:
                 st.info("No supplies available in inventory.")
 
-    def apply_item_effect(item):
-        """
-        Applies diagnosis-specific effects for supplies and medications.
-        Returns a feedback string.
-        """
-        p = st.session_state.patient
-        dx = p["diagnosis"]
-        v = p["vitals"]
+def apply_item_effect(item):
+    """
+    Applies diagnosis-specific effects for supplies and medications.
+    Returns a feedback string.
+    """
+    p = st.session_state.patient
+    dx = p["diagnosis"]
+    v = p["vitals"]
 
-        correct = False
-        message = ""
+    correct = False
+    message = ""
 
     # ---------------- OXYGEN ----------------
     if item == "Oxygen Mask":
@@ -492,7 +492,7 @@ with col2:
             message = "⚠️ Oxygen provided minimal benefit."
 
     # ---------------- NEBULIZER ----------------
-    elif item == "Nebulizer" or item == "Albuterol":
+    elif item in ["Nebulizer", "Albuterol"]:
         if dx == "Asthma exacerbation":
             v["RR"] = max(14, v["RR"] - 6)
             v["O2"] = f"{min(100, int(v['O2'].replace('%','')) + 8)}%"
@@ -514,7 +514,7 @@ with col2:
 
     # ---------------- IV FLUIDS ----------------
     elif item == "IV Fluids":
-        if dx in ["Sepsis", "Hypotension"]:
+        if dx == "Sepsis":
             sys, dia = map(int, v["BP"].split("/"))
             v["BP"] = f"{min(130, sys + 15)}/{min(85, dia + 10)}"
             v["HR"] = max(75, v["HR"] - 10)
@@ -524,7 +524,7 @@ with col2:
             message = "⚠️ Fluids had limited effect."
 
     # ---------------- WARMING ----------------
-    elif item == "Warming Blankets" or item == "Blood Warmer":
+    elif item in ["Warming Blankets", "Blood Warmer"]:
         if dx == "Hypothermia":
             v["Temp"] = min(37.0, v["Temp"] + 1.2)
             v["HR"] = min(90, v["HR"] + 8)
