@@ -176,15 +176,6 @@ with col2:
     if st.session_state.room == "ER":
         st.header("🏥 Emergency Room")
 
-    elif st.session_state.room == "Supply Room":
-        st.header("🛒 Supply Room")
-
-    elif st.session_state.room == "Medstation":
-        st.header("💊 Medstation")
-
-    elif st.session_state.room == "Diagnostic Lab":
-        st.header("🧪 Diagnostic Lab")
-
 # --------------------------------------
 # RIGHT COLUMN
 # --------------------------------------
