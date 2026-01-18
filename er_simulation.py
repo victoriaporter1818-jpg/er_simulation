@@ -275,7 +275,7 @@ with col2:
                     st.session_state.inventory.append(item)
 
     elif st.session_state.room == "Medstation":
-    st.header("💊 Medstation")
+        st.header("💊 Medstation")
 
     med_categories = {
         "Pain Relief": ["Acetaminophen", "Morphine", "Motrin"],
@@ -306,7 +306,7 @@ with col2:
                     st.session_state.inventory.append(med)
 
     elif st.session_state.room == "Diagnostic Lab":
-    st.header("🧪 Diagnostic Lab")
+        st.header("🧪 Diagnostic Lab")
 
     p = st.session_state.patient
     if not p:
