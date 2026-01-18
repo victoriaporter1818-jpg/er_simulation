@@ -245,90 +245,90 @@ with col2:
                     restart_simulation()
                     st.rerun()
 
- elif st.session_state.room == "Supply Room":
-          st.header("🛒 Supply Room")
+       elif st.session_state.room == "Supply Room":
+            st.header("🛒 Supply Room")
 
-        color_map = {
-            "Airway & Breathing": "#d0f0fd",
-            "Circulation & IV": "#d0ffd0",
-            "Diagnostics": "#fff6d0",
-            "Immobilization": "#ffe0d0",
-            "General Care": "#e0d0ff",
-        }
+            color_map = {
+                "Airway & Breathing": "#d0f0fd",
+                "Circulation & IV": "#d0ffd0",
+                "Diagnostics": "#fff6d0",
+                "Immobilization": "#ffe0d0",
+                "General Care": "#e0d0ff",
+            }
 
-        categorized_supplies = {
-            "Airway & Breathing": ["Oxygen Mask", "Nebulizer", "Intubation Kit", "Defibrillator"],
-            "Circulation & IV": ["IV Kit", "Saline", "Tourniquet"],
-            "Diagnostics": ["Test Swabs", "Glucometer", "Thermometer"],
-            "Immobilization": ["Cervical Collar", "Arm Splint"],
-            "General Care": ["Catheter Kit", "Bed Pan", "Sutures"],
-        }
+            categorized_supplies = {
+                "Airway & Breathing": ["Oxygen Mask", "Nebulizer", "Intubation Kit", "Defibrillator"],
+                "Circulation & IV": ["IV Kit", "Saline", "Tourniquet"],
+                "Diagnostics": ["Test Swabs", "Glucometer", "Thermometer"],
+                "Immobilization": ["Cervical Collar", "Arm Splint"],
+                "General Care": ["Catheter Kit", "Bed Pan", "Sutures"],
+            }
 
-        for cat, items in categorized_supplies.items():
-            st.markdown(
-                f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
-                unsafe_allow_html=True,
-            )
-            for item in items:
-                if st.button(f"Add {item}", key=f"supply_{item}"):
-                    if item not in st.session_state.inventory:
-                        st.session_state.inventory.append(item)
+            for cat, items in categorized_supplies.items():
+                st.markdown(
+                    f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
+                    unsafe_allow_html=True,
+                )
+                for item in items:
+                    if st.button(f"Add {item}", key=f"supply_{item}"):
+                        if item not in st.session_state.inventory:
+                            st.session_state.inventory.append(item)
 
-    elif st.session_state.room == "Medstation":
-        st.header("💊 Medstation")
+        elif st.session_state.room == "Medstation":
+            st.header("💊 Medstation")
 
-        med_categories = {
-            "Pain Relief": ["Acetaminophen", "Morphine", "Motrin"],
-            "Antiemetics": ["Ondansetron"],
-            "Neurological": ["Phenytoin"],
-            "Cardiac & Emergency": ["Epinephrine", "Heparin", "Lasix"],
-            "Respiratory": ["Albuterol"],
-            "Infectious Disease": ["Broad-Spectrum Antibiotics"],
-        }
+            med_categories = {
+                "Pain Relief": ["Acetaminophen", "Morphine", "Motrin"],
+                "Antiemetics": ["Ondansetron"],
+                "Neurological": ["Phenytoin"],
+                "Cardiac & Emergency": ["Epinephrine", "Heparin", "Lasix"],
+                "Respiratory": ["Albuterol"],
+                "Infectious Disease": ["Broad-Spectrum Antibiotics"],
+            }
 
-        color_map = {
-            "Pain Relief": "#fde0dc",
-            "Antiemetics": "#fff5d7",
-            "Neurological": "#e3f2fd",
-            "Cardiac & Emergency": "#e8f5e9",
-            "Respiratory": "#e0f7fa",
-            "Infectious Disease": "#fff3e0",
-        }
+            color_map = {
+                "Pain Relief": "#fde0dc",
+                "Antiemetics": "#fff5d7",
+                "Neurological": "#e3f2fd",
+                "Cardiac & Emergency": "#e8f5e9",
+                "Respiratory": "#e0f7fa",
+                "Infectious Disease": "#fff3e0",
+            }
 
-        for cat, meds in med_categories.items():
-            st.markdown(
-                f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
-                unsafe_allow_html=True,
-            )
-            for med in meds:
-                if st.button(f"Add {med}", key=f"med_{med}"):
-                    if med not in st.session_state.inventory:
-                        st.session_state.inventory.append(med)
+            for cat, meds in med_categories.items():
+                st.markdown(
+                    f"<h4 style='background:{color_map[cat]};padding:6px;border-radius:6px'>{cat}</h4>",
+                    unsafe_allow_html=True,
+                )
+                for med in meds:
+                    if st.button(f"Add {med}", key=f"med_{med}"):
+                        if med not in st.session_state.inventory:
+                            st.session_state.inventory.append(med)
 
-    elif st.session_state.room == "Diagnostic Lab":
-        st.header("🧪 Diagnostic Lab")
+        elif st.session_state.room == "Diagnostic Lab":
+            st.header("🧪 Diagnostic Lab")
 
-        p = st.session_state.patient
-        if not p:
-            st.info("No active patient.")
-        else:
-            colA, colB = st.columns(2)
+            p = st.session_state.patient
+            if not p:
+                  st.info("No active patient.")
+                else:
+                colA, colB = st.columns(2)
+    
+                with colA:
+                    st.subheader("📸 Imaging")
+                    for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
+                        if st.button(test):
+                            st.session_state.diagnostic_history.append(test)
 
-            with colA:
-                st.subheader("📸 Imaging")
-                for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
-                    if st.button(test):
-                        st.session_state.diagnostic_history.append(test)
-
-            with colB:
-                st.subheader("🧫 Labs")
-                for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
-                    if st.button(test):
-                        st.session_state.diagnostic_history.append(test)
-
-            st.divider()
-            for r in st.session_state.diagnostic_history:
-                st.markdown(f"- {r}")
+                with colB:
+                    st.subheader("🧫 Labs")
+                    for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
+                        if st.button(test):
+                            st.session_state.diagnostic_history.append(test)
+    
+                st.divider()
+                for r in st.session_state.diagnostic_history:
+                    st.markdown(f"- {r}")
 
 # --------------------------------------
 # RIGHT COLUMN
