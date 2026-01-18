@@ -245,7 +245,7 @@ with col2:
                     restart_simulation()
                     st.rerun()
 
-     elif st.session_state.room == "Supply Room":
+ elif st.session_state.room == "Supply Room":
           st.header("🛒 Supply Room")
 
         color_map = {
