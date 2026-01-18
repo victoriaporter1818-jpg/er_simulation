@@ -246,7 +246,7 @@ with col2:
                     st.rerun()
 
     elif st.session_state.room == "Supply Room":
-    st.header("🛒 Supply Room")
+        st.header("🛒 Supply Room")
 
     color_map = {
         "Airway & Breathing": "#d0f0fd",
