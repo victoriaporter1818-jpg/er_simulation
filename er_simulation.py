@@ -161,92 +161,92 @@ col2, col3 = st.columns([3.4, 1.3])
 # --------------------------------------
 with col2:
 
-    if st.session_state.room == "ER":
+if st.session_state.room == "ER":
 
-        if not st.session_state.patient:
-            st.header("🏥 Emergency Room")
-            if st.button("🆕 Generate Patient"):
-                assign_patient()
-                st.rerun()
+    if not st.session_state.patient:
+        st.header("🏥 Emergency Room")
+        if st.button("🆕 Generate Patient"):
+            assign_patient()
+            st.rerun()
 
-        else:
-            gradual_deterioration()
-            check_patient_outcome()
+    else:
+        gradual_deterioration()
+        check_patient_outcome()
 
-            p = st.session_state.patient
-            st.subheader(f"Status: {st.session_state.patient_status}")
-            st.write(f"❤️ HR: {p['vitals']['HR']} bpm")
-            st.write(f"💨 O₂: {p['vitals']['O2']}")
+        p = st.session_state.patient
+        st.subheader(f"Status: {st.session_state.patient_status}")
+        st.write(f"❤️ HR: {p['vitals']['HR']} bpm")
+        st.write(f"💨 O₂: {p['vitals']['O2']}")
 
-            df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
-            st.line_chart(df, height=120)
+        df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
+        st.line_chart(df, height=120)
 
-            st.divider()
-            st.subheader("🧰 Use Supplies")
+        st.divider()
+        st.subheader("🧰 Use Supplies")
 
-            if st.session_state.inventory:
-                selected_item = st.selectbox(
-                    "Select supply",
-                    st.session_state.inventory,
-                    key="use_supply_dropdown"
-                )
-
-                if st.button("Use Selected Supply"):
-                    if selected_item == "Oxygen Mask":
-                        update_vitals("improve")
-                        st.session_state.score += 5
-                        message = "🫁 Oxygen mask applied — breathing improved."
-                    else:
-                        update_vitals("worsen")
-                        st.session_state.mistakes += 1
-                        message = f"⚠️ {selected_item} used — limited effect."
-
-                    st.session_state.inventory.remove(selected_item)
-                    st.session_state.treatment_history.append(message)
-                    st.session_state.last_update = time.time()
-                    st.toast(message)
-                    st.rerun()
-            else:
-                st.info("No supplies available.")
-
-            st.divider()
-            st.subheader("🧠 Clinical Reasoning")
-
-            st.text_input(
-                "Enter Working Diagnosis",
-                key="entered_diagnosis",
+        if st.session_state.inventory:
+            selected_item = st.selectbox(
+                "Select supply",
+                st.session_state.inventory,
+                key="use_supply_dropdown"
             )
 
-            if st.button("Confirm Diagnosis"):
-                if p["diagnosis"].lower() in st.session_state.entered_diagnosis.lower():
-                    st.success("Correct diagnosis.")
-                    st.session_state.score += 15
+            if st.button("Use Selected Supply"):
+                if selected_item == "Oxygen Mask":
+                    update_vitals("improve")
+                    st.session_state.score += 5
+                    message = "🫁 Oxygen mask applied — breathing improved."
                 else:
-                    st.error("Incorrect diagnosis.")
+                    update_vitals("worsen")
                     st.session_state.mistakes += 1
+                    message = f"⚠️ {selected_item} used — limited effect."
 
-            st.divider()
-            st.subheader("📞 Patient Handoff")
+                st.session_state.inventory.remove(selected_item)
+                st.session_state.treatment_history.append(message)
+                st.session_state.last_update = time.time()
+                st.toast(message)
+                st.rerun()
+        else:
+            st.info("No supplies available.")
 
-            handoff = st.radio(
-                "Choose Handoff Destination",
-                ["Discharge", "Prep for Surgery", "Send to ICU"],
-                key="handoff_decision"
-            )
+        st.divider()
+        st.subheader("🧠 Clinical Reasoning")
 
-            if st.button("Complete Handoff"):
-                st.session_state.case_complete = True
+        st.text_input(
+            "Enter Working Diagnosis",
+            key="entered_diagnosis",
+        )
+
+        if st.button("Confirm Diagnosis"):
+            if p["diagnosis"].lower() in st.session_state.entered_diagnosis.lower():
+                st.success("Correct diagnosis.")
+                st.session_state.score += 15
+            else:
+                st.error("Incorrect diagnosis.")
+                st.session_state.mistakes += 1
+
+        st.divider()
+        st.subheader("📞 Patient Handoff")
+
+        handoff = st.radio(
+            "Choose Handoff Destination",
+            ["Discharge", "Prep for Surgery", "Send to ICU"],
+            key="handoff_decision"
+        )
+
+        if st.button("Complete Handoff"):
+            st.session_state.case_complete = True
+            st.rerun()
+
+        if st.session_state.case_complete:
+            st.subheader("🏁 End of Case")
+            st.metric("Score", st.session_state.score)
+            if st.button("🔄 Restart"):
+                restart_simulation()
                 st.rerun()
 
-            if st.session_state.case_complete:
-                st.subheader("🏁 End of Case")
-                st.metric("Score", st.session_state.score)
-                if st.button("🔄 Restart"):
-                    restart_simulation()
-                    st.rerun()
-
-    elif st.session_state.room == "Supply Room":
-        st.header("🛒 Supply Room")
+elif st.session_state.room == "Supply Room":
+    st.header("🛒 Supply Room")
 
     color_map = {
         "Airway & Breathing": "#d0f0fd",
@@ -274,8 +274,8 @@ with col2:
                 if item not in st.session_state.inventory:
                     st.session_state.inventory.append(item)
 
-    elif st.session_state.room == "Medstation":
-        st.header("💊 Medstation")
+elif st.session_state.room == "Medstation":
+    st.header("💊 Medstation")
 
     med_categories = {
         "Pain Relief": ["Acetaminophen", "Morphine", "Motrin"],
@@ -305,30 +305,30 @@ with col2:
                 if med not in st.session_state.inventory:
                     st.session_state.inventory.append(med)
 
-    elif st.session_state.room == "Diagnostic Lab":
-        st.header("🧪 Diagnostic Lab")
+elif st.session_state.room == "Diagnostic Lab":
+    st.header("🧪 Diagnostic Lab")
 
-        p = st.session_state.patient
-        if not p:
-            st.info("No active patient.")
-        else:
-            colA, colB = st.columns(2)
+    p = st.session_state.patient
+    if not p:
+        st.info("No active patient.")
+    else:
+        colA, colB = st.columns(2)
 
-            with colA:
-                st.subheader("📸 Imaging")
-                for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
-                    if st.button(test):
-                        st.session_state.diagnostic_history.append(test)
+        with colA:
+            st.subheader("📸 Imaging")
+            for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
+                if st.button(test):
+                    st.session_state.diagnostic_history.append(test)
 
-            with colB:
-                st.subheader("🧫 Labs")
-                for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
-                    if st.button(test):
-                        st.session_state.diagnostic_history.append(test)
+        with colB:
+            st.subheader("🧫 Labs")
+            for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
+                if st.button(test):
+                    st.session_state.diagnostic_history.append(test)
 
-            st.divider()
-            for r in st.session_state.diagnostic_history:
-                st.markdown(f"- {r}")
+        st.divider()
+        for r in st.session_state.diagnostic_history:
+            st.markdown(f"- {r}")
 
 # --------------------------------------
 # RIGHT COLUMN
