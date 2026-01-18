@@ -308,27 +308,27 @@ with col2:
     elif st.session_state.room == "Diagnostic Lab":
         st.header("🧪 Diagnostic Lab")
 
-    p = st.session_state.patient
-    if not p:
-        st.info("No active patient.")
-    else:
-        colA, colB = st.columns(2)
+        p = st.session_state.patient
+        if not p:
+            st.info("No active patient.")
+        else:
+            colA, colB = st.columns(2)
 
-        with colA:
-            st.subheader("📸 Imaging")
-            for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
-                if st.button(test):
-                    st.session_state.diagnostic_history.append(test)
+            with colA:
+                st.subheader("📸 Imaging")
+                for test in ["X-Ray", "CT Scan", "MRI", "Ultrasound"]:
+                    if st.button(test):
+                        st.session_state.diagnostic_history.append(test)
 
-        with colB:
-            st.subheader("🧫 Labs")
-            for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
-                if st.button(test):
-                    st.session_state.diagnostic_history.append(test)
+            with colB:
+                st.subheader("🧫 Labs")
+                for test in ["CBC", "Blood Test", "Urinalysis", "Biopsy"]:
+                    if st.button(test):
+                        st.session_state.diagnostic_history.append(test)
 
-        st.divider()
-        for r in st.session_state.diagnostic_history:
-            st.markdown(f"- {r}")
+            st.divider()
+            for r in st.session_state.diagnostic_history:
+                st.markdown(f"- {r}")
 
 # --------------------------------------
 # RIGHT COLUMN
