@@ -469,17 +469,17 @@ with col2:
             else:
                 st.info("No supplies available in inventory.")
 
-            def apply_item_effect(item):
-    """
-    Applies diagnosis-specific effects for supplies and medications.
-    Returns a feedback string.
-    """
-    p = st.session_state.patient
-    dx = p["diagnosis"]
-    v = p["vitals"]
+         def apply_item_effect(item):
+            """
+            Applies diagnosis-specific effects for supplies and medications.
+            Returns a feedback string.
+            """
+            p = st.session_state.patient
+            dx = p["diagnosis"]
+            v = p["vitals"]
 
-    correct = False
-    message = ""
+            correct = False
+            message = ""
 
     # ---------------- OXYGEN ----------------
     if item == "Oxygen Mask":
