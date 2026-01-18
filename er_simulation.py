@@ -469,7 +469,7 @@ with col2:
             else:
                 st.info("No supplies available in inventory.")
 
-def apply_item_effect(item):
+            def apply_item_effect(item):
     """
     Applies diagnosis-specific effects for supplies and medications.
     Returns a feedback string.
