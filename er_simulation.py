@@ -173,15 +173,56 @@ with col2:
             gradual_deterioration()
             check_patient_outcome()
 
-            p = st.session_state.patient
             st.subheader(f"Status: {st.session_state.patient_status}")
-            st.write(f"❤️ HR: {p['vitals']['HR']} bpm")
-            st.write(f"💨 O₂: {p['vitals']['O2']}")
 
-            ecg_placeholder = st.empty()
+v = p["vitals"]
 
-            df = pd.DataFrame({"ECG": [math.sin(i / 5) for i in range(50)]})
-            ecg_placeholder.line_chart(df, height=120)
+def vital_color(val, low, high):
+    if val < low:
+        return "#f1c40f"
+    if val > high:
+        return "#e74c3c"
+    return "#2ecc71"
+
+sys, dia = map(int, v["BP"].split("/"))
+hr = int(v["HR"])
+o2 = int(v["O2"].replace("%", ""))
+rr = int(v["RR"])
+temp = float(v["Temp"])
+
+# ================= PATIENT MONITOR =================
+st.markdown(
+    f"""
+    <div style="background:#000;padding:16px;border-radius:12px;
+                box-shadow:0 0 14px rgba(0,255,0,0.35);font-family:monospace;">
+        <h4 style="color:#39FF14;">📺 Patient Monitor</h4>
+        <div style="color:{vital_color(hr,60,110)};">❤️ HR: {hr} bpm</div>
+        <div style="color:{vital_color(o2,92,100)};">💨 SpO₂: {o2}%</div>
+        <div style="color:{vital_color(rr,12,20)};">🫁 RR: {rr} /min</div>
+        <div style="color:{vital_color(sys,90,140)};">🩺 BP: {sys}/{dia}</div>
+        <div style="color:{vital_color(temp,36.0,38.0)};">🌡 Temp: {temp:.1f} °C</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ================= PATIENT-SPECIFIC ECG =================
+ecg_placeholder = st.empty()
+
+ecg_values = generate_ecg(p["diagnosis"], hr)
+ecg_df = pd.DataFrame({"Time": range(len(ecg_values)), "ECG": ecg_values})
+
+ecg_chart = (
+    alt.Chart(ecg_df)
+    .mark_line(color="#39FF14")
+    .encode(
+        x=alt.X("Time", title=None),
+        y=alt.Y("ECG", scale=alt.Scale(domain=[-1, 5]), title=None),
+    )
+    .properties(height=160)
+)
+
+ecg_placeholder.altair_chart(ecg_chart, use_container_width=True)
 
             st.divider()
             st.subheader("🧰 Use Supplies")
